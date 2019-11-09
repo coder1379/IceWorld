@@ -1,0 +1,468 @@
+/*
+UploadiFive
+Copyright (c) 2012 Reactive Apps, Ronnie Garcia
+*/
+
+/*.uploadifive-button {
+	background-color: #505050;
+	background-image: linear-gradient(bottom, #505050 0%, #707070 100%);
+	background-image: -o-linear-gradient(bottom, #505050 0%, #707070 100%);
+	background-image: -moz-linear-gradient(bottom, #505050 0%, #707070 100%);
+	background-image: -webkit-linear-gradient(bottom, #505050 0%, #707070 100%);
+	background-image: -ms-linear-gradient(bottom, #505050 0%, #707070 100%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, #505050),
+		color-stop(1, #707070)
+	);
+	background-position: center top;
+	background-repeat: no-repeat;
+	-webkit-border-radius: 30px;
+	-moz-border-radius: 30px;
+	border-radius: 30px;
+	border: 2px solid #808080;
+	color: #FFF;
+	font: bold 12px Arial, Helvetica, sans-serif;
+	text-align: center;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+	text-transform: uppercase;
+	width: 100%;
+}
+.uploadifive-button:hover {
+	background-color: #606060;
+	background-image: linear-gradient(top, #606060 0%, #808080 100%);
+	background-image: -o-linear-gradient(top, #606060 0%, #808080 100%);
+	background-image: -moz-linear-gradient(top, #606060 0%, #808080 100%);
+	background-image: -webkit-linear-gradient(top, #606060 0%, #808080 100%);
+	background-image: -ms-linear-gradient(top, #606060 0%, #808080 100%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, #606060),
+		color-stop(1, #808080)
+	);
+	background-position: center bottom;
+}*/
+.uploadifive-queue-item {
+	background-color: #F5F5F5;
+	border-bottom: 1px dotted #D5D5D5;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	font: 12px Arial, Helvetica, Sans-serif;
+	margin-top: 3px;
+	padding: 15px;
+}
+.uploadifive-queue-item .close {
+	background: url('uploadifive-cancel.png') 0 0 no-repeat;
+	display: block;
+	float: right;
+	height: 16px;
+	text-indent: -9999px;
+	width: 16px;
+}
+.uploadifive-queue-item .progress {
+	border: 1px solid #D0D0D0;
+	height: 3px;
+	margin-top: 5px;
+	width: 100%;
+}
+.uploadifive-queue-item .progress-bar {
+	background-color: #0072BC;
+	height: 3px;
+	width: 0;
+}
+
+/*2016-3-30*/
+.upload5_message_button{
+    background: #fff;
+
+
+}
+
+.upload5_message_button .upl5_message{
+
+}
+
+.upload5_message_button .uploadbtn_5{
+	border: 1px solid #cacaca;
+    background: #e6e6e6;
+    width: 80px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    margin-top: 10px;
+    color: #333;
+}
+
+.upload5_load_demo{
+	 background: #fff;
+ 
+}
+
+.upload5_load_demo .upl5_load{
+	
+    width: 50%;
+    float: left;
+    display: inline;
+	text-align:left;
+   
+}
+
+.upload5_load_demo .upl5_demoimage{
+	width: 50%;
+    float: left;
+    display: inline;
+	text-align:left;
+}
+
+.upload5_load_demo .upl5_load img{
+	width: 140px;
+    height: 160px;
+	margin-top:10px;
+}
+
+.upload5_load_demo .upl5_demoimage img{
+	width: 140px;
+    height: 160px;
+	margin-top:10px;
+}
+
+
+
+/*2016-3-30*/
+
+
+/*upload5_message_button3*/
+.upload5_message_button3{
+	display:inline-block;
+	width:31%;
+	margin-left:1%;
+	margin-right:1%;
+	position:relative;
+	float: left;
+}
+
+.upload5_message_button3 .uploadbtn_53{
+	position:absolute;
+	top:25%;
+	left:32%;
+	/*border: 1px solid #ffffff;
+    background: #ffffff;*/
+    width: 40px;
+    text-align: center;
+    margin-top: 10px;
+    color: #333;
+	height: 40px; 
+	line-height: 30px; 
+	overflow: hidden; 
+    border-radius: 5px;
+}
+
+.upload5_message_button3 .upl5_load3{
+	text-align:center;
+	
+	width:100%;
+	height:120px;
+}
+
+.upload5_message_button3 .upl5_demoimage3{
+	text-align:center;
+	width:100%;
+	height:120px;
+}
+
+.upload5_message_button3 .upd5_oderImg3{
+	width:100%;
+	height:100%;
+}
+
+.upload5_message_button3 .upl5_message3{
+	text-align:center;
+	margin-top:5px;
+	
+}
+
+.upload5_message_button3 .clearuploadimg{
+	display:inline-block;
+	position:absolute;
+	top:5px;
+	right:5px;
+	width:20px;
+	height:20px;
+	background-image:url('ch.png');
+	background-size:100%;
+}
+
+.upload5_message_button3 .uploadBtnImg{
+	display:inline-block;
+	width:30px;
+	height:30px;
+	background-image:url('uploadimg.png');
+	background-size:100%;
+}
+
+.upload5_message_button3 .filename{display:none;}
+.upload5_message_button3 .uploadifive-queue-item{
+margin-top:0px;margin-bottom:0px;padding-top:0px;padding-bottom:5px;}
+
+/*upload5_message_button3*/
+
+
+/*upload5_message_button7 PC 样式 2图*/
+.upload5_message_button7{
+	display:inline-block;
+	width:47%;
+	margin-left:1%;
+	margin-right:1%;
+	position:relative;
+	margin-top:20px;
+}
+
+.upload5_message_button7 .uploadbtn_57{
+	position:absolute;
+	top:30%;
+	left:40%;
+	/*border: 1px solid #ffffff;
+    background: #ffffff;*/
+    width: 80px;
+    text-align: center;
+    margin-top: 10px;
+    color: #333;
+	height: 80px; 
+	line-height: 80px; 
+	overflow: hidden; 
+}
+
+.upload5_message_button7 .upl5_load7{
+	text-align:center;
+	
+	width:100%;
+	height:350px;
+}
+
+.upload5_message_button7 .upl5_demoimage7{
+	text-align:center;
+	width:100%;
+	height:350px;
+}
+
+.upload5_message_button7 .upd5_oderImg7{
+	width:100%;
+	height:100%;
+}
+
+.upload5_message_button7 .upl5_message7{
+	text-align:center;
+	margin-top:5px;
+	
+}
+
+.upload5_message_button7 .clearuploadimg{
+	display:inline-block;
+	position:absolute;
+	top:5px;
+	right:5px;
+	width:36px;
+	height:36px;
+	background-image:url('upload57cha.png');
+	background-size:100%;
+}
+
+.upload5_message_button7 .uploadBtnImg{
+	display:inline-block;
+	width:80px;
+	height:80px;
+	background-image:url('upload57.png');
+	background-size:100%;
+}
+
+.upload5_message_button7 .filename{display:none;}
+.upload5_message_button7 .uploadifive-queue-item{
+margin-top:0px;margin-bottom:0px;padding-top:0px;padding-bottom:5px;}
+
+.uploadbtn_57 input{
+	height:80px;
+}
+/*upload5_message_button7 PC 样式 2图*/
+
+
+/*upload5_message_button97 mobile 7 2图*/
+.upload5_message_button97{
+	display:inline-block;
+	width:47%;
+	margin-left:1%;
+	margin-right:1%;
+	position:relative;
+	margin-top:20px;
+}
+
+.upload5_message_button97 .uploadbtn_597{
+	position:absolute;
+	top:30%;
+	left:36%;
+	/*border: 1px solid #ffffff;
+    background: #ffffff;*/
+    width: 60px;
+    text-align: center;
+    margin-top: 10px;
+    color: #333;
+	height: 60px; 
+	line-height: 60px; 
+	overflow: hidden; 
+}
+
+.upload5_message_button97 .upl5_load97{
+	text-align:center;
+	
+	width:100%;
+	height:220px;
+}
+
+.upload5_message_button97 .upl5_demoimage97{
+	text-align:center;
+	width:100%;
+	height:220px;
+}
+
+.upload5_message_button97 .upd5_oderImg97{
+	width:100%;
+	height:100%;
+}
+
+.upload5_message_button97 .upl5_message97{
+	text-align:center;
+	margin-top:5px;
+	
+}
+
+.upload5_message_button97 .clearuploadimg{
+	display:inline-block;
+	position:absolute;
+	top:5px;
+	right:5px;
+	width:36px;
+	height:36px;
+	background-image:url('upload57cha.png');
+	background-size:100%;
+}
+
+.upload5_message_button97 .uploadBtnImg{
+	display:inline-block;
+	width:60px;
+	height:60px;
+	background-image:url('upload57.png');
+	background-size:100%;
+}
+
+.upload5_message_button97 .filename{display:none;}
+.upload5_message_button97 .uploadifive-queue-item{
+margin-top:0px;margin-bottom:0px;padding-top:0px;padding-bottom:5px;}
+
+.uploadbtn_597 input{
+	height:60px;
+}
+/*upload5_message_button97  mobile 7  2图*/
+
+
+
+/*upload5_message_button17 mobile 1 1图*/
+.upload5_message_button17{
+	display:inline-block;
+	width:97%;
+	margin-left:1%;
+	margin-right:1%;
+	position:relative;
+	
+}
+
+.upload5_message_button17 .uploadbtn_517{
+	position:absolute;
+	top:30%;
+	left:36%;
+	/*border: 1px solid #ffffff;
+    background: #ffffff;*/
+    width: 60px;
+    text-align: center;
+    margin-top: 10px;
+    color: #333;
+	height: 60px; 
+	line-height: 60px; 
+	overflow: hidden; 
+}
+
+.upload5_message_button17 .upl5_load17{
+	text-align:center;
+	
+	width:100%;
+	height:220px;
+}
+
+.upload5_message_button17 .upl5_demoimage17{
+	text-align:center;
+	width:100%;
+	height:220px;
+}
+
+.upload5_message_button17 .upd5_oderImg17{
+	width:100%;
+	height:100%;
+}
+
+.upload5_message_button17 .upl5_message17{
+	text-align:center;
+	margin-top:5px;
+	
+}
+
+.upload5_message_button17 .clearuploadimg{
+	display:inline-block;
+	position:absolute;
+	top:5px;
+	right:5px;
+	width:36px;
+	height:36px;
+	background-image:url('upload57cha.png');
+	background-size:100%;
+}
+
+.upload5_message_button17 .uploadBtnImg{
+	display:inline-block;
+	width:60px;
+	height:60px;
+	background-image:url('upload57.png');
+	background-size:100%;
+}
+
+.upload5_message_button17 .filename{display:none;}
+.upload5_message_button17 .uploadifive-queue-item{
+margin-top:0px;margin-bottom:0px;padding-top:0px;padding-bottom:5px;}
+
+.uploadbtn_597 input{
+	height:60px;
+}
+/*upload5_message_button97  mobile 7  2图*/
+
+
+
+/*新的上传2019-03-05*/
+
+.form-group-upload .upload-image-pre{
+	position: relative;
+
+}
+
+
+.form-group-upload .clearuploadimg{
+	display:inline-block;
+	position:absolute;
+	top:5px;
+	right:5px;
+	width:20px;
+	height:20px;
+	background-image:url('ch.png');
+	background-size:100%;
+}

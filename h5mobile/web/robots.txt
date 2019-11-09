@@ -1,0 +1,7 @@
+User-agent: *
+Disallow:/index/
+Disallow:/index.php
+Disallow:/index/index.html
+Disallow:/index/createorder.html
+Disallow:/index/myorder.html
+Disallow:/index/refundorder847237275274.html
