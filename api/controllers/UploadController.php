@@ -27,20 +27,18 @@ class UploadController extends Controller
             return Json::encode($common->getJsonArray([], 410, '参数错误'));
         }
         $uploadLogic = new UploadLogic('uploadimg');
-        $result = $uploadLogic->upload($_FILES['Filedata'], 'oss');
+        $result = $uploadLogic->upload($_FILES['Filedata'], Yii::$app->params['uploadMode']);
         return Json::encode($result);
     }
 
 
     public function actionMiniProgramUploadImage()
     {
-
         if (!isset($_FILES['FileData'])) {
             Json::echoJson([], 410, '参数错误');
         }
-        $common = new BaseCommon();
         $uploadLogic = new UploadLogic('upload-image');
-        $result = $uploadLogic->upload($_FILES['FileData'], 'oss');
+        $result = $uploadLogic->upload($_FILES['FileData'], Yii::$app->params['uploadMode']);
         return Json::encode($result);
     }
 }

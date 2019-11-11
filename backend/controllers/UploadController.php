@@ -64,16 +64,16 @@ class UploadController extends AuthController
 
             /* 列出图片 */
             case 'listimage':
-                $result = include("action_list.php");
+                //$result = include("action_list.php");
                 break;
             /* 列出文件 */
             case 'listfile':
-                $result = include("action_list.php");
+                //$result = include("action_list.php");
                 break;
 
             /* 抓取远程文件 */
             case 'catchimage':
-                $result = include("action_crawler.php");
+                //$result = include("action_crawler.php");
                 break;
 
             default:
@@ -105,8 +105,9 @@ class UploadController extends AuthController
         if (!isset($_FILES['Filedata'])) {
             return Json::encode($common->getJsonArray([], 411, '参数错误'));
         }
+
         $upload = new UploadLogic(Yii::$app->params['oss']['bucket'],'audio');
-        $result = $upload->upload($_FILES['Filedata'], 'oss');
+        $result = $upload->upload($_FILES['Filedata'],Yii::$app->params['uploadMode']);
         return Json::encode($result);
     }
 
@@ -116,9 +117,9 @@ class UploadController extends AuthController
         if (!isset($_FILES['Filedata'])) {
             return Json::encode($common->getJsonArray([], 410, '参数错误'));
         }
+
         $upload = new UploadLogic(Yii::$app->params['oss']['bucket'],'image');
-        //$result = $upload->upload($_FILES['Filedata'], 'local');
-        $result = $upload->upload($_FILES['Filedata'], 'oss');
+        $result = $upload->upload($_FILES['Filedata'],Yii::$app->params['uploadMode']);
         return Json::encode($result);
     }
 
@@ -129,7 +130,7 @@ class UploadController extends AuthController
             return Json::encode($common->getJsonArray([], 410, '参数错误'));
         }
         $uploadLogic = new UploadLogic(Yii::$app->params['oss']['bucket']);
-        $result = $uploadLogic->upload($_FILES['Filedata'], 'local');
+        $result = $uploadLogic->upload($_FILES['Filedata'], Yii::$app->params['uploadMode']);
         //返回特定的格式
         $newArr = [
             'errno' => $result['code']

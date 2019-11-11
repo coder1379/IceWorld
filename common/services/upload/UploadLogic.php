@@ -1,7 +1,7 @@
 <?php
 namespace common\services\upload;
 
-use common\BaseCommon;
+use common\Base;
 use common\lib\UploadOSS;
 use Yii;
 
@@ -11,8 +11,6 @@ use Yii;
  */
 class UploadLogic
 {
-
-    protected $common = null;
     //阿里云oss配置
     protected $ossConfig;
 
@@ -44,7 +42,6 @@ class UploadLogic
      */
     public function __construct($ossBucket,$fileType='image')
     {
-        $this->common = new BaseCommon();
         //设置oss配置
         $this->ossConfig = Yii::$app->params['oss'];
         $this->ossConfig['bucket'] = $ossBucket;
@@ -61,14 +58,13 @@ class UploadLogic
      */
     public function upload($file, $storageServer = 'oss')
     {
-
         //获取缓存文件信息
         $this->tempFile = $file['tmp_name'];
         $this->tempFileParts = pathinfo($file['name']);
         $this->tempFileExt = strtolower($this->tempFileParts['extension']);
         //对上传的文件类型进行判断
         if (!$this->_hasFileExt($this->tempFileExt)) {
-            return $this->common->getJsonArray([], 411, '不支持该类型的文件');
+            return Base::getJsonArray([], 411, '不支持该类型的文件');
         }
         switch ($storageServer) {
             //本地化存储
@@ -85,7 +81,7 @@ class UploadLogic
                 $result = $this->_ossUpload();
                 break;
             default:
-                $result = $this->common->getJsonArray([], 412, '错误的存储方式:' . $storageServer);
+                $result = Base::getJsonArray([], 412, '错误的存储方式:' . $storageServer);
         }
         return $result;
     }
@@ -107,7 +103,7 @@ class UploadLogic
                 $result = $this->_ossDelete($file);
                 break;
             default:
-                $result = $this->common->getJsonArray([], 411, '错误的存储方式');
+                $result = Base::getJsonArray([], 411, '错误的存储方式');
         }
         return $result;
     }
@@ -119,17 +115,17 @@ class UploadLogic
     private function _localUpload()
     {
         //获取绝对路径
-        $absolutePath = Yii::getAlias('@webroot') . $this->filePath;
+        $absolutePath = Base::getUploadRootPath() . $this->filePath;
         $mkdirPath = dirname($absolutePath);
         //创建文件夹
-        if (!file_exists($mkdirPath) && !mkdir($mkdirPath, 0777, true)) {
-            return $this->common->getJsonArray([], 414, '没有足够的上传权限');
+        if (!file_exists($mkdirPath) && !mkdir($mkdirPath, 0644, true)) {
+            return Base::getJsonArray([], 414, '没有足够的上传权限');
         }
         if (!move_uploaded_file($this->tempFile, $absolutePath)) {
-            return $this->common->getJsonArray([], 415, '上传文件失败');
+            return Base::getJsonArray([], 415, '上传文件失败');
         }
-        $url = Yii::$app->request->hostInfo . $this->filePath;
-        return $this->common->getJsonArray(['url' => $url]);
+        $url = Yii::$app->params['local_static_link'] . $this->filePath;
+        return Base::getJsonArray(['url' => $url]);
     }
 
     /**
@@ -139,16 +135,16 @@ class UploadLogic
      */
     private function _ossUpload()
     {
-        $imageBaseUrl = Yii::$app->params['images_base_link'];
+        $imageBaseUrl = Yii::$app->params['oss_base_link'];
         $oss = new UploadOSS($this->ossConfig, $imageBaseUrl);
         $ossName = $oss->getOssName('.' . $this->tempFileExt);
         $result = $oss->upload($ossName, $this->tempFile);
         unlink($this->tempFile);
         if (!$result) {
-            return $this->common->getJsonArray([], 416, '文件上传失败');
+            return Base::getJsonArray([], 416, '文件上传失败');
         }
         $url = $oss->getOssUrl($ossName);
-        return $this->common->getJsonArray(['url' => $url]);
+        return Base::getJsonArray(['url' => $url]);
     }
 
     /**
@@ -160,7 +156,7 @@ class UploadLogic
     public function localToOss($file)
     {
         if (!file_exists($file)) {
-            return $this->common->getJsonArray([], 417, '没有找到要上传的文件');
+            return Base::getJsonArray([], 417, '没有找到要上传的文件');
         }
         $this->tempFile = $file;
         $this->tempFileParts = pathinfo($file);
@@ -178,9 +174,9 @@ class UploadLogic
     {
         $oss = new UploadOSS();
         if ($oss->delete($file)) {
-            return $this->common->getJsonArray([]);
+            return Base::getJsonArray([]);
         }
-        return $this->common->getJsonArray([], 411, '删除文件失败');
+        return Base::getJsonArray([], 411, '删除文件失败');
     }
 
     /**
@@ -191,13 +187,17 @@ class UploadLogic
     public function setUploadPath($dir = null)
     {
         if (empty($dir)) {
-            $filePath = '/upload/' . $this->fileType . '/' . date('Ymd');
-            $filePath .= '/' . time() . mt_rand(10000, 90000);
-            $this->filePath = $filePath;
+            $this->filePath = $this->getUploadPath('upload');
         } else {
             $this->filePath = $dir;
         }
         return true;
+    }
+
+    public function getUploadPath($dirName = 'upload'){
+        $filePath = '/'.$dirName.'/' . date('Ymd');
+        $filePath .= '/' . md5(time() .'_'. mt_rand(1000000, 9000000).Base::getMd5Key());
+        return $filePath;
     }
 
     /**

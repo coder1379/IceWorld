@@ -1,6 +1,8 @@
 <?php
 namespace common\lib\upload;
 
+use common\Base;
+use common\services\upload\UploadLogic;
 use Yii;
 use common\lib\UploadOSS;
 class Uploader
@@ -103,7 +105,7 @@ class Uploader
         }
 
         //创建目录失败
-        if (!file_exists($dirname) && !mkdir($dirname, 0777, true)) {
+        if (!file_exists($dirname) && !mkdir($dirname, 0644, true)) {
             $this->stateInfo = $this->getStateInfo("ERROR_CREATE_DIR");
             return;
         } else if (!is_writeable($dirname)) {
@@ -117,21 +119,24 @@ class Uploader
 
             $this->stateInfo = $this->getStateInfo("ERROR_FILE_MOVE");
         } else { //移动成功
-            $this->stateInfo = $this->stateMap[0];
-            $uploadOss = new UploadOSS();
-            $filePath = $this->filePath;
-            $ossName = $uploadOss->getOssName($this->fileType);
-            $res=$uploadOss->upload($ossName,$this->filePath);
-            unlink($this->filePath);
-            if($res){
-                $ossPath= $uploadOss->getOssUrl($ossName);
-                $this->fullName= $ossPath;
+            if(Yii::$app->params['uploadMode']=='local'){
+                $this->fullName = Yii::$app->params['local_static_link'] . $this->fullName;
                 $this->stateInfo = $this->stateMap[0];
-            }else{
-                $this->stateInfo = $this->stateMap['ERROR_UNKNOWN'];
+            }else if(Yii::$app->params['uploadMode']=='oss'){
+                $this->stateInfo = $this->stateMap[0];
+                $uploadOss = new UploadOSS();
+                $filePath = $this->filePath;
+                $ossName = $uploadOss->getOssName($this->fileType);
+                $res=$uploadOss->upload($ossName,$this->filePath);
+                unlink($this->filePath);
+                if($res){
+                    $ossPath= $uploadOss->getOssUrl($ossName);
+                    $this->fullName= $ossPath;
+                    $this->stateInfo = $this->stateMap[0];
+                }else{
+                    $this->stateInfo = $this->stateMap['ERROR_UNKNOWN'];
+                }
             }
-
-           
         }
         return $this;
     }
@@ -160,7 +165,7 @@ class Uploader
         }
 
         //创建目录失败
-        if (!file_exists($dirname) && !mkdir($dirname, 0777, true)) {
+        if (!file_exists($dirname) && !mkdir($dirname, 0644, true)) {
             $this->stateInfo = $this->getStateInfo("ERROR_CREATE_DIR");
             return;
         } else if (!is_writeable($dirname)) {
@@ -231,7 +236,7 @@ class Uploader
         }
 
         //创建目录失败
-        if (!file_exists($dirname) && !mkdir($dirname, 0777, true)) {
+        if (!file_exists($dirname) && !mkdir($dirname, 0644, true)) {
             $this->stateInfo = $this->getStateInfo("ERROR_CREATE_DIR");
             return;
         } else if (!is_writeable($dirname)) {
@@ -273,7 +278,7 @@ class Uploader
      */
     private function getFullName()
     {
-        //替换日期事件
+        /*//替换日期事件
         $t = time();
         $d = explode('-', date("Y-y-m-d-H-i-s"));
         $format = $this->config["pathFormat"];
@@ -295,8 +300,9 @@ class Uploader
         $randNum = rand(1, 10000000000) . rand(1, 10000000000);
         if (preg_match("/\{rand\:([\d]*)\}/i", $format, $matches)) {
             $format = preg_replace("/\{rand\:[\d]*\}/i", substr($randNum, 0, $matches[1]), $format);
-        }
-
+        }*/
+        $uploadLogic = new UploadLogic('','');
+        $format = $uploadLogic->getUploadPath();
         $ext = $this->getFileExt();
         return $format . $ext;
     }
@@ -316,7 +322,7 @@ class Uploader
     private function getFilePath()
     {
         $fullname = $this->fullName;
-        $rootPath = $_SERVER['DOCUMENT_ROOT'];
+        $rootPath = Base::getUploadRootPath();
 
         if (substr($fullname, 0, 1) != '/') {
             $fullname = '/' . $fullname;
