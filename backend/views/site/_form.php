@@ -3,20 +3,20 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
 use common\lib\widgets\FileUploadHtml;
 use common\lib\widgets\UeditorHtml;
+
 /* @var $this yii\web\View */
 /* @var $model common\services\site\SiteModel */
 /* @var $form yii\widgets\ActiveForm */
 
-
 $fileUploadHtml = new FileUploadHtml();
-$ueditorHtml = new UeditorHtml();?>
+$ueditorHtml = new UeditorHtml(); ?>
 
 
 <?php echo $fileUploadHtml->getLinkScript(); ?>
 <?php echo $ueditorHtml->getLinkScript(); ?>
+
 <div class="site-model-form">
 
     <?php $form = ActiveForm::begin(); ?>
@@ -39,17 +39,15 @@ $ueditorHtml = new UeditorHtml();?>
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
-<?php echo $fileUploadHtml->createFileUpload($model,"img_url","logo",["hide_input"=>1]); ?>
+    <?php echo $fileUploadHtml->createFileUpload($model, "img_url", "logo", ["hide_input" => 0]); ?>
 
-<?php echo $form->field($model, "img_url")->label(false)->hiddenInput(["maxlength" => true,"id"=>$fileUploadHtml->getHideInputId("img_url")]); ?> <!--加入非空提示-->
+    <?php echo $ueditorHtml->createUeditor($model, "content", "详细介绍"); ?>
 
-<?php echo $ueditorHtml->createUeditor($model,"content","详细介绍"); ?>
+    <?php echo $ueditorHtml->createUeditor($model, "about_us", "关于我们"); ?>
 
-<?php echo $form->field($model, "content")->label(false)->textarea(["maxlength" => true,"style"=>"display:none;"]); ?>
+    <?= $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine, ['prompt' => '请选择状态', 'options' => [$model->status => ['Selected' => true]]]) ?>
 
- <?= $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['prompt' => '请选择状态','options'=>[$model->status=>['Selected'=>true]]]) ?>
-
- <?= $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '请选择类型','options'=>[$model->type=>['Selected'=>true]]]) ?>
+    <?= $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine, ['prompt' => '请选择类型', 'options' => [$model->type => ['Selected' => true]]]) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? '添加' : '修改', ['class' => $model->isNewRecord ? 'btn btn-primary radius' : 'btn btn-primary radius']) ?>
@@ -59,7 +57,7 @@ $ueditorHtml = new UeditorHtml();?>
 
 </div>
 <script>
-    $(document).ready(function(){
+    $(document).ready(function () {
         // 防止重复提交
         $('form').on('beforeValidate', function (e) {
             $(':submit').attr('disabled', true).addClass('disabled');
@@ -74,11 +72,7 @@ $ueditorHtml = new UeditorHtml();?>
         });
     });
 
-    /*
-       //当富文本内容不能为空时采用此方式
-       $("#w0").on("beforeValidate", function (event) {
-           $("#websitearticlemodel-content").val($('ueditor-id-content').getContent());
+    //当富文本内容不能为空时采用此方式
 
-        });*/
 
 </script>

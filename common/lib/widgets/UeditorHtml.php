@@ -17,6 +17,10 @@ class UeditorHtml
         echo '<script type="text/javascript" src="/lib/ueditor/ueditor.config.js"></script><script type="text/javascript" src="/lib/ueditor/ueditor.all.min.js"> </script>';
     }
 
+    public function getUeObjectName(){
+        return 'ueObj_';
+    }
+
     public function createUeditor($model,$attrName,$showName='',$otherArr=[]){
         $reflector = new ReflectionClass($model);
         $modelName = $reflector->getShortName();
@@ -29,7 +33,7 @@ class UeditorHtml
             $oldValue = $model->$attrName;
         }
         $html = '<div class="form-group field-'.$attrName.'"><label class="control-label" for="ueditor-label-'.$attrName.'">'.$showName.'</label><div style="width:'.$width.';display:inline-block;"><script id="ueditor-id-'.$attrName.'" type="text/plain" >'.$oldValue.'</script></div><div class="help-block"></div></div>';
-        $html=$html."<script>\$(document).ready(function(){var ue".$attrName." = UE.getEditor('ueditor-id-".$attrName."', {
+        $html=$html."<script>\$(document).ready(function(){  ".$this->getUeObjectName().$attrName." = UE.getEditor('ueditor-id-".$attrName."', {
             toolbars: ueditorTools,
             textarea:'".$modelName."[".$attrName."]',
             autoHeightEnabled: ".$autoHeightEnabled.",
@@ -43,5 +47,6 @@ class UeditorHtml
     public function getPreImage($width,$height,$url){
         return '<img style="max-width:'.$width.'px;max-height:'.$height.'px;" src="'.$url.'" />';
     }
+
 
 }

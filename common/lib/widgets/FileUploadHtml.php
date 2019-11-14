@@ -14,7 +14,7 @@ use ReflectionClass;
 class FileUploadHtml
 {
     public function getLinkScript(){
-        echo '<link rel="stylesheet" type="text/css" href="/static/uploadify5/uploadifive.css?253"><script type="text/javascript" src="/static/uploadify5/jquery.uploadifive.min.js"></script>';
+        echo '<link rel="stylesheet" type="text/css" href="/static/uploadify5/uploadifive.css"><script type="text/javascript" src="/static/uploadify5/jquery.uploadifive.min.js"></script>';
     }
 
     public function createFileUpload($model,$attrName,$showName='',$otherArr=[]){

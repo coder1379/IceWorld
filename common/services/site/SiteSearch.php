@@ -19,7 +19,7 @@ class SiteSearch extends SiteModel
     {
         return [
             [['id', 'status', 'type', 'is_delete'], 'integer'],
-            [['name', 'introduce', 'seo_title', 'seo_keywords', 'seo_description', 'telphone', 'mobile', 'qq', 'email', 'img_url', 'content', 'add_time'], 'safe'],
+            [['name', 'introduce', 'seo_title', 'seo_keywords', 'seo_description', 'telphone', 'mobile', 'qq', 'email', 'img_url', 'content', 'about_us', 'add_time'], 'safe'],
         ];
     }
 
@@ -76,7 +76,8 @@ class SiteSearch extends SiteModel
             ->andFilterWhere(['like', 'qq', $this->qq])
             ->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'img_url', $this->img_url])
-            ->andFilterWhere(['like', 'content', $this->content]);
+            ->andFilterWhere(['like', 'content', $this->content])
+            ->andFilterWhere(['like', 'about_us', $this->about_us]);
 
         
 
