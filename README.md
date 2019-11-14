@@ -16,3 +16,10 @@ if (!-e $request_filename){
 
 'dsn' => 'mysql:host=127.0.0.1;dbname=ice_world_db;port=3069',
 
+composer 生产性能优化：
+composer dumpautoload -o
+根据情况使用：
+composer dump-autoload -a
+
+composer dump-autoload --apcu //需要安装apcu扩展
+

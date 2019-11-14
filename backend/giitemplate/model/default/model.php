@@ -134,14 +134,17 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . 
 
         if(count($lableArr)>1){
             $jsonV=json_decode($lableArr[1],true);
-            if($jsonV["type"]=="text" || $jsonV["type"]=="db"){
-                $reqrieArr[]="'".$name."'";
+            if(!empty($jsonV["type"])){
+                if(!empty($jsonV["must"]) && $jsonV["must"]==1){
+                    $reqrieArr[]="'".$name."'";
+                }
+
             }
         }
 
     }
     if(empty($reqrieArr)!=true){
-        //$rules[]="[[".implode(",",$reqrieArr)."], 'required']";
+        $rules[]="[[".implode(",",$reqrieArr)."], 'required']";
     }
     ?>
 

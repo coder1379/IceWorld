@@ -19,6 +19,7 @@ use Yii;
  * @property string $email
  * @property string $img_url
  * @property string $content
+ * @property string $about_us
  * @property string $add_time
  * @property integer $status
  * @property integer $type
@@ -33,7 +34,7 @@ class SiteModel extends \yii\db\ActiveRecord
     //对应字段:status,备注：状态
     public $statusPredefine=["1"=>"启用","2"=>"停用"];
     //对应字段:type,备注：类型
-    public $typePredefine=["1"=>"普通","2"=>"特殊"];
+    public $typePredefine=["1"=>"常用","2"=>"特殊"];
 
 
     /*
@@ -56,8 +57,8 @@ class SiteModel extends \yii\db\ActiveRecord
     
         ////////////字段验证规则
         return [
-            [['name', 'telphone', 'content'], 'required'],
-            [['content'], 'string'],
+            [['name', 'telphone'], 'required'],
+            [['content', 'about_us'], 'string'],
             [['add_time'], 'safe'],
             [['status', 'type', 'is_delete'], 'integer'],
             [['name'], 'string', 'max' => 50],
@@ -73,9 +74,9 @@ class SiteModel extends \yii\db\ActiveRecord
     {
         ///////模型使用场景
                 return [
-        'create' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','content','add_time','status','type',],//创建场景
+        'create' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','content','about_us','add_time','status','type',],//创建场景
 
-        'update' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','content','add_time','status','type',],//修改场景
+        'update' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','content','about_us','add_time','status','type',],//修改场景
 
         'delete' => ['is_delete'],//删除场景
         ];
@@ -99,6 +100,7 @@ class SiteModel extends \yii\db\ActiveRecord
             'email' => '邮箱',
             'img_url' => 'logo',
             'content' => '详细介绍',
+            'about_us' => '关于我们',
             'add_time' => '添加时间',
             'status' => '状态',
             'type' => '类型',
