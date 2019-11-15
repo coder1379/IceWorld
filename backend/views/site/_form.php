@@ -11,7 +11,7 @@ use common\lib\widgets\UeditorHtml;
 /* @var $form yii\widgets\ActiveForm */
 
 $fileUploadHtml = new FileUploadHtml();
-$ueditorHtml = new UeditorHtml(); ?>
+$ueditorHtml = new UeditorHtml();?>
 
 
 <?php echo $fileUploadHtml->getLinkScript(); ?>
@@ -19,7 +19,7 @@ $ueditorHtml = new UeditorHtml(); ?>
 
 <div class="site-model-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id'=>'create_update_active_form']); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
@@ -39,15 +39,15 @@ $ueditorHtml = new UeditorHtml(); ?>
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
-    <?php echo $fileUploadHtml->createFileUpload($model, "img_url", "logo", ["hide_input" => 0]); ?>
+    <?php echo $fileUploadHtml->createFileUpload($model,"img_url","logo",["hide_input"=>0]); ?>
 
-    <?php echo $ueditorHtml->createUeditor($model, "content", "详细介绍"); ?>
+    <?php echo $ueditorHtml->createUeditor($model,"content","详细介绍"); ?>
 
-    <?php echo $ueditorHtml->createUeditor($model, "about_us", "关于我们"); ?>
+    <?php echo $ueditorHtml->createUeditor($model,"about_us","关于我们"); ?>
 
-    <?= $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine, ['prompt' => '请选择状态', 'options' => [$model->status => ['Selected' => true]]]) ?>
+    <?= $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['prompt' => '请选择状态','options'=>[$model->status=>['Selected'=>true]]]) ?>
 
-    <?= $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine, ['prompt' => '请选择类型', 'options' => [$model->type => ['Selected' => true]]]) ?>
+    <?= $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '请选择类型','options'=>[$model->type=>['Selected'=>true]]]) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? '添加' : '修改', ['class' => $model->isNewRecord ? 'btn btn-primary radius' : 'btn btn-primary radius']) ?>
@@ -57,7 +57,7 @@ $ueditorHtml = new UeditorHtml(); ?>
 
 </div>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function(){
         // 防止重复提交
         $('form').on('beforeValidate', function (e) {
             $(':submit').attr('disabled', true).addClass('disabled');
@@ -72,7 +72,11 @@ $ueditorHtml = new UeditorHtml(); ?>
         });
     });
 
-    //当富文本内容不能为空时采用此方式
+    //禁用input回车提交
+    $(document).on("keydown","#create_update_active_form input[type='text']", function(event) {
+        return event.key != "Enter";
+    });
 
+    
 
 </script>

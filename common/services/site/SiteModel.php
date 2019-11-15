@@ -57,7 +57,7 @@ class SiteModel extends \yii\db\ActiveRecord
     
         ////////////字段验证规则
         return [
-            [['name', 'telphone'], 'required'],
+            [['name'], 'required'],
             [['content', 'about_us'], 'string'],
             [['add_time'], 'safe'],
             [['status', 'type', 'is_delete'], 'integer'],

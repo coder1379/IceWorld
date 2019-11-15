@@ -65,7 +65,7 @@ use yii\widgets\ActiveForm;
 
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-form">
 
-    <?= "<?php " ?>$form = ActiveForm::begin(); ?>
+    <?= "<?php " ?>$form = ActiveForm::begin(['id'=>'create_update_active_form']); ?>
 
 <?php
 $flag=0;
@@ -145,12 +145,16 @@ foreach ($generator->getColumnNames() as $attribute) {
         });
     });
 
+    //禁用input回车提交
+    $(document).on("keydown","#create_update_active_form input[type='text']", function(event) {
+        return event.key != "Enter";
+    });
 
     <?php
     if(!empty($richTextNoNullList)){
         ?>
     //百度富文本是用此方式进行必填检查
-    $("#w0").on("beforeValidate", function (event) {
+    $("#create_update_active_form").on("beforeValidate", function (event) {
         <?php
 
         foreach ($richTextNoNullList as $r){
