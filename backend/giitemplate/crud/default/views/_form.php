@@ -95,22 +95,22 @@ foreach ($generator->getColumnNames() as $attribute) {
                 $hideStr = '//';
             }
             if($jsonV["type"]=="text"){
-                echo  $hideStr."    <?= \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["name"].",['prompt' => '请选择".$lableArr[0]."','options'=>[\$model->".$attribute."=>['Selected'=>true]]]) ?>\n\n";
+                echo  "    <?php ".$hideStr."echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["name"].",['prompt' => '请选择".$lableArr[0]."','options'=>[\$model->".$attribute."=>['Selected'=>true]]]); ?>\n\n";
             }else if($jsonV["type"]=="db"){
-                echo  $hideStr."    <?= \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["functionName"]."List(),['prompt' => '请选择".$lableArr[0]."','options'=>[\$model->".$attribute."=>['Selected'=>true]]]) ?>\n\n";
+                echo  "    <?php ".$hideStr."echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["functionName"]."List(),['prompt' => '请选择".$lableArr[0]."','options'=>[\$model->".$attribute."=>['Selected'=>true]]]); ?>\n\n";
             }else if($jsonV["type"]=="upload_image"){
                 $mustFlag = 0;
-                echo $hideStr.'    <?php echo $fileUploadHtml->createFileUpload($model,"'.$attribute.'","'.$lableArr[0].'"); ?>'."\n";
-                echo $hideStr.'    <?php echo $form->field($model, "'.$attribute.'")->label(false)->hiddenInput(["maxlength" => true,"id"=>$fileUploadHtml->getHideInputId("'.$attribute.'")]); ?> '."\n\n";
+                echo '    <?php '.$hideStr.'echo $fileUploadHtml->createFileUpload($model,"'.$attribute.'","'.$lableArr[0].'"); ?>'."\n";
+                echo '    <?php '.$hideStr.'echo $form->field($model, "'.$attribute.'")->label(false)->hiddenInput(["maxlength" => true,"id"=>$fileUploadHtml->getHideInputId("'.$attribute.'")]); ?> '."\n\n";
             }else if($jsonV["type"]=="rich_text"){
-                echo $hideStr.'    <?php echo $ueditorHtml->createUeditor($model,"'.$attribute.'","'.$lableArr[0].'"); ?>'."\n\n";
+                echo '    <?php '.$hideStr.'echo $ueditorHtml->createUeditor($model,"'.$attribute.'","'.$lableArr[0].'"); ?>'."\n\n";
                 if(!empty($jsonV["must"]) && $jsonV["must"]==1){
-                    echo $hideStr.'    <?php echo $form->field($model, "'.$attribute.'")->label(false)->textarea(["maxlength" => true,"style"=>"display:none;"]); ?>'."\n\n";
+                    echo '    <?php '.$hideStr.'echo $form->field($model, "'.$attribute.'")->label(false)->textarea(["maxlength" => true,"style"=>"display:none;"]); ?>'."\n\n";
                     $richTextNoNullList[] = $attribute;
                 }
 
             }else{
-                echo $hideStr."    <?= " . $generator->generateActiveField($attribute) . " ?>\n\n";
+                echo "    <?php ".$hideStr."echo " . $generator->generateActiveField($attribute) . "; ?>\n\n";
             }
         }
         else{

@@ -31,11 +31,11 @@ $ueditorHtml = new UeditorHtml();?>
 
     <?= $form->field($model, 'seo_description')->textInput(['maxlength' => true]) ?>
 
-//    <?= $form->field($model, 'telphone')->textInput(['maxlength' => true]) ?>
+    <?php //echo $form->field($model, 'telphone')->textInput(['maxlength' => true]); ?>
 
-//    <?= $form->field($model, 'mobile')->textInput(['maxlength' => true]) ?>
+    <?php //echo $form->field($model, 'mobile')->textInput(['maxlength' => true]); ?>
 
-//    <?= $form->field($model, 'qq')->textInput(['maxlength' => true]) ?>
+    <?php //echo $form->field($model, 'qq')->textInput(['maxlength' => true]); ?>
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
@@ -51,11 +51,11 @@ $ueditorHtml = new UeditorHtml();?>
 
     <?php echo $ueditorHtml->createUeditor($model,"about_us","关于我们"); ?>
 
-    <?= $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['prompt' => '请选择状态','options'=>[$model->status=>['Selected'=>true]]]) ?>
+    <?php echo $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['prompt' => '请选择状态','options'=>[$model->status=>['Selected'=>true]]]); ?>
 
-    <?= $form->field($model, 'user_id')->label('用户')->dropDownList($model->getUserRecordList(),['prompt' => '请选择用户','options'=>[$model->user_id=>['Selected'=>true]]]) ?>
+    <?php echo $form->field($model, 'user_id')->label('用户')->dropDownList($model->getUserRecordList(),['prompt' => '请选择用户','options'=>[$model->user_id=>['Selected'=>true]]]); ?>
 
-//    <?= $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '请选择类型','options'=>[$model->type=>['Selected'=>true]]]) ?>
+    <?php //echo $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '请选择类型','options'=>[$model->type=>['Selected'=>true]]]); ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? '添加' : '修改', ['class' => $model->isNewRecord ? 'btn btn-primary radius' : 'btn btn-primary radius']) ?>
