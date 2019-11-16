@@ -18,8 +18,8 @@ class SiteSearch extends SiteModel
     public function rules()
     {
         return [
-            [['id', 'status', 'type', 'is_delete'], 'integer'],
-            [['name', 'introduce', 'seo_title', 'seo_keywords', 'seo_description', 'telphone', 'mobile', 'qq', 'email', 'img_url', 'content', 'about_us', 'add_time'], 'safe'],
+            [['id', 'status', 'user_id', 'type', 'is_delete'], 'integer'],
+            [['name', 'introduce', 'seo_title', 'seo_keywords', 'seo_description', 'telphone', 'mobile', 'qq', 'email', 'img_url', 'cover', 'content', 'about_us', 'add_time'], 'safe'],
         ];
     }
 
@@ -62,6 +62,7 @@ class SiteSearch extends SiteModel
             'id' => $this->id,
             'add_time' => $this->add_time,
             'status' => $this->status,
+            'user_id' => $this->user_id,
             'type' => $this->type,
             'is_delete' => 0,
         ]);
@@ -76,10 +77,11 @@ class SiteSearch extends SiteModel
             ->andFilterWhere(['like', 'qq', $this->qq])
             ->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'img_url', $this->img_url])
+            ->andFilterWhere(['like', 'cover', $this->cover])
             ->andFilterWhere(['like', 'content', $this->content])
             ->andFilterWhere(['like', 'about_us', $this->about_us]);
 
-        
+        $query->with('userRecord');
 
         $query->addOrderBy('id desc');
 

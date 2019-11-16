@@ -31,23 +31,31 @@ $ueditorHtml = new UeditorHtml();?>
 
     <?= $form->field($model, 'seo_description')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'telphone')->textInput(['maxlength' => true]) ?>
+//    <?= $form->field($model, 'telphone')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'mobile')->textInput(['maxlength' => true]) ?>
+//    <?= $form->field($model, 'mobile')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'qq')->textInput(['maxlength' => true]) ?>
+//    <?= $form->field($model, 'qq')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
-    <?php echo $fileUploadHtml->createFileUpload($model,"img_url","logo",["hide_input"=>0]); ?>
+    <?php echo $fileUploadHtml->createFileUpload($model,"img_url","logo"); ?>
+    <?php echo $form->field($model, "img_url")->label(false)->hiddenInput(["maxlength" => true,"id"=>$fileUploadHtml->getHideInputId("img_url")]); ?> 
+
+    <?php echo $fileUploadHtml->createFileUpload($model,"cover","封面"); ?>
+    <?php echo $form->field($model, "cover")->label(false)->hiddenInput(["maxlength" => true,"id"=>$fileUploadHtml->getHideInputId("cover")]); ?> 
 
     <?php echo $ueditorHtml->createUeditor($model,"content","详细介绍"); ?>
+
+    <?php echo $form->field($model, "content")->label(false)->textarea(["maxlength" => true,"style"=>"display:none;"]); ?>
 
     <?php echo $ueditorHtml->createUeditor($model,"about_us","关于我们"); ?>
 
     <?= $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['prompt' => '请选择状态','options'=>[$model->status=>['Selected'=>true]]]) ?>
 
-    <?= $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '请选择类型','options'=>[$model->type=>['Selected'=>true]]]) ?>
+    <?= $form->field($model, 'user_id')->label('用户')->dropDownList($model->getUserRecordList(),['prompt' => '请选择用户','options'=>[$model->user_id=>['Selected'=>true]]]) ?>
+
+//    <?= $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '请选择类型','options'=>[$model->type=>['Selected'=>true]]]) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? '添加' : '修改', ['class' => $model->isNewRecord ? 'btn btn-primary radius' : 'btn btn-primary radius']) ?>
@@ -77,6 +85,18 @@ $ueditorHtml = new UeditorHtml();?>
         return event.key != "Enter";
     });
 
+        //百度富文本是用此方式进行必填检查
+    $("#create_update_active_form").on("beforeValidate", function (event) {
+                try
+        {
+            $("#sitemodel-content").val(ueObj_content.getContent());
+        }
+        catch(err)
+        {
+            console.log("富文本对象缺失:"+err);
+        }
+
+            });
     
 
 </script>

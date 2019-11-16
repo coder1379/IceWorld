@@ -8,12 +8,19 @@
 namespace common;
 
 use Yii;
-class Base
+class ComBase
 {
-    public static $successMessage='操作成功。';
-    public static $createMessage='创建成功。';
-    public static $updateMessage='修改成功。';
-    public static $deleteMessage='删除成功。';
+    const MESSAGE_RUN_SUCCESS='操作成功';
+    const MESSAGE_CREATE_SUCCESS='创建成功';
+    const MESSAGE_UPDATE_SUCCESS='修改成功';
+    const MESSAGE_DELETE_SUCCESS='删除成功';
+    const MESSAGE_SERVER_ERROR='服务端处理失败,请重试';
+    const MESSAGE_PARAM_ERROR='参数错误';
+    const CODE_RUN_SUCCESS = 200; //运行成功码
+    const CODE_PARAM_ERROR = 10001;//参数错误码
+    const CODE_PARAM_FORMAT_ERROR = 10111;//字段参数错误码
+    const CODE_SERVER_ERROR = 500;//服务端错误码
+
     /**
      * 返回JSON数据格式
      * @param array $data 数组数据
@@ -21,14 +28,20 @@ class Base
      * @param string $msg 消息
      * @return array 格式数组
      */
-    public static function getJsonArray($data=[],$code=200, $msg='success'){
+    public static function getJsonArray($data=[],$code=0, $msg='success'){
         if(empty($data)==true){
             $data=new \StdClass();//将空数组赋值空对象便于前端兼容处理.
+        }
+        if(empty($code)){
+            $code = self::CODE_RUN_SUCCESS;
         }
         return ['code'=>$code,'msg'=>$msg,'data'=>$data];
     }
 
-    public static function getJsonString($data=[],$code=200, $msg='success'){
+    public static function getJsonString($data=[],$code=0, $msg='success'){
+        if(empty($code)){
+            $code = self::CODE_RUN_SUCCESS;
+        }
         return json_encode(self::getJsonArray($data,$code,$msg));
     }
 
@@ -63,48 +76,8 @@ class Base
         if(Yii::$app->params['returnAllErrors']==true){
             $returnData['allErrors']=$errors['all'];
         }
-        return self::getJsonArray($returnData,10111,$errors['first']['v']);
+        return self::getJsonArray($returnData,self::CODE_PARAM_FORMAT_ERROR,$errors['first']['v']);
     }
-
-    /**
-     * 获取参数错误的统一提示
-     * @return array
-     */
-    public static function getParameterErrorMassage($returnFormatArray=false){
-        $returnStr = '参数错误。';
-        if($returnFormatArray == true){
-            return self::getJsonArray([],10001,$returnStr);
-        }else{
-            return $returnStr;
-        }
-    }
-
-    /**
-     * 获取操作失败的统一提示
-     * @return array
-     */
-    public static function getOperationFailedMassage($returnFormatArray=false){
-        $returnStr = '操作失败,请重试。';
-        if($returnFormatArray == true){
-            return self::getJsonArray([],10001,$returnStr);
-        }else{
-            return $returnStr;
-        }
-    }
-
-    /**
-     * 获取未知错误的统一提示
-     * @return array
-     */
-    public static function getUnknowErrorMassage($returnFormatArray=false){
-        $returnStr = '未知的错误。';
-        if($returnFormatArray == true){
-            return self::getJsonArray([],10001,$returnStr);
-        }else{
-            return $returnStr;
-        }
-    }
-
 
     /**
      * 封装YII2 设置cookie

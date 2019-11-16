@@ -1,7 +1,7 @@
 <?php
 namespace common\lib\upload;
 
-use common\Base;
+use common\ComBase;
 use common\services\upload\UploadLogic;
 use Yii;
 use common\lib\UploadOSS;
@@ -322,7 +322,7 @@ class Uploader
     private function getFilePath()
     {
         $fullname = $this->fullName;
-        $rootPath = Base::getUploadRootPath();
+        $rootPath = ComBase::getUploadRootPath();
 
         if (substr($fullname, 0, 1) != '/') {
             $fullname = '/' . $fullname;

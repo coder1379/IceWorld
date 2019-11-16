@@ -39,6 +39,7 @@ use yii\data\ActiveDataProvider;
 use <?= ltrim($generator->baseControllerClass, '\\') ?>;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use common\ComBase;
 <?php
 $haveArray=[];
 
@@ -180,14 +181,14 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     {
         $obj=$this->findModel(<?= $actionParams ?>);
         if(empty($obj)==true){
-            return $this->getJsonString([],10001,'参数错误!');
+            return ComBase::getJsonString([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);
         }else{
             $obj->scenario = 'delete';//删除场景，控制字段安全
             $obj->is_delete=1;
             if($obj->update()==true){
-                return $this->getJsonString([],200,'删除成功!');
+                return $this->getJsonString([],ComBase::CODE_RUN_SUCCESS,ComBase::MESSAGE_DELETE_SUCCESS);
             }else{
-                return $this->getJsonString([],10001,'删除失败!');
+                return $this->getJsonString([],ComBase::CODE_SERVER_ERROR,ComBase::MESSAGE_SERVER_ERROR);
             }
         }
     }

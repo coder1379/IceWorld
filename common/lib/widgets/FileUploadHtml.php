@@ -26,12 +26,12 @@ class FileUploadHtml
         $height = $otherArr['height']??"200px";
         $value = '';
         $required = empty($otherArr['required'])!=true?"required":"";
-        $hide_input = $otherArr['hide_input']??0; //控制是否在当前目录下显示input,主要用户控制字段的错误提示 上传图片为必填时使用此字段
+        //$hide_input = $otherArr['hide_input']??0; //控制是否在当前目录下显示input,主要用户控制字段的错误提示 上传图片为必填时使用此字段
         $showInputStr = ''; //显示input
 
-        if($hide_input!=1){
+        /*if($hide_input!=1){
             $showInputStr = '<input type="hidden" name="'.$modelName.'['.$attrName.']" value="'.$value.'" id="filename-'.$attrName.'">';
-        }
+        }*/
 
         if(empty($model->$attrName)!=true){
             $oldValue = '<a class="clearuploadimg" onclick="reUpLoadImg(\''.$attrName.'\');" ></a><img style="max-width:'.$width.';max-height:'.$height.';" src="'.$model->$attrName.'" />';
