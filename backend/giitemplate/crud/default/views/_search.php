@@ -46,6 +46,14 @@ use yii\widgets\ActiveForm;
                 if($jsonV["type"]=="text"){
 
        echo  " <?php echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["name"].",['prompt' => '请选择".$lableArr[0]."'])" ." ?>\n\n";
+                }else if($jsonV["type"]=="db"){
+                    echo  " <?php //echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["functionName"]."List(),['prompt' => '请选择".$lableArr[0]."'])" ." ?>\n\n";
+                }else if($jsonV["type"]=="upload_image"){
+
+                }else if($jsonV["type"]=="rich_text"){
+
+                }else {
+                    echo "<?php echo " . $generator->generateActiveSearchField($attribute) . " ?>\n\n";
                 }
             }else{
                 echo "<?php echo " . $generator->generateActiveSearchField($attribute) . " ?>\n\n";

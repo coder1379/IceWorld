@@ -39,6 +39,8 @@ use yii\widgets\ActiveForm;
 
  <?php echo $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['prompt' => '请选择状态']) ?>
 
+ <?php echo $form->field($model, 'user_id')->label('用户')->dropDownList($model->getUserRecordList(),['prompt' => '请选择用户']) ?>
+
  <?php echo $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '请选择类型']) ?>
 
     <div class="form-group">

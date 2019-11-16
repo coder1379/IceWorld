@@ -165,3 +165,25 @@
 
 /*上传样式调整 e*/
 
+
+/*
+后台列表页面 img 大小样式
+*/
+.backend-index-img{
+    max-width: 30px;
+}
+
+/**
+后台view显示页面 img大小样式
+ */
+.backend-view-img{
+    max-width: 300px;
+}
+
+/**
+后台富文本 iframe 大小样式
+ */
+.backend-view-iframe{
+    width: 100%;
+    height: 600px;
+}

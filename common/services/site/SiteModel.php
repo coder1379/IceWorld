@@ -3,6 +3,7 @@
 namespace common\services\site;
 
 use Yii;
+use common\services\user\UserModel;
 
 /**
  * This is the model class for table "{{%site}}".
@@ -18,10 +19,12 @@ use Yii;
  * @property string $qq
  * @property string $email
  * @property string $img_url
+ * @property string $cover
  * @property string $content
  * @property string $about_us
  * @property string $add_time
  * @property integer $status
+ * @property integer $user_id
  * @property integer $type
  * @property integer $is_delete
  */
@@ -40,6 +43,25 @@ class SiteModel extends \yii\db\ActiveRecord
     /*
     * @关系内容写入
     */
+     //对应字段：user_id,用户
+     public function getUserRecord()
+     {
+        return $this->hasOne(UserModel::className(), ['id' => 'user_id']);
+     }
+
+     //获取user_id,用户 的LIST
+     public function getUserRecordList(){
+            $array = UserModel::find()->select('id,name')->where(['is_delete'=>0])->orderBy("id desc")->limit(100)->asArray()->all();
+            $newArr = [];
+
+            if(empty($array)!=true){
+                foreach($array as $v){
+                $newArr[$v["id"]]=$v["name"];
+                }
+            }
+            return $newArr;
+      }
+
 
     /**
      * @inheritdoc
@@ -60,13 +82,14 @@ class SiteModel extends \yii\db\ActiveRecord
             [['name'], 'required'],
             [['content', 'about_us'], 'string'],
             [['add_time'], 'safe'],
-            [['status', 'type', 'is_delete'], 'integer'],
+            [['status', 'user_id', 'type', 'is_delete'], 'integer'],
             [['name'], 'string', 'max' => 50],
-            [['introduce', 'seo_title', 'seo_keywords', 'seo_description', 'img_url'], 'string', 'max' => 255],
+            [['introduce', 'seo_title', 'seo_keywords', 'seo_description', 'img_url', 'cover'], 'string', 'max' => 255],
             [['telphone'], 'string', 'max' => 20],
             [['mobile'], 'string', 'max' => 11],
             [['qq'], 'string', 'max' => 15],
             [['email'], 'string', 'max' => 30],
+            [['img_url','content','user_id'], 'required'],
         ];
     }
 
@@ -74,9 +97,9 @@ class SiteModel extends \yii\db\ActiveRecord
     {
         ///////模型使用场景
                 return [
-        'create' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','content','about_us','add_time','status','type',],//创建场景
+        'create' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id','type',],//创建场景
 
-        'update' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','content','about_us','add_time','status','type',],//修改场景
+        'update' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id','type',],//修改场景
 
         'delete' => ['is_delete'],//删除场景
         ];
@@ -99,10 +122,12 @@ class SiteModel extends \yii\db\ActiveRecord
             'qq' => 'QQ',
             'email' => '邮箱',
             'img_url' => 'logo',
+            'cover' => '封面',
             'content' => '详细介绍',
             'about_us' => '关于我们',
             'add_time' => '添加时间',
             'status' => '状态',
+            'user_id' => '用户',
             'type' => '类型',
             'is_delete' => '是否删除',
         ];
