@@ -67,7 +67,7 @@ class ComBase
     }
 
     /**
-     * 将 getModelErrorsToArray 格式化后的数据再次格式化为直接能返回前端的数据
+     *  将 getModelErrorsToArray 格式化后的数据再次格式化为直接能返回前端的数据
      * @param $errors
      * @return array
      */
