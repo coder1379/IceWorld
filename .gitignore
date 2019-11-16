@@ -1,6 +1,6 @@
 # yii console command
 /yii
-
+static/upload
 # phpstorm project files
 .idea
 
