@@ -46,7 +46,7 @@ class SiteModel extends \yii\db\ActiveRecord
      //对应字段：user_id,用户
      public function getUserRecord()
      {
-        return $this->hasOne(UserModel::className(), ['id' => 'user_id']);
+        return $this->hasOne(UserModel::class, ['id' => 'user_id']);
      }
 
      //获取user_id,用户 的LIST

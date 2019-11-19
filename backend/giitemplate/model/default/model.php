@@ -83,7 +83,7 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . 
 
      public function <?php echo $jsonV["functionName"]; ?>()
      {
-        return $this->hasOne(<?php echo $jsonV["modelName"]; ?>::className(), ['<?php echo $jsonV["joinTableId"]; ?>' => '<?php echo $name; ?>']);
+        return $this->hasOne(<?php echo $jsonV["modelName"]; ?>::class, ['<?php echo $jsonV["joinTableId"]; ?>' => '<?php echo $name; ?>']);
      }
 
      //获取<?php echo $name; ?>,<?php echo $lableArr[0]; ?> 的LIST
