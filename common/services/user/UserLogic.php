@@ -32,7 +32,7 @@ class UserLogic
                   return $common->getOperationFailedMassage(true); //直接获取操作错误返回
               }
           }else{
-              //return $common->getJsonArray($model->getErrors(),10001,'');
+              return $common->getJsonArray($model->getErrors(),10001,'');
               return $common->getFormatErrorsArray($common->getModelErrorsToArray($model->getErrors()));
           }
         }else{

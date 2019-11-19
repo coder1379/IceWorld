@@ -37,7 +37,7 @@ class UserApiModel extends UserModel
     public function fieldsScenarios(){
 
         return [
-            'list'=>['id','name','mobile','sex','truename'],
+            'list'=>['id','name','mobile','sex','truename','account'],
         ];
     }
 

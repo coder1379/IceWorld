@@ -181,7 +181,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     {
         $obj=$this->findModel(<?= $actionParams ?>);
         if(empty($obj)==true){
-            return ComBase::getJsonString([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);
+            return ComBase::getReturnJson([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);
         }else{
             $obj->scenario = 'delete';//删除场景，控制字段安全
             $obj->is_delete=1;

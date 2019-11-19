@@ -28,6 +28,20 @@ if (!YII_ENV_TEST) {
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
         'generators' => [
+            'apiCrud' => [ //生成器名称
+                'class' => 'backend\giitemplate\apiCrud\Generator',
+                'templates' => [ //设置我们自己的模板
+                    //模板名 => 模板路径
+                    'apiCrud' => '@app/giitemplate/apiCrud/default',
+                ]
+            ],
+            'apiModel' => [ //生成器名称
+                'class' => 'backend\giitemplate\apiModel\Generator',
+                'templates' => [ //设置我们自己的模板
+                    //模板名 => 模板路径
+                    'apiModel' => '@app/giitemplate/apiModel/default',
+                ]
+            ],
             'crud' => [ //生成器名称
                 'class' => 'yii\gii\generators\crud\Generator',
                 'templates' => [ //设置我们自己的模板

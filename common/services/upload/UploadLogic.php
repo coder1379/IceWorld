@@ -64,7 +64,7 @@ class UploadLogic
         $this->tempFileExt = strtolower($this->tempFileParts['extension']);
         //对上传的文件类型进行判断
         if (!$this->_hasFileExt($this->tempFileExt)) {
-            return ComBase::getJsonArray([], 411, '不支持该类型的文件');
+            return ComBase::getReturnArray([], 411, '不支持该类型的文件');
         }
         switch ($storageServer) {
             //本地化存储
@@ -81,7 +81,7 @@ class UploadLogic
                 $result = $this->_ossUpload();
                 break;
             default:
-                $result = ComBase::getJsonArray([], 412, '错误的存储方式:' . $storageServer);
+                $result = ComBase::getReturnArray([], 412, '错误的存储方式:' . $storageServer);
         }
         return $result;
     }
@@ -103,7 +103,7 @@ class UploadLogic
                 $result = $this->_ossDelete($file);
                 break;
             default:
-                $result = ComBase::getJsonArray([], 411, '错误的存储方式');
+                $result = ComBase::getReturnArray([], 411, '错误的存储方式');
         }
         return $result;
     }
@@ -119,13 +119,13 @@ class UploadLogic
         $mkdirPath = dirname($absolutePath);
         //创建文件夹
         if (!file_exists($mkdirPath) && !mkdir($mkdirPath, 0644, true)) {
-            return ComBase::getJsonArray([], 414, '没有足够的上传权限');
+            return ComBase::getReturnArray([], 414, '没有足够的上传权限');
         }
         if (!move_uploaded_file($this->tempFile, $absolutePath)) {
-            return ComBase::getJsonArray([], 415, '上传文件失败');
+            return ComBase::getReturnArray([], 415, '上传文件失败');
         }
         $url = Yii::$app->params['local_static_link'] . $this->filePath;
-        return ComBase::getJsonArray(['url' => $url]);
+        return ComBase::getReturnArray(['url' => $url]);
     }
 
     /**
@@ -141,10 +141,10 @@ class UploadLogic
         $result = $oss->upload($ossName, $this->tempFile);
         unlink($this->tempFile);
         if (!$result) {
-            return ComBase::getJsonArray([], 416, '文件上传失败');
+            return ComBase::getReturnArray([], 416, '文件上传失败');
         }
         $url = $oss->getOssUrl($ossName);
-        return ComBase::getJsonArray(['url' => $url]);
+        return ComBase::getReturnArray(['url' => $url]);
     }
 
     /**
@@ -156,7 +156,7 @@ class UploadLogic
     public function localToOss($file)
     {
         if (!file_exists($file)) {
-            return ComBase::getJsonArray([], 417, '没有找到要上传的文件');
+            return ComBase::getReturnArray([], 417, '没有找到要上传的文件');
         }
         $this->tempFile = $file;
         $this->tempFileParts = pathinfo($file);
@@ -174,9 +174,9 @@ class UploadLogic
     {
         $oss = new UploadOSS();
         if ($oss->delete($file)) {
-            return ComBase::getJsonArray([]);
+            return ComBase::getReturnArray([]);
         }
-        return ComBase::getJsonArray([], 411, '删除文件失败');
+        return ComBase::getReturnArray([], 411, '删除文件失败');
     }
 
     /**

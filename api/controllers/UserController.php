@@ -4,6 +4,7 @@ namespace api\controllers;
 use common\controllers\ApiCommonAuthContoller;
 use common\services\mobilesms\MobileSmsLogic;
 use common\services\user\UserLogic;
+use common\services\user\UserModel;
 use Yii;
 use yii\helpers\Json;
 /**
