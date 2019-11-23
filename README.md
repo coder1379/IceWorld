@@ -1,6 +1,8 @@
 ICE WORLD
 ===============================
 
+程序见数据交换以数据形式传递，object形式均为model实例
+
 Nginx 配置中加入
 
 index index.php index.html index.htm;

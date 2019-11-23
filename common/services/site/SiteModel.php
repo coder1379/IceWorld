@@ -49,6 +49,7 @@ class SiteModel extends \yii\db\ActiveRecord
         return $this->hasOne(UserModel::class, ['id' => 'user_id']);
      }
 
+
      //获取user_id,用户 的LIST
      public function getUserRecordList(){
             $array = UserModel::find()->select('id,name')->where(['is_delete'=>0])->orderBy("id desc")->limit(100)->asArray()->all();
@@ -61,6 +62,14 @@ class SiteModel extends \yii\db\ActiveRecord
             }
             return $newArr;
       }
+
+    public function fields()
+    {
+        $fields =  parent::fields();
+        $fields['xxxx'] = $fields['name'];
+        $fields['name'] = 'id';
+        return $fields;
+    }
 
 
     /**
@@ -98,12 +107,15 @@ class SiteModel extends \yii\db\ActiveRecord
         ///////模型使用场景
                 return [
         'create' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id','type',],//创建场景
-
+        'default' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id','type',],//修改场景
         'update' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id','type',],//修改场景
 
         'delete' => ['is_delete'],//删除场景
         ];
     }
+
+
+
 
     /**
      * @inheritdoc

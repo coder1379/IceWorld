@@ -120,4 +120,76 @@ class ComBase
         return Yii::$app->params['md5Key'];
     }
 
+    /**
+     * 该数据尽量仅适用一层到2层，层数过多会导致递归缓慢，特别是在获取列表时。
+     * 根据配置的关系数组自动获取数据,如果此方法无法满足使用则在XxxLogic中自行根据业务获取数据
+     * 由于model主要是以实例对象的形式使用，所有当判断返回的为数组时只可能是model list和返回数据为array
+     * @param $model 模型实例
+     * @param array $include 需要包含的数据关系 例如
+     * $include = [
+            [
+                'name'=>'userRecord', //对面model里 get+name的function
+                'fields'=>['id','name','mobile'], //Model->getAttributes($fields);,在获取非model数据时fields可以不传
+                'include'=>[ //是否递归子包含
+                ]
+            ],
+            [
+                'name'=>'inviterUserRecordList',
+                'fields'=>['id','name','mobile'],
+                'include'=>[
+                ]
+            ],
+        ];
+     * @return array
+     * @throws \Exception
+     */
+    public static function getLogicInclude($model, $include = [])
+    {
+        if (!empty($include)) {
+            $returnList = [];
+            foreach ($include as $obj) {
+                $recordName = $obj['name'];
+                $fields = $obj['fields']; //在获取非model数据时fields可以不传
+                $thisInclude = $obj['include']??null;
+                $thisModel = $model->$recordName;
+                $modelList = null;
+                $modelListFlag = 0;
+                if(is_array($thisModel) && is_object(current($thisModel))) {
+                    $modelList = $thisModel;
+                    $modelListFlag = 1;
+                }else{
+                    $modelList[] = $thisModel;
+                }
+
+                $dataArray = [];
+                if(!empty($modelList)){
+                    foreach ($modelList as $nextModel){
+                        $thisArray = null;
+                        if(is_object($nextModel)){
+                            $thisArray = $nextModel->getAttributes($fields);
+                        }else{
+                            $thisArray = $nextModel;
+                        }
+
+                        if (!empty($thisInclude) && !empty($nextModel)) {
+                            $includeArray = self::getLogicInclude($nextModel, $thisInclude);
+                            if (!empty($includeArray)) {
+                                foreach ($includeArray as $inc) {
+                                    $thisArray[$inc['name']] = $inc['data'];
+                                }
+                            }
+                        }
+                        if($modelListFlag == 1){
+                            $dataArray[] = $thisArray;
+                        }else{
+                            $dataArray = $thisArray;
+                        }
+                    }
+                }
+                $returnList[] = ['name' => $recordName, 'data' => $dataArray];
+            }
+        }
+        return $returnList;
+    }
+
 }

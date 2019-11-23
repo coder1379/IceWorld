@@ -67,7 +67,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
         return Json::encode($result);
     }
 
-    public function actionDetail(<?= $actionParams ?>)
+    public function actionDetail()
     {
         $logic = new <?= $logicClass ?>();
         $result = $logic->detail($this->post());
