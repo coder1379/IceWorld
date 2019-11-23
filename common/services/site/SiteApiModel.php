@@ -3,6 +3,7 @@
 namespace common\services\site;
 
 use Yii;
+use common\services\user\UserModel;
 
 class SiteApiModel extends \common\services\site\SiteModel
 {
@@ -11,11 +12,21 @@ class SiteApiModel extends \common\services\site\SiteModel
     public function fieldsScenarios()
     {
         return [
-            'list' => ['id','name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id','type',],//列表
+            'list' => ['status','user_id','type',],//列表
 
-            'detail' => ['id','name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id','type',],//详情
+            'detail' => ['id','name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id',],//详情
         ];
     }
+
+    public function getInviterUserRecordList()
+    {
+        return $this->hasMany(UserModel::class, ['inviter_user_id' => 'user_id']);
+    }
+
+    public function getStatusStr(){
+        return $this->statusPredefine[$this->status];
+    }
+
 
     //apiModel覆盖父类默认屏蔽，仅在父类与api存在冲突时才独立使用
     /*public function rules()

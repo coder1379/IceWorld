@@ -39,7 +39,7 @@ class SiteController extends ApiCommonAuthContoller
         return Json::encode($result);
     }
 
-    public function actionDetail($id)
+    public function actionDetail()
     {
         $logic = new SiteLogic();
         $result = $logic->detail($this->post());
