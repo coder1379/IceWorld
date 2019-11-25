@@ -13,6 +13,9 @@ class SiteLogic{
      * @return array
      */
     public function create($data=[],$scenario='create',$formName=''){
+        if(empty($scenario)){
+            throw new \Exception('scenario cant null');
+        }
         if(!empty($data)){
             $model = new SiteApiModel();
             $model->scenario = $scenario;
@@ -42,6 +45,9 @@ class SiteLogic{
      * @return array
      */
     public function update($data=[],$scenario='update',$formName=''){
+        if(empty($scenario)){
+            throw new \Exception('scenario cant null');
+        }
         if(!empty($data)){
             $id = $data['id']??0;
             $id = intval($id);
@@ -75,6 +81,9 @@ class SiteLogic{
      * @return array
      */
     public function delete($data=[],$scenario='delete'){
+        if(empty($scenario)){
+            throw new \Exception('scenario cant null');
+        }
         if(!empty($data)){
             $data['is_delete'] = 0;
             $model = SiteApiModel::findOne($data);
@@ -97,15 +106,21 @@ class SiteLogic{
     /**
      * 获取详情并根据参数附带关联数据
      * @param array $data sql查询数据
-     * @param string $fieldsScenarios 字段场景 根据配置控制输出字段
+     * @param string $fieldScenarios 字段场景 根据配置控制输出字段
      * @param array $include 包含数据，结合Model 的 hasOne,hasMany,getFunction 包含进来关系数据 详见 ComBase::getLogicInclude
      * @return array | model
      */
-    public function detail($data=[],$fieldsScenarios='detail',$include=[]){
+    public function detail($data=[],$fieldScenarios='detail',$include=[]){
+        if(empty($fieldScenarios)){
+            throw new \Exception('fieldsScenarios cant null');
+        }
         if(!empty($data)){
             $data['is_delete'] = 0;
             $detailModel = new SiteApiModel();
-            $printFields = $detailModel->fieldsScenarios()[$fieldsScenarios]??[];
+            $printFields = $detailModel->fieldsScenarios()[$fieldScenarios]??[];
+            if(empty($printFields)){
+                throw new \Exception('Unknown fieldsScenarios:'.$fieldScenarios);
+            }
             $model = $detailModel->find()->where($data)->one();
             if(!empty($model)){
                 //直接获取数组数据并返回，可以将关联数据在此加入或者将预定义状态等返回
@@ -127,14 +142,20 @@ class SiteLogic{
     /**
      * 获取列表 并根据参数附带关联数据
      * @param array $data 数据
-     * @param string $fieldsScenarios list 字段场景 控制列表输出到前端字段
+     * @param string $fieldScenarios list 字段场景 控制列表输出到前端字段
      * @param array $include 包含数据，结合Model 的 hasOne,hasMany,getFunction 包含进来关系数据 详见 ComBase::getLogicInclude
      * @return array
      */
-    public function list($data=[],$fieldsScenarios='list',$include=[]){
+    public function list($data=[],$fieldScenarios='list',$include=[]){
+        if(empty($fieldScenarios)){
+            throw new \Exception('fieldsScenarios cant null');
+        }
         $searchModel = new SiteApiSearch();
         $dataProvider = $searchModel->search($data);
-        $printFields = $searchModel->fieldsScenarios()[$fieldsScenarios]??[];
+        $printFields = $searchModel->fieldsScenarios()[$fieldScenarios]??[];
+        if(empty($printFields)){
+            throw new \Exception('Unknown fieldsScenarios:'.$fieldScenarios);
+        }
         $listObjects = $dataProvider->getModels();
         $list = [];
 
