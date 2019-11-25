@@ -38,7 +38,7 @@ class SiteController extends ApiCommonAuthContoller
         $logic = new SiteLogic();
         $params = [];
         $include = [ [ 'name'=>'userRecord', 'fields'=>['id','name','mobile'] ] ];//支持关联数据获取
-        $result = $logic->list($this->post(),'list',$include);
+        $result = $logic->list($this->post());
         return Json::encode($result);
     }
 
