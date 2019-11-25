@@ -38,8 +38,7 @@ class SiteController extends ApiCommonAuthContoller
         $logic = new SiteLogic();
         $params = [];
         $include = [ [ 'name'=>'userRecord', 'fields'=>['id','name','mobile'] ] ];//支持关联数据获取
-        $result = Yii::$app->db->createCommand('select * from m_site where is_delete=0 order by id desc limit 0,10')->queryAll();
-        //$result = $logic->list($this->post());
+        $result = $logic->list($this->post(),'list',$include);
         return Json::encode($result);
     }
 
