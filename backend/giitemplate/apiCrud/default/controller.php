@@ -37,6 +37,7 @@ use <?= ltrim($generator->baseControllerClass, '\\') ?>;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
+use common\ComBase;
 
 /**
  * <?= $controllerClass ?> implements the CRUD actions for <?= $modelClass ?> model.
@@ -63,6 +64,8 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     public function actionList()
     {
         $logic = new <?= $logicClass ?>();
+        $params = [];
+        //$include = [ [ 'name'=>'xxxRecord', 'fields'=>['id','name'] ] ];//支持关联数据获取
         $result = $logic->list($this->post());
         return Json::encode($result);
     }
@@ -70,7 +73,13 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     public function actionDetail()
     {
         $logic = new <?= $logicClass ?>();
-        $result = $logic->detail($this->post());
+        $id = intval($this->post('id',0));
+        if(empty($id)){
+            return Json::encode(ComBase::getReturnArray([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR));
+        }
+        $params = ['id'=>$id];
+        //$include = [ [ 'name'=>'xxxRecord', 'fields'=>['id','name'] ] ];//支持关联数据获取
+        $result = $logic->detail($params);
         return Json::encode($result);
     }
 
@@ -91,7 +100,12 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     public function actionDelete()
     {
         $logic = new <?= $logicClass ?>();
-        $result = $logic->delete($this->post());
+        $id = intval($this->post('id',0));
+        if(empty($id)){
+            return Json::encode(ComBase::getReturnArray([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR));
+        }
+        $params = ['id'=>$id];
+        $result = $logic->delete($params);
         return Json::encode($result);
     }
 
