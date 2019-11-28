@@ -29,4 +29,12 @@ class ApiCommonContoller extends BaseContoller
         }
     }
 
+    public function getUserId(){
+        $userId = 0;
+        if(!empty($this->user['id'])){
+            $userId = $this->user['id'];
+        }
+        return $userId;
+    }
+
 }

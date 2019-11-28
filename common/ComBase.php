@@ -18,8 +18,11 @@ class ComBase
     const MESSAGE_SERVER_ERROR = '服务端处理失败,请重试';
     const MESSAGE_PARAM_FORMAT_ERROR = '参数格式校验失败';
     const MESSAGE_PARAM_ERROR = '参数错误';
+    const MESSAGE_NO_FIND_ERROR = '没有找到指定数据';
+
     const CODE_RUN_SUCCESS = 200; //运行成功码
     const CODE_PARAM_ERROR = 10001;//参数错误码
+    const CODE_NO_FIND_ERROR = 10002;//没有找到指定数据错误码
     const CODE_PARAM_FORMAT_ERROR = 10111;//字段参数错误码
     const CODE_SERVER_ERROR = 500;//服务端错误码
 
@@ -189,6 +192,25 @@ class ComBase
                 $returnList[] = ['name' => $recordName, 'data' => $dataArray];
             }
         }
+        return $returnList;
+    }
+
+    /**
+     * 获取预设数组内的值
+     * @param array $params
+     * @param array $keyList
+     * @return array
+     */
+    public static function getReserveArray($params=[],$keyList = []){
+        $returnList = [];
+        if(!empty($params) && !empty($keyList)){
+            foreach ($keyList as $name) {
+                if (isset($params[$name])) {
+                    $returnList[$name] = $params[$name];
+                }
+            }
+        }
+
         return $returnList;
     }
 

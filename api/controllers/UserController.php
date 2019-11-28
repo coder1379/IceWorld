@@ -32,6 +32,13 @@ class UserController extends ApiCommonAuthContoller
         return Json::encode($result);
     }
 
+    /**
+     * 获取详情
+     * @param string $user 手机号 必填
+     * @param string $pwd 密码  与验证码有一个必填
+     * @param string $code 验证码 与密码有一个必填
+     * @return json 成功 {"code":200,"msg":"success","data":{}}，失败 {"code":1001,"msg":"手机已经注册存在","data":{}}
+     */
     public function actionCreate(){
         $logic = new UserLogic();
         $result = $logic->create($this->get());
