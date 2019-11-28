@@ -12,7 +12,7 @@ class SiteApiModel extends \common\services\site\SiteModel
     public function fieldsScenarios()
     {
         return [
-            'list' => ['status','user_id','type',],//列表
+            'list' => ['id','name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id',],//列表
 
             'detail' => ['id','name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id',],//详情
         ];

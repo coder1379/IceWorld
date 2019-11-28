@@ -428,6 +428,7 @@ class Generator extends \yii\gii\Generator
     public function generateSearchConditions()
     {
         $columns = [];
+        $columnsLength = [];
         if (($table = $this->getTableSchema()) === false) {
             $class = $this->modelClass;
             /* @var $model \yii\base\Model */
@@ -437,6 +438,7 @@ class Generator extends \yii\gii\Generator
             }
         } else {
             foreach ($table->columns as $column) {
+                $columnsLength[$column->name] = $column->size;
                 $columns[$column->name] = $column->type;
             }
         }
@@ -458,11 +460,19 @@ class Generator extends \yii\gii\Generator
                 case Schema::TYPE_TIME:
                 case Schema::TYPE_DATETIME:
                 case Schema::TYPE_TIMESTAMP:
-                    $hashConditions[] = "'{$column}' => \$this->{$column},";
+                    if($column == 'is_delete'){
+                        $hashConditions[] = "'{$column}' => 0,";
+                    }else{
+                        $hashConditions[] = "'{$column}' => \$this->{$column},";
+                    }
+
                     break;
                 default:
-                    $likeKeyword = $this->getClassDbDriverName() === 'pgsql' ? 'ilike' : 'like';
-                    $likeConditions[] = "->andFilterWhere(['{$likeKeyword}', '{$column}', \$this->{$column}])";                    
+                    if(in_array($type,[Schema::TYPE_CHAR,Schema::TYPE_STRING])){
+                        if($columnsLength[$column]<=50){
+                            $hashConditions[] = "'{$column}' => \$this->{$column},";
+                        }
+                    }
                     break;
             }
         }

@@ -5,9 +5,9 @@
 
 use yii\helpers\StringHelper;
 
-
+/*由于接口业务对应前端传递搜索字段的场景太少所有目前不在生成前端动态搜索功能，使用时自行继承实现*/
 /* @var $this yii\web\View */
-/* @var $generator yii\gii\generators\crud\Generator */
+/* @var $generator backend\giitemplate\apiCrud\Generator */
 
 $modelClass = StringHelper::basename($generator->modelClass);
 $searchModelClass = StringHelper::basename($generator->searchModelClass);
@@ -24,8 +24,9 @@ echo "<?php\n";
 
 namespace <?= StringHelper::dirname(ltrim($generator->searchModelClass, '\\')) ?>;
 
-use yii\base\Model;
+use common\ComBase;
 use yii\data\ActiveDataProvider;
+use common\widgets\Pagination;
 use <?= ltrim($generator->modelClass, '\\') . (isset($modelAlias) ? " as $modelAlias" : "") ?>;
 
 /**
@@ -49,8 +50,9 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
      */
     public function scenarios()
     {
-        // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
+        return [
+            'search' =>[<?php foreach ($searchAttributes as $key => $value){ echo "'".$value."',"; } ?>]
+        ];
     }
 
     /**
@@ -58,28 +60,38 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
      *
      * @param array $params
      *
+     * @param string $formName 表单名称
+     *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($query, $paginationParams, $formName)
     {
         $query = <?= isset($modelAlias) ? $modelAlias : $modelClass ?>::find();
 
         // add conditions that should always apply here
 
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination'=>$paginationParams,
         ]);
 
-        $this->load($params);
-
+        // 参数验证失败可以打开此代码进行严格控制将不返回任何数据
+        /*$this->setScenario($scenario);
+        $this->load($params, $formName);
         if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
+            $query->where('0=1');
             return $dataProvider;
-        }
+        }*/
 
-        // grid filtering conditions
-        <?= implode("\n        ", $searchConditions) ?>
+        $searchScenarios = $this->scenarios()[$scenario];
+        if(empty($searchScenarios)){
+            throw new \Exception('Unknown scenario:'.$scenario);
+        }
+        $where = ['is_delete' => 0]; //必须字段直接在此处添加,注意不要在searh场景内覆盖了
+        $query->where($where);
+        $searchParams = ComBase::getReserveArray($params,$searchScenarios);
+        $query->andFilterWhere($searchParams);
 
         return $dataProvider;
     }
