@@ -38,14 +38,22 @@ API DOC 自动生成接口文档规则
 **/
 
 备注显示为接口文档示例
+//这部分可以不写 自动为空 必须是完善的数组格式
+[ 
+"name"=>"手机号", //名称 
+"require"=>1,//是否必须 默认0
+"default"=>"",//默认值 默认无
+"enum"=>[1=>"1描述",2=>"2描述"] //枚举 默认无
+]
 
     /**
-     * 获取详情
-     * @param string $user 手机号 必填
+     * 获取详情 第一行标题
+     * @param string $user ["name"=>"手机号","require"=>1,"default"=>"","enum"=>[1=>"1描述",2=>"2描述"]]
      * @param string $pwd 密码  与验证码有一个必填
      * @param string $push_plist 所在客户端类型 1,2,3,4,5,6 必填
      * @param array $data 数据
      * @return json 成功 {"code":200,"msg":"success","data":{}}，失败 {"code":1001,"msg":"手机已经注册存在","data":{}}
+     * @description 一些描述解释的描述信息
      */
 
 
