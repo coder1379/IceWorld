@@ -2,6 +2,7 @@
 
 namespace common\services\site;
 
+use common\services\user\UserApiModel;
 use Yii;
 use common\services\user\UserModel;
 
@@ -16,6 +17,15 @@ class SiteApiModel extends \common\services\site\SiteModel
 
             'detail' => ['id','name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id',],//详情
         ];
+    }
+
+    /**
+     * 覆盖父类方法
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserRecord()
+    {
+        return $this->hasOne(UserApiModel::class, ['id' => 'user_id']);
     }
 
     public function getInviterUserRecordList()

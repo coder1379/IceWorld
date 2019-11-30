@@ -76,6 +76,7 @@
                         ?>
                         <div class="method_block" id="id=show_method_<?php echo $key; ?>">
                             <h3 style="color: #0f9ae0;"><?php echo $number; ?>.<?php echo $m['tags']['description']; ?> 接口名称:<?php echo $key; ?></h3>
+                            <h4><?php if(!empty($m['tags']['notes'])){ echo $m['tags']['notes']; } ?></h4>
                             <div class="show_params">
                                 <?php
                                 if(!empty($m['tags']['param'])){
@@ -85,11 +86,28 @@
                                     if(is_array($m['tags']['param'])===false){
                                         echo $m['tags']['param'];
                                     }else{
+                                        ?>
+                                        <div>
+                                            <table>
+                                                <tr>
+                                                <td>参数名</td><td>类型</td><td>描述</td><td>是否必填</td><td>默认值</td></tr>
+
+                                                <?php
                                     foreach ($m['tags']['param'] as $p){
                                         ?>
-                                            <div><?php echo $p; ?></div>
+                                          <tr>
+                                              <td><?php if(!empty($p['name'])){ echo $p['name']; } ?></td>
+                                              <td><?php if(!empty($p['type'])){ echo $p['type']; } ?></td>
+                                              <td><?php if(!empty($p['desc'])){ echo $p['desc']; } ?></td>
+                                              <td><?php if(!empty($p['require'])){ echo $p['require']; }else{ echo '否'; } ?></td>
+                                              <td><?php if(!empty($p['default'])){ echo $p['default']; }else{ echo '无'; } ?></td>
+                                          </tr>
                                         <?php
                                     }
+                                    ?>
+                                            </table>
+                            </div>
+                                <?php
                                     }
 
                                 }
@@ -102,7 +120,13 @@
                                 if(!empty($m['tags']['return'])){
                                     ?>
                                     <h4>返回参数:</h4>
-                                    <div><?php echo $m['tags']['return']; ?></div>
+                                    <div><?php if(is_array($m['tags']['return'])){
+                                        foreach ($m['tags']['return'] as $re){
+                                            echo '<p class="show-json-p">'.json_encode($re).'</p>';
+                                        }
+                                        }else{
+                                        echo $m['tags']['return'];
+                                        } ?></div>
                                         <?php
                                 }
                                 ?>

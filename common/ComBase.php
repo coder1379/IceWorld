@@ -132,7 +132,7 @@ class ComBase
      * $include = [
             [
                 'name'=>'userRecord', //对面model里 get+name的function
-                'fields'=>['id','name','mobile'], //Model->getAttributes($fields);,在获取非model数据时fields可以不传
+                'fields'=>['id','name','mobile']|'fields'=>'list|detail等', //Model->getAttributes($fields);,在获取非model数据时fields可以不传,同时可以string，fieldsScenarios的key值，将自动获取对应数组,这里需要注意apiModel与model之间的继承关系，可能hasOne里的父类model没有fieldsScenarios 需要将hasOne或many里面的model指向XxxApiModel
                 'include'=>[ //是否递归子包含
                 ]
             ],
@@ -169,7 +169,18 @@ class ComBase
                     foreach ($modelList as $nextModel){
                         $thisArray = null;
                         if(is_object($nextModel)){
-                            $thisArray = $nextModel->getAttributes($fields);
+                            if(is_array($fields)){
+                                $thisArray = $nextModel->getAttributes($fields);
+                            }else if(is_string($fields)){
+                                if(empty($nextModel->fieldsScenarios()) || empty($nextModel->fieldsScenarios()[$fields])){
+                                    throw new \Exception('fieldsScenarios is null or fieldsScenarios['.$fields.'] is null');
+                                }else{
+                                    $printFields = $nextModel->fieldsScenarios()[$fields];
+                                    $thisArray = $nextModel->getAttributes($printFields);
+                                }
+
+                            }
+
                         }else{
                             $thisArray = $nextModel;
                         }
