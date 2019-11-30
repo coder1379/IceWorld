@@ -46,6 +46,7 @@ class UserApiModel extends UserModel
 
         return [
             'list'=>['id','name','mobile','sex','truename','account'],
+            'detail'=>['id','name'],
         ];
     }
 

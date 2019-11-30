@@ -35,6 +35,17 @@ if(!empty($columnNames)){
     }
 }
 
+$dbNameString = Yii::$app->db->dsn;
+$dbName1=explode(';',$dbNameString);
+$dbNameArr=explode('=',$dbName1[1]);
+$dbName=$dbNameArr[1];
+$tableNmae = $generator->getTableSchema()->fullName;
+$tableCommentObj = Yii::$app->db->createCommand("select table_name,table_comment from information_schema.tables where table_schema = '".$dbName."' and table_name ='".$tableNmae."'")->queryOne();
+$tableComment = $tableCommentObj['table_comment'];
+if(empty($tableComment)){
+    $tableComment=$tableCommentObj['table_name'];
+}
+
 echo "<?php\n";
 ?>
 
@@ -49,6 +60,7 @@ use yii\helpers\Json;
 use common\ComBase;
 
 /**
+ * <?php echo $tableComment.PHP_EOL; ?>
  * <?= $controllerClass ?> implements the CRUD actions for <?= $modelClass ?> model.
  */
 class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->baseControllerClass) . "\n" ?>
@@ -56,9 +68,10 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     public $enableCsrfValidation = false;
 
     /**
-    * 获取列表
-    * @param int $page 页数 非必填 默认:0
-    * @param int $page_size 每页数量 非必填 默认:10
+    * 获取<?php echo $tableComment; ?>列表
+    * @notes
+    * @param int $page 页数 0 0
+    * @param int $page_size 每页数量 0 10
     * @return json
     */
     public function actionList()
@@ -92,8 +105,8 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-    * 获取明细
-    * @param int $id 数据ID 必填
+    * 获取<?php echo $tableComment; ?>详情
+    * @param int $id ID 1
     * @return json
     */
     public function actionDetail()
@@ -121,8 +134,8 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-    * 创建
-    * @param string $name name 必填
+    * 创建<?php echo $tableComment.PHP_EOL; ?>
+    * @param string $name name 1
     * @return json
     */
     public function actionCreate()
@@ -134,8 +147,8 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-    * 修改
-    * @param int $id 数据ID 必填
+    * 修改<?php echo $tableComment.PHP_EOL; ?>
+    * @param int $id ID 1
     * @return json
     */
     public function actionUpdate()
@@ -159,8 +172,8 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-    * 删除
-    * @param int $id 数据ID 必填
+    * 删除<?php echo $tableComment.PHP_EOL; ?>
+    * @param int $id ID 1
     * @return json
     */
     public function actionDelete()
@@ -182,8 +195,8 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-    * 物理删除 默认屏蔽，需要自行打开
-    * @param int $id 数据ID 必填
+    * 物理删除<?= $tableComment ?> 默认屏蔽，需要自行打开
+    * @param int $id ID 1
     * @return json
     */
     /*public function actionPhysiedelete()
