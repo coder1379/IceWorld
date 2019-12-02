@@ -89,7 +89,7 @@ class ComBase
         if (Yii::$app->params['returnAllErrors'] == true) {
             $returnData['allErrors'] = $errors['all'];
         }
-        return self::getReturnArray($returnData, self::CODE_PARAM_FORMAT_ERROR, $errors['first']['v']);
+        return self::getReturnArray($returnData, self::CODE_PARAM_FORMAT_ERROR, $errors['first']['k'].':'.$errors['first']['v']);
     }
 
     /**

@@ -46,7 +46,12 @@ API DOC 自动生成接口文档规则
 @param type name desc require default
 
 @return type(json或者string,int等) yes|no {"data":{"@model":"common\services\site\SiteApiModel","userRecord":{"@model":"common\services\site\SiteApiModel","@fields":"list","inviterUserRecord":{"@model":"common\services\site\SiteApiModel","names":"xxx"}}}}
-code,msg等如果不写默认为yes|no对应的值yes操作成功,no参数错误，@model 为list还是detail对象,@model为引用的对象,@fields为model对应的显示字段场景,注意继承关系
+code,msg等如果不写默认为yes|no对应的值yes操作成功,no参数错误，@model为引用的对象,@fields为model对应的显示字段场景,注意继承关系
+
+如果内容太多不方便拼接或者写到备注里可以直接引入文件：
+     
+ @return file no site/getListJson.txt //文件统一存放在api/document下，引用时不包含document
+
 
     /**
      * 获取详情 第一行标题
@@ -63,5 +68,7 @@ code,msg等如果不写默认为yes|no对应的值yes操作成功,no参数错误
 注意：
 当使用$include获取列表或详情下关联数据时由于会导致多次查询数据库，可以在query时配合->with('xxxRecor') 进行直接加载一次查询对应关联数据，详细内容查看yii2 及时加载与延迟加载
 
+接口全量自动测试：
+AllapitestController.php 中手动写入需要全量测试的接口
 
 

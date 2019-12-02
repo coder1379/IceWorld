@@ -24,9 +24,10 @@ class SiteController extends ApiCommonAuthContoller
     * @notes
     * @param int $page 页数 0 0
     * @param int $page_size 每页数量 0 10
-    * @return json yes {"data":{"other":"abc","@model":"common\services\site\SiteApiModel","userRecord":{"@fields":"list","@model":"common\services\user\UserApiModel","inviterUserRecord":{"@model":"common\services\user\UserApiModel","names":"xxx"}}}}
+    * @return json yes {"data":"other":"abc","@model":"common\services\site\SiteApiModel","userRecord":{"@fields":"list","@model":"common\services\user\UserApiModel","inviterUserRecord":{"@model":"common\services\user\UserApiModel","names":"xxx"}}}}
      * @return json no {"data":{"other":"abc","@model":"common\services\site\SiteApiModel","userRecord":{"@fields":"list","@model":"common\services\user\UserApiModel","inviterUserRecord":{"@model":"common\services\user\UserApiModel","names":"xxx"}}}}
-    */
+     * @return file no site/getListJson.txt
+     */
     public function actionList()
     {
         $fieldScenarios = 'list';
@@ -59,11 +60,6 @@ class SiteController extends ApiCommonAuthContoller
     */
     public function actionDetail()
     {
-
-        $detailModel = new \common\services\site\SiteModel();
-       var_dump($detailModel->getTableSchema()->columns['id']->type);
-
-       exit();
 
         $logic = new SiteLogic();
         $id = intval($this->post('id',0));

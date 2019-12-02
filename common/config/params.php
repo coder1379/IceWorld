@@ -14,5 +14,6 @@ return [
         'endPoint' => 'oss-cn-beijing.aliyuncs.com',
     ],
     'oss_base_link' => 'http://www.test.com/',//阿里云静态文件自定义前缀
+    'api_root_url' => 'http://test.yii.com/',//api 域名地址
 
 ];
