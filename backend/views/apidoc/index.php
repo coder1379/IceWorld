@@ -34,7 +34,7 @@
            <div>
             接口地址：****/<br/>
             传参方式：POST<br/>
-            接口完整地址：接口地址+模块名称+接口名称 例如：http://***.com/baseapi/network
+            接口完整地址：接口地址+模块名称+接口名称 例如：http://***.com/controler/action
                <br/><br/>
                返回类型：<br/>
                code = 返回状态码，200 成功，非200即为失败，弹出错误提示，401为权限验证失败需要进行重新登录<br/>
@@ -117,17 +117,32 @@
 
                             <div class="show_return">
                                 <?php
-                                if(!empty($m['tags']['return'])){
+                                if(!empty($m['tags']['return']['yes'])){
                                     ?>
-                                    <h4>返回参数:</h4>
-                                    <div><?php if(is_array($m['tags']['return'])){
-                                        foreach ($m['tags']['return'] as $re){
+                                    <h4>返回成功参数:</h4>
+                                    <div><?php if(is_array($m['tags']['return']['yes'])){
+                                        foreach ($m['tags']['return']['yes'] as $re){
                                             echo '<p class="show-json-p">'.json_encode($re).'</p>';
                                         }
                                         }else{
-                                        echo $m['tags']['return'];
+                                        echo $m['tags']['return']['yes'];
                                         } ?></div>
                                         <?php
+                                }
+                                ?>
+
+                                <?php
+                                if(!empty($m['tags']['return']['no'])){
+                                    ?>
+                                    <h4>返回失败参数:</h4>
+                                    <div><?php if(is_array($m['tags']['return']['no'])){
+                                            foreach ($m['tags']['return']['no'] as $re){
+                                                echo '<p class="show-json-p">'.json_encode($re).'</p>';
+                                            }
+                                        }else{
+                                            echo $m['tags']['return']['no'];
+                                        } ?></div>
+                                    <?php
                                 }
                                 ?>
 
