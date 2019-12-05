@@ -15,7 +15,7 @@ use common\ComBase;
  * 网站内容
  * SiteController implements the CRUD actions for SiteApiModel model.
  */
-class SiteController extends ApiCommonAuthContoller
+class SiteWebController extends ApiCommonAuthContoller
 {
     public $enableCsrfValidation = false;
 
@@ -24,11 +24,11 @@ class SiteController extends ApiCommonAuthContoller
     * @notes
     * @param int $page 页数 0 0
     * @param int $page_size 每页数量 0 10
-    * @return json yes {"afew":"wfefwg23w","@model":"common\services\site\SiteApiModel","data":{"other":"abc","@model":"common\services\site\SiteApiModel","userRecord":{"@fields":"list","@model":"common\services\user\UserApiModel","inviterUserRecord":{"@model":"common\services\user\UserApiModel","names":"xxx"}}}}
+    * @return json yes {"data":"other":"abc","@model":"common\services\site\SiteApiModel","userRecord":{"@fields":"list","@model":"common\services\user\UserApiModel","inviterUserRecord":{"@model":"common\services\user\UserApiModel","names":"xxx"}}}}
      * @return json no {"data":{"other":"abc","@model":"common\services\site\SiteApiModel","userRecord":{"@fields":"list","@model":"common\services\user\UserApiModel","inviterUserRecord":{"@model":"common\services\user\UserApiModel","names":"xxx"}}}}
      * @return file no site/getListJson.txt
      */
-    public function actionList()
+    public function actionListShow()
     {
         $fieldScenarios = 'list';
         $logic = new SiteLogic();
