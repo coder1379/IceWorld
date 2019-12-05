@@ -106,7 +106,7 @@ class ApidocController extends AuthController
             $docList[$name] = ['name' => $name, 'description' => $controllerDoc, 'methods' => $methodList];
         }
 
-        return $this->render('index', ['docList' => $docList, 'cname' => $clickName]);
+        return $this->render('index', ['docList' => $docList, 'cname' => $clickName,'apiRootUrl'=>Yii::$app->params['api_root_url']]);
     }
 
 
