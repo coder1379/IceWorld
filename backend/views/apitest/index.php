@@ -44,7 +44,7 @@
                 foreach ($apiData['params'] as $p){
             ?>
                     <div class="row cl">
-                        <label class="form-label col-xs-4 col-sm-2"><?php if(!empty($p['require']) && $p['require'] == '是'){ echo '<span class="c-red">*</span>'; } ?><?php echo $p['desc']??''; ?>(<?php echo $p['type']??''; ?>)：</label>
+                        <label class="form-label col-xs-4 col-sm-2"><?php if(!empty($p['require']) && $p['require'] == true){ echo '<span class="c-red">*</span>'; } ?><?php echo $p['desc']??''; ?>(<?php echo $p['type']??''; ?>)：</label>
                         <div class="formControls col-xs-8 col-sm-9">
                             <input type="text" class="input-text" value="<?php echo $p['default']??''; ?>" placeholder="<?php echo $p['desc']??''; ?>" name="<?php echo $p['name']??''; ?>">
                         </div>

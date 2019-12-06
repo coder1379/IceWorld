@@ -108,7 +108,7 @@ class SiteModel extends \yii\db\ActiveRecord
                 return [
         'create' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id','type',],//创建场景
         'default' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id','type',],//修改场景
-        'update' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status','user_id','type',],//修改场景
+        'update' => ['name','introduce','seo_title','seo_keywords','seo_description','telphone','mobile','qq','email','img_url','cover','content','about_us','add_time','status'],//修改场景
 
         'delete' => ['is_delete'],//删除场景
         ];

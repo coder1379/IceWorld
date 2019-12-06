@@ -9,6 +9,10 @@ use yii\db\Schema;
 
 class ApiReflection
 {
+    //返回参数的替换字符串，直接进行替换即可
+    public $replaceArray =[
+        '@pagination'=>'"pagination": {"page_size": "[number] 每页条数","total_page": "[number] 总页数","page": "[number] 当前页数","total_count": "[number] 数据总数"}',//分页替换变量 @pagination
+    ];
 
     public function formatParams($tagsParm){
         $formatParams = [];
@@ -31,31 +35,65 @@ class ApiReflection
                     }
                 }
 
-                if (!empty($tmpArr2[0])) {
-                    $newPam['type'] = $tmpArr2[0];
-                }
+                if(!empty($tmpArr2[0]) && $tmpArr2[0]=='@model'){
+                    $modelClass = $tmpArr2[1];
+                    $scenarios = $tmpArr2[2];
 
-                if (!empty($tmpArr2[1])) {
-                    $newPam['name'] = str_replace('$', '', $tmpArr2[1]);
-                }
-
-                if (!empty($tmpArr2[2])) {
-                    $newPam['desc'] = $tmpArr2[2];
-                }
-                if (!empty($tmpArr2[3])) {
-                    $requireStr = strval($tmpArr2[3]);
-                    if ($requireStr == '1' || $requireStr == 'true' || $requireStr == '必填') {
-                        $requireStr = '是';
-                    } else if ($requireStr == '0' || $requireStr == 'false' || $requireStr == '非必填') {
-                        $requireStr = '否';
+                    if(empty($modelClass) || empty($scenarios)){
+                        continue;
                     }
-                    $newPam['require'] = $requireStr;
-                }
-                if (!empty($tmpArr2[4])) {
-                    $newPam['default'] = $tmpArr2[4];
+                    try{
+                        $apiModel = new $modelClass();
+                        $scenariosList = $apiModel->scenarios()[$scenarios] ?? [];
+                        if(!empty($scenariosList)){
+                            $apiModel->loadDefaultValues();
+                            $typeList = $apiModel->getTableSchema()->columns;
+                            foreach ($scenariosList as $sname){
+                                $newPam['require'] = $apiModel->isAttributeRequired($sname);
+                                $newPam['default'] = $apiModel->$sname;
+                                $newPam['desc'] = $apiModel->getAttributeLabel($sname);
+                                $typeObj = $typeList[$sname] ?? null;
+                                $newPam['name'] = $sname;
+                                $newPam['type'] = '';
+                                if (!empty($typeObj)) {
+                                    $newPam['type'] = $this->getFeildType($typeObj->type);
+                                }
+                                $formatParams[] = $newPam;
+                            }
+                        }
+                    }catch (\Exception $ex){
+
+                    }
+                }else{
+                    if (!empty($tmpArr2[0])) {
+                        $newPam['type'] = $tmpArr2[0];
+                    }
+
+                    if (!empty($tmpArr2[1])) {
+                        $newPam['name'] = str_replace('$', '', $tmpArr2[1]);
+                    }
+
+                    if (!empty($tmpArr2[2])) {
+                        $newPam['desc'] = $tmpArr2[2];
+                    }
+                    if (!empty($tmpArr2[3])) {
+                        $requireStr = strval($tmpArr2[3]);
+                        if ($requireStr == '1' || $requireStr == 'true' || $requireStr == '必填') {
+                            $requireStr = true;
+                        } else if ($requireStr == '0' || $requireStr == 'false' || $requireStr == '非必填') {
+                            $requireStr = false;
+                        }
+                        $newPam['require'] = $requireStr;
+                    }
+                    if (!empty($tmpArr2[4])) {
+                        $newPam['default'] = $tmpArr2[4];
+                    }
+                    $formatParams[] = $newPam;
                 }
 
-                $formatParams[] = $newPam;
+
+
+
             }
         }
         return $formatParams;
@@ -135,6 +173,9 @@ class ApiReflection
 
                             $thisDataNew = $this->getReturnJsonFormat($jsonObj);
                             $thisData = array_merge($thisData, $thisDataNew);
+                            if(empty($thisData['data'])){
+                                $thisData['data'] = new \StdClass();
+                            }
                             $returnList = $thisData;
                         } else {
                             $returnList = implode(' ', $fm);
@@ -180,6 +221,9 @@ class ApiReflection
     public function parseDocCommentTags($reflection)
     {
         $comment = $reflection->getDocComment();
+        foreach ($this->replaceArray as $key=>$re){
+            $comment = str_replace($key, $re, $comment);
+        }
         $comment = "@description \n" . strtr(trim(preg_replace('/^\s*\**( |\t)?/m', '', trim($comment, '/'))), "\r", '');
         $parts = preg_split('/^\s*@/m', $comment, -1, PREG_SPLIT_NO_EMPTY);
         $tags = [];
@@ -205,8 +249,9 @@ class ApiReflection
         $reurnArr = [];
         if (!empty($json)) {
             foreach ($json as $key => $val) {
-                if ($key == '@model') {
+                if ($key === '@model') {
                     $fields = $json['@fields'] ?? 'detail';
+
                     $model = new $val();
                     $labels = $model->attributeLabels();
                     $typeList = $model->getTableSchema()->columns;
@@ -225,6 +270,9 @@ class ApiReflection
                         }
                     }
                 } else {
+                    if($key === '@fields'){
+                        continue;
+                    }
                     if (is_array($val)) {
                         $newArr = $this->getReturnJsonFormat($val);
                         if (!empty($newArr)) {
@@ -237,6 +285,7 @@ class ApiReflection
                 }
             }
         }
+
         return $reurnArr;
     }
 
