@@ -96,7 +96,7 @@
                                               <td><?php if(!empty($p['name'])){ echo $p['name']; } ?></td>
                                               <td><?php if(!empty($p['type'])){ echo $p['type']; } ?></td>
                                               <td><?php if(!empty($p['desc'])){ echo $p['desc']; } ?></td>
-                                              <td><?php if(!empty($p['require'])){ echo $p['require']; }else{ echo '否'; } ?></td>
+                                              <td><?php if(!empty($p['require'])){ echo '是'; }else{ echo '否'; } ?></td>
                                               <td><?php if(!empty($p['default'])){ echo $p['default']; }else{ echo '无'; } ?></td>
                                           </tr>
                                         <?php

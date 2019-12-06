@@ -10,7 +10,6 @@ use yii\web\NotFoundHttpException;
 use yii\helpers\Json;
 use common\ComBase;
 
-
 /**
  * 网站内容
  * SiteController implements the CRUD actions for SiteApiModel model.
@@ -24,10 +23,8 @@ class SiteController extends ApiCommonAuthContoller
     * @notes
     * @param int $page 页数 0 0
     * @param int $page_size 每页数量 0 10
-    * @return json yes {"afew":"wfefwg23w","@model":"common\services\site\SiteApiModel","data":{"other":"abc","@model":"common\services\site\SiteApiModel","userRecord":{"@fields":"list","@model":"common\services\user\UserApiModel","inviterUserRecord":{"@model":"common\services\user\UserApiModel","names":"xxx"}}}}
-     * @return json no {"data":{"other":"abc","@model":"common\services\site\SiteApiModel","userRecord":{"@fields":"list","@model":"common\services\user\UserApiModel","inviterUserRecord":{"@model":"common\services\user\UserApiModel","names":"xxx"}}}}
-     * @return file no site/getListJson.txt
-     */
+    * @return json yes {"data":{"list":[{"@model":"common\services\site\SiteApiModel","@fields":"list"}],@pagination}}
+    */
     public function actionList()
     {
         $fieldScenarios = 'list';
@@ -48,19 +45,18 @@ class SiteController extends ApiCommonAuthContoller
         //获取post内的分页数据并格式化
         $paginationParams = $logic->getPaginationParams($params);
 
-        $include = [ [ 'name'=>'userRecord', 'fields'=>'list' ] ];//支持关联数据获取
-        $result = $logic->list($searchDataQuery, $printFields,$paginationParams,$include);
+        //$include = [ [ 'name'=>'xxxRecord', 'fields'=>['id','name'] ] ];//支持关联数据获取
+        $result = $logic->list($searchDataQuery, $printFields,$paginationParams);
         return Json::encode($result);
     }
 
     /**
     * 获取网站内容详情
     * @param int $id ID 1
-    * @return json
+    * @return json yes {"data":{"@model":"common\services\site\SiteApiModel","@fields":"detail"}}
     */
     public function actionDetail()
     {
-
         $logic = new SiteLogic();
         $id = intval($this->post('id',0));
         if(empty($id)){
@@ -80,8 +76,8 @@ class SiteController extends ApiCommonAuthContoller
 
     /**
     * 创建网站内容
-    * @param string $name name 1
-    * @return json
+    * @param @model common\services\site\SiteApiModel create
+    * @return json yes {"data":{"id":"[number] ID"}}
     */
     public function actionCreate()
     {
@@ -94,7 +90,8 @@ class SiteController extends ApiCommonAuthContoller
     /**
     * 修改网站内容
     * @param int $id ID 1
-    * @return json
+    * @param @model common\services\site\SiteApiModel update
+    * @return json yes {"data":null}
     */
     public function actionUpdate()
     {
@@ -114,7 +111,7 @@ class SiteController extends ApiCommonAuthContoller
     /**
     * 删除网站内容
     * @param int $id ID 1
-    * @return json
+    * @return json yes {"data":null}
     */
     public function actionDelete()
     {
@@ -132,7 +129,7 @@ class SiteController extends ApiCommonAuthContoller
     /**
     * 物理删除网站内容 默认屏蔽，需要自行打开
     * @param int $id ID 1
-    * @return json
+    * @return json yes {"data":null}
     */
     /*public function actionPhysiedelete()
     {

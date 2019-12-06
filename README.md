@@ -45,25 +45,14 @@ API DOC 自动生成接口文档规则
 
 @param type name desc require default
 
+@param @model common\services\xxx\XxxApiModel create //备注中 @model表示引入model com..为model路径,create 为场景标识
+
 @return type(json或者string,int等) yes|no {"data":{"@model":"common\services\site\SiteApiModel","userRecord":{"@model":"common\services\site\SiteApiModel","@fields":"list","inviterUserRecord":{"@model":"common\services\site\SiteApiModel","names":"xxx"}}}}
 code,msg等如果不写默认为yes|no对应的值yes操作成功,no参数错误，@model为引用的对象,@fields为model对应的显示字段场景,注意继承关系
 
 如果内容太多不方便拼接或者写到备注里可以直接引入文件：
      
  @return file no site/getListJson.txt //文件统一存放在api/document下，引用时不包含document
-
-
-    /**
-     * 获取详情 第一行标题
-     * @param string $user 手机号 true 1=描述,2=描述
-     * @param string $pwd 密码  与验证码有一个必填
-     * @param string $push_plist 所在客户端类型 1,2,3,4,5,6 必填
-     * @param array $data 数据
-     * @return json 成功 {"code":200,"msg":"success","data":{}}，失败 {"code":1001,"msg":"手机已经注册存在","data":{}}
-     * @description 一些描述解释的描述信息
-     */
-
-
 
 注意：
 当使用$include获取列表或详情下关联数据时由于会导致多次查询数据库，可以在query时配合->with('xxxRecor') 进行直接加载一次查询对应关联数据，详细内容查看yii2 及时加载与延迟加载
