@@ -67,7 +67,11 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
                }else if($jsonV["type"]=="upload_image"){
                echo $hideStr."['attribute' => '" . $name . "','label' => '".$comarr[0]."','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $name . ",['class'=>'backend-view-img']),\$model->" . $name . ",['target' => '_blank']),],\n";
            }else if($jsonV["type"]=="val"){
-               echo $hideStr."            '" . $name . "',\n";
+               if(!empty($jsonV["TimeFormat"]) && $jsonV["TimeFormat"]==1){
+                   echo $hideStr."['label'=>'".$comarr[0]."','value'=>((\$model->".$name.")>0?date('Y-m-d H:i:s',\$model->".$name."):''),\n";
+               }else{
+                   echo $hideStr."            '" . $name . "',\n";
+               }
            }else if($jsonV["type"]=="rich_text"){
                echo $hideStr."['attribute' => '" . $name . "','label' => '".$comarr[0]."','format' => 'raw','value'=>'<iframe srcdoc=\''.\$model->".$name.".'\' class=\'backend-view-iframe\' frameborder=\'1\'></iframe>'],\n";
            }
@@ -106,7 +110,11 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
                echo $hideStr."['attribute' => '" . $column->name . "','label' => '".$comarr[0]."','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $column->name . ",['class'=>'backend-view-img']),\$model->" . $column->name . ",['target' => '_blank']),],\n";
            }else if($jsonV["type"]=="val"){
                $format = $generator->generateColumnFormat($column);
-               echo $hideStr."            '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
+               if(!empty($jsonV["TimeFormat"]) && $jsonV["TimeFormat"]==1){
+                   echo $hideStr."['label'=>'".$comarr[0]."','value'=>((\$model->".$column->name.")>0?date('Y-m-d H:i:s',\$model->".$column->name."):'')],\n";
+               }else{
+                   echo $hideStr."            '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
+               }
            }else if($jsonV["type"]=="rich_text"){
                echo $hideStr."['attribute' => '" . $column->name . "','label' => '".$comarr[0]."','format' => 'raw','value'=>'<iframe srcdoc=\''.\$model->".$column->name.".'\' class=\'backend-view-iframe\' frameborder=\'1\'></iframe>'],\n";
            }
