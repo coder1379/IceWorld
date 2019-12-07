@@ -116,7 +116,11 @@ if(empty($jsonV)!=true){
     }else if($jsonV["type"]=="upload_image"){
         echo $hideStr."['value'=>function(\$data){ return Html::a(Html::img(\$data->".$name.",['class' => 'backend-index-img']),\$data->".$name.",['target' => '_blank']);},'label'=>'".$commntstr."','format'=>'raw'],\n";
     }else if($jsonV["type"]=="val"){
-        echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','label' => '".$commntstr."'],\n";
+        if(!empty($jsonV["TimeFormat"]) && $jsonV["TimeFormat"]==1){
+            echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>function(\$data){ if(\$data->".$name.">0){ return date('Y-m-d H:i:s',\$data->".$name."); }else{ return ''; } },'label' => '".$commntstr."'],\n";
+        }else{
+            echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','label' => '".$commntstr."'],\n";
+        }
     }
 }else{
     if($name=='is_delete'){}else{
