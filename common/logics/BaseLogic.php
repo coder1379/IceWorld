@@ -284,4 +284,12 @@ class BaseLogic
         return $pagination;
     }
 
+    /**
+     * 统一获取参数错误返回,可在子类中自行覆盖
+     * @return array
+     */
+    public function getParamsErrorReturnArray(){
+        return ComBase::getReturnArray([], ComBase::CODE_PARAM_ERROR, ComBase::MESSAGE_PARAM_ERROR);
+    }
+
 }
