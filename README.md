@@ -60,4 +60,7 @@ code,msg等如果不写默认为yes|no对应的值yes操作成功,no参数错误
 接口全量自动测试：
 AllapitestController.php 中手动写入需要全量测试的接口
 
+##队列 yii2-queue
+无报错即执行完成，如需重试直接throw异常
+
 
