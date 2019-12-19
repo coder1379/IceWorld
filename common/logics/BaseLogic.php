@@ -300,4 +300,12 @@ class BaseLogic
         return ComBase::getReturnArray([], ComBase::CODE_SERVER_ERROR, ComBase::MESSAGE_SERVER_ERROR);
     }
 
+    /**
+     * 统一获取服务器繁忙，可在子类自行覆盖
+     * @return array
+     */
+    public function getServerBusyReturnArray(){
+        return ComBase::getReturnArray([], ComBase::CODE_SERVER_BUSY, ComBase::MESSAGE_SERVER_BUSY);
+    }
+
 }
