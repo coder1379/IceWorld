@@ -63,4 +63,7 @@ AllapitestController.php 中手动写入需要全量测试的接口
 ##队列 yii2-queue
 无报错即执行完成，如需重试直接throw异常
 
+##基本流程
+创建数据库表格->生成Model->生成curd
+
 
