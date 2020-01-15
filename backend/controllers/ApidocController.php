@@ -16,7 +16,7 @@ class ApidocController extends AuthController
     public $layout = 'main-iframe';
 
     /**
-     * Lists all WebsiteNewsModel models.
+     * 根据代码自动生成接口文档控制器
      * @return mixed
      */
     public function actionIndex()
