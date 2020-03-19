@@ -140,6 +140,10 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
                 $model->add_time = date('Y-m-d H:i:s',time());
             }
 
+            if(!empty($allAttributeLabels['update_time']) && (empty($model->update_time) || $model->update_time == '0000-00-00 00:00:00' )){
+                $model->update_time = date('Y-m-d H:i:s',time());
+            }
+
             if(!empty($allAttributeLabels['add_admin_id']) && empty($model->add_admin_id)){
                 $model->add_admin_id = $this->getAdminId();
             }
@@ -164,6 +168,11 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
         $model->scenario = 'update';//修改场景，控制字段安全
         $model->loadDefaultValues();
         if ($model->load(Yii::$app->request->post())==true) {
+            //维护修改时间如果存在字段
+            $allAttributeLabels = $model->attributeLabels();
+            if(!empty($allAttributeLabels['update_time'])){
+                $model->update_time = date('Y-m-d H:i:s',time());
+            }
             if($model->save()==true){
                 return $this->redirect(['view', <?= $urlParams ?>]);
             }
