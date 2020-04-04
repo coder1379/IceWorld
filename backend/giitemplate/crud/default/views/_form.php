@@ -91,13 +91,29 @@ foreach ($generator->getColumnNames() as $attribute) {
     if (in_array($attribute, $safeAttributes)) {
         if(empty($jsonV)!=true){
             $hideStr = '';
+
+            $tipDefaultValue = '';
             if(!empty($jsonV["cuHide"]) && $jsonV["cuHide"]==1){
                 $hideStr = '//';
             }
+
+            if(isset($jsonV["tipDefVal"])){
+                $tipDefaultValue = $jsonV["tipDefVal"];
+            }
+
+            $tipShow = 0;
+            if(!empty($jsonV["tipShow"]) && $jsonV["tipShow"]==1){
+                $tipShow = $jsonV["tipShow"];
+            }
+
+            $promptVal = '';
+            if($tipShow==1){
+                $promptVal =  "'prompt' => ['text'=>'请选择".$lableArr[0]."','options'=>['value'=>'".$tipDefaultValue."']],";
+            }
             if($jsonV["type"]=="text"){
-                echo  "    <?php ".$hideStr."echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["name"].",['prompt' => '请选择".$lableArr[0]."','options'=>[\$model->".$attribute."=>['Selected'=>true]]]); ?>\n\n";
+                echo  "    <?php ".$hideStr."echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["name"].",[".$promptVal."'options'=>[\$model->".$attribute."=>['Selected'=>true]]]); ?>\n\n";
             }else if($jsonV["type"]=="db"){
-                echo  "    <?php ".$hideStr."echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["functionName"]."List(),['prompt' => '请选择".$lableArr[0]."','options'=>[\$model->".$attribute."=>['Selected'=>true]]]); ?>\n\n";
+                echo  "    <?php ".$hideStr."echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["functionName"]."List(),[".$promptVal."'options'=>[\$model->".$attribute."=>['Selected'=>true]]]); ?>\n\n";
             }else if($jsonV["type"]=="upload_image"){
                 $mustFlag = 0;
                 echo '    <?php '.$hideStr.'echo $fileUploadHtml->createFileUpload($model,"'.$attribute.'","'.$lableArr[0].'"); ?>'."\n";
@@ -109,6 +125,8 @@ foreach ($generator->getColumnNames() as $attribute) {
                     $richTextNoNullList[] = $attribute;
                 }
 
+            }else if($jsonV["type"]=="more_text"){
+                echo "    <?php ".$hideStr."echo \$form->field(\$model, '$attribute')->textarea(['rows' => 3,'maxlength' => true]); ?>\n\n";
             }else{
                 echo "    <?php ".$hideStr."echo " . $generator->generateActiveField($attribute) . "; ?>\n\n";
             }

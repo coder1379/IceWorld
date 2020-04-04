@@ -121,10 +121,13 @@ class AdminroleController extends AuthController
         $model->scenario = 'create';//创建场景，控制字段安全
         $model->loadDefaultValues();
         if ( $model->load(Yii::$app->request->post())==true) {
-            if(isset($model->add_time)){
+            //添加添加时间和添加的管理员代码
+            $allAttributeLabels = $model->attributeLabels();
+            if(!empty($allAttributeLabels['add_time']) && (empty($model->add_time) || $model->add_time == '0000-00-00 00:00:00' )){
                 $model->add_time = date('Y-m-d H:i:s',time());
             }
-            if(isset($model->add_admin_id)){
+
+            if(!empty($allAttributeLabels['add_admin_id']) && empty($model->add_admin_id)){
                 $model->add_admin_id = $this->getAdminId();
             }
             $model->auth_list=$this->getAuthArray($authlist);
