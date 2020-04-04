@@ -17,6 +17,7 @@ return [
             'mutex' => \yii\mutex\MysqlMutex::class,
             'ttr' => 5, // Max time for anything job handling
             'attempts' => 3, // Max number of attempts
+            'as log'=> \yii\queue\LogBehavior::class,//日志
         ],
     ],
 ];

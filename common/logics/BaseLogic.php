@@ -284,4 +284,28 @@ class BaseLogic
         return $pagination;
     }
 
+    /**
+     * 统一获取参数错误返回,可在子类中自行覆盖
+     * @return array
+     */
+    public function getParamsErrorReturnArray(){
+        return ComBase::getReturnArray([], ComBase::CODE_PARAM_ERROR, ComBase::MESSAGE_PARAM_ERROR);
+    }
+
+    /**
+     * 统一获取服务器异常返回,可在子类中自行覆盖
+     * @return array
+     */
+    public function getServerErrorReturnArray(){
+        return ComBase::getReturnArray([], ComBase::CODE_SERVER_ERROR, ComBase::MESSAGE_SERVER_ERROR);
+    }
+
+    /**
+     * 统一获取服务器繁忙，可在子类自行覆盖
+     * @return array
+     */
+    public function getServerBusyReturnArray(){
+        return ComBase::getReturnArray([], ComBase::CODE_SERVER_BUSY, ComBase::MESSAGE_SERVER_BUSY);
+    }
+
 }

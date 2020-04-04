@@ -14,6 +14,9 @@ return [
     'language'=>'zh-CN',
     'sourceLanguage'=>'en-US',
     'controllerNamespace' => 'api\controllers',
+    'modules' => [
+        'feedback' => ['class'=>'api\modules\feedback\Module'],//反馈模块,模块化模板
+    ],
     'components' => [
         'log' => [
 				'traceLevel' => YII_DEBUG ? 3 : 0,
