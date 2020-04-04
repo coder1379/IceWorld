@@ -4,10 +4,10 @@ $config = [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=cdb-8jss4y4m.bj.tencentcdb.com;dbname=ice_world_db;port=10052',
+            'dsn' => 'mysql:host=127.0.0.1;dbname=name_db',
             'tablePrefix' => 'm_',
-            'username' => 'user01',
-            'password' => 'jwioe#72895khwke_hk224',
+            'username' => 'root',
+            'password' => 'password',
             'charset' => 'utf8',
         ],
         'request' => [
