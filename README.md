@@ -5,14 +5,13 @@ ICE WORLD
 
 Nginx 配置中加入
 
+最外层加入
+```nginx
 index index.php index.html index.htm;
-
 if (!-e $request_filename){
-
-   		rewrite ^/(.*) /index.php last;
-   		
+    rewrite ^/(.*) /index.php last;
 }
-
+```
 
 数据库连接字符串顺序
 
