@@ -81,5 +81,21 @@ AllapitestController.php 中手动写入需要全量测试的接口
 
 制作一套类似postman的系统，可以预定义参数，参数保存在后台用户里面
 
+```
+composer 常用流程
+1 初始化项目:
+创建 composer.json，并添加依赖到的扩展包；
+运行 composer install，安装扩展包并生成 composer.lock；
+提交 composer.lock 到代码版本控制器中，如：git;
+
+2.项目协作者安装现有项目 (如生产环境)
+克隆项目后，根目录下直接运行 composer install 从 composer.lock 中安装 指定版本 的扩展包以及其依赖
+
+3.为项目添加新扩展包 避免对全部包进行更新导致系统问题
+使用 composer require vendor/package 添加扩展包；
+提交更新后的 composer.json 和 composer.lock 到代码版本控制器中，如：git;
+例如：composer require "phpspec/php-diff:^1.1.0"
+
+```
 
 
