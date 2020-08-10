@@ -194,9 +194,17 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
         if(empty($obj)==true){
             return ComBase::getReturnJson([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);
         }else{
-            $obj->scenario = 'delete';//删除场景，控制字段安全
-            $obj->is_delete=1;
-            if($obj->update()==true){
+
+            $deleteFlag = 0;
+            if(isset($obj->is_delete)!=true){
+                $deleteFlag = $obj->delete();
+            }else{
+                $obj->scenario = 'delete';//删除场景，控制字段安全
+                $obj->is_delete=1;
+                $deleteFlag = $obj->update();
+            }
+
+            if($deleteFlag){
                 return $this->getJsonString([],ComBase::CODE_RUN_SUCCESS,ComBase::MESSAGE_DELETE_SUCCESS);
             }else{
                 return $this->getJsonString([],ComBase::CODE_SERVER_ERROR,ComBase::MESSAGE_SERVER_ERROR);
