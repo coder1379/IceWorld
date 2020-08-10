@@ -125,8 +125,15 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
 
         ?>
 
+        <?php
+        if(!empty($idKey)) {
+            ?>
 
-        $query->addOrderBy('id desc');
+            $query->addOrderBy('<?php echo $idKey; ?> desc');
+
+            <?php
+        }
+        ?>
 
         return $dataProvider;
     }
