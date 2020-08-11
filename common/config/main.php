@@ -4,10 +4,20 @@ return [
 	'timeZone' => 'Asia/Shanghai',
     'bootstrap'=> [
         'queue',
+        'log',
     ],
     'components' => [
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
+        'log' => [
+            'traceLevel' => YII_DEBUG ? 3 : 0,
+            'targets' => [
+                [
+                    'class' => 'yii\log\DbTarget',
+                    'levels' => ['error', 'warning'],
+                    'except' => [
+                        'yii\web\HttpException:404',
+                    ],
+                ],
+            ],
         ],
         'queue' => [
             'class' => \yii\queue\db\Queue::class,
