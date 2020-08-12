@@ -86,8 +86,8 @@ class BackendCommon extends BaseCommon
         $adminLoginKey = trim($cookies->getValue('adminloginkey'));
         if(empty($adminLoginName)!=true && empty($adminLoginTime)!=true && empty($adminLoginKey)!=true){
             $md5LoginString=$this->getLoginMd5Aes($adminLoginTime,$adminLoginName,Yii::$app->params["adminAutoLoginKey"]);
-            if($md5LoginString==$adminLoginKey){
-                return $this->setAdminLoginSession($adminLoginName,'',1);
+            if($md5LoginString===$adminLoginKey){
+                return $this->setAdminCookieLoginSession($adminLoginName,1);
             }else{
                 $this->clearLoginCookie();
             }
@@ -152,32 +152,63 @@ class BackendCommon extends BaseCommon
     }
 
     /**
-     * 登陆并写入session
-     * @param $adminName
-     * @param string $password
-     * @param bool $online
-     * @return bool
+     * 设置cookie缓存 登录
+     * @param $adminRecord
      */
-    public function setAdminLoginSession($adminName,$password='',$online=0){
-        $params = [':login_username'=>$adminName,':is_delete'=>0,':status'=>1];
-        $adminRecord=Yii::$app->db->createCommand('select * from {{%administrator}} where login_username=:login_username and is_delete=:is_delete and status=:status')->bindValues($params)->queryOne();
-        if(empty($adminRecord)){
-            return false;
-        }
-        if(empty($password)!=true){
-            if($this->getSaveDBPassword($password)!=$adminRecord['login_password']){
-                return false;
-            }
-        }
-        $this->setLoginInfoToSession($adminRecord);
-        
-        if($online == 1){
+    public function setLoginOnline($adminRecord){
+        if(!empty($adminRecord)){
             $loginTime = time();
             $timetemp=$loginTime+Yii::$app->params["adminLoginExpireTime"];
             $cookies = Yii::$app->response->getCookies();
             $this->setCookie($cookies,'adminloginname',$adminRecord['login_username'],$timetemp);
             $this->setCookie($cookies,'adminlogintime',$loginTime,$timetemp);
             $this->setCookie($cookies,'adminloginkey',$this->getLoginMd5Aes($loginTime,$adminRecord['login_username'],Yii::$app->params["adminAutoLoginKey"]),$timetemp);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 登陆并写入session
+     * @param $adminName
+     * @param string $password
+     * @param bool $online
+     * @return bool
+     */
+    public function setAdminLoginSession($adminName,$password,$online=0){
+        $password = strval($password);
+        $params = [':login_username'=>$adminName,':is_delete'=>0,':status'=>1];
+        $adminRecord=Yii::$app->db->createCommand('select * from {{%administrator}} where login_username=:login_username and is_delete=:is_delete and status=:status')->bindValues($params)->queryOne();
+        if(!empty($adminRecord) && !empty($password)){
+            if($this->getSaveDBPassword($password)===$adminRecord['login_password']){
+                $this->setLoginInfoToSession($adminRecord);
+
+                if($online == 1){
+                    $this->setLoginOnline($adminRecord);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 通过cookie登录的处理
+     * @param $adminName
+     * @param bool $online
+     * @return bool
+     */
+    public function setAdminCookieLoginSession($adminName,$online=0){
+        $params = [':login_username'=>$adminName,':is_delete'=>0,':status'=>1];
+        $adminRecord=Yii::$app->db->createCommand('select * from {{%administrator}} where login_username=:login_username and is_delete=:is_delete and status=:status')->bindValues($params)->queryOne();
+        if(empty($adminRecord)){
+            return false;
+        }
+
+        $this->setLoginInfoToSession($adminRecord);
+        
+        if($online == 1){
+            $this->setLoginOnline($adminRecord);
         }
         return true;
     }
