@@ -10,13 +10,15 @@ $urlParams = $generator->generateUrlParams();
 $nameAttribute = $generator->getNameAttribute();
 
 //获取表备注
-$dbNameString = Yii::$app->db->dsn;
+$tempClass = $generator->modelClass;
+$tempClassDb = $tempClass::getDb();
+$dbNameString = $tempClassDb->dsn;
 $dbName1=explode(';',$dbNameString);
 $dbNameArr=explode('=',$dbName1[1]);
 $dbName=$dbNameArr[1];
 $tableNmae = $generator->getTableSchema()->fullName;
 
-$tableCommentObj = Yii::$app->db->createCommand("select table_name,table_comment from information_schema.tables where table_schema = '".$dbName."' and table_name ='".$tableNmae."'")->queryOne();
+$tableCommentObj = $tempClassDb->createCommand("select table_name,table_comment from information_schema.tables where table_schema = '".$dbName."' and table_name ='".$tableNmae."'")->queryOne();
 $tableComment = $tableCommentObj['table_comment'];
 if(empty($tableComment)){
     $tableComment=$tableCommentObj['table_name'];
@@ -45,11 +47,11 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'view',null)==true){ $bu
 if($common->checkButtonAuth($mainAuthJson,$controllerId,'update',null)==true){ $buttonList.= '{update}'; }
 if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $buttonList.= '{delete}'; }
 ?>
-<nav class="breadcrumb">
+<nav class="breadcrumb index-nav-list">
     <i class="Hui-iconfont">&#xe67f;</i> 首页
     <span class="c-gray en">&gt;</span> <?php echo $tableComment; ?>管理
     <span class="c-gray en">&gt;</span> <?php echo $tableComment; ?>列表
-    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" >
+    <a class="btn btn-success radius r operation-reload-icon" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" >
         <i class="Hui-iconfont">&#xe68f;</i>
     </a>
 </nav>
@@ -64,7 +66,7 @@ echo "<?php if(\$common->checkButtonAuth(\$mainAuthJson,\$controllerId,'create',
 ?>
     <div class="cl pd-5 mt-20">
         <span class="l">
-            <a href="javascript:;" onclick="backend_create_data('添加','<?= "<?= Yii::\$app->urlManager->createUrl(''.\$controllerId.'/create') ?>" ?>',layerOpenWindowWidth,layerOpenWindowHeight)" class="btn btn-primary radius">
+            <a href="javascript:;" onclick="backend_create_data('添加','<?= "<?= Yii::\$app->urlManager->createUrl(''.\$controllerId.'/create') ?>" ?>',layerOpenWindowWidth,layerOpenWindowHeight)" class="btn btn-primary radius operation-add-icon">
                 <i class="Hui-iconfont">&#xe600;</i> 添加
             </a>
         </span>
@@ -136,11 +138,11 @@ if(empty($jsonV)!=true){
                 'template' => $buttonList,
                 'buttons' => [
     'view' => function ($url, $model, $key) {
-    return '<a title="详情" href="javascript:;" onclick="backend_view_data(\'查看详情\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe665;</i></a>'; },
+    return '<a title="详情" href="javascript:;" onclick="backend_view_data(\'查看详情\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5 operation-icon operation-view-icon" style="text-decoration:none"><i class="Hui-iconfont">&#xe665;</i></a>'; },
                 'update' => function ($url, $model, $key) {
-    return '<a title="编辑" href="javascript:;" onclick="backend_update_data(\'编辑\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>'; },
+    return '<a title="编辑" href="javascript:;" onclick="backend_update_data(\'编辑\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5 operation-icon operation-update-icon" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>'; },
     'delete' => function ($url, $model, $key) {
-    return '<a title="删除" href="javascript:;" clickDelete="0" onclick="backend_delete_data(this,\''.$key.'\',\''.$model-><?= $nameAttribute ?>.'\',\''.$url.'\')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>'; },
+    return '<a title="删除" href="javascript:;" clickDelete="0" onclick="backend_delete_data(this,\''.$key.'\',\''.$model-><?= $nameAttribute ?>.'\',\''.$url.'\')" class="ml-5 operation-icon operation-del-icon" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>'; },
                 ],
     ],
         ],

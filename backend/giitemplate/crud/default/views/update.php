@@ -11,13 +11,15 @@ $urlParams = $generator->generateUrlParams();
 echo "<?php\n";
 
 //获取表备注
-$dbNameString = Yii::$app->db->dsn;
+$tempClass = $generator->modelClass;
+$tempClassDb = $tempClass::getDb();
+$dbNameString = $tempClassDb->dsn;
 $dbName1=explode(';',$dbNameString);
 $dbNameArr=explode('=',$dbName1[1]);
 $dbName=$dbNameArr[1];
 $tableNmae = $generator->getTableSchema()->fullName;
 
-$tableCommentObj = Yii::$app->db->createCommand("select table_name,table_comment from information_schema.tables where table_schema = '".$dbName."' and table_name ='".$tableNmae."'")->queryOne();
+$tableCommentObj = $tempClassDb->createCommand("select table_name,table_comment from information_schema.tables where table_schema = '".$dbName."' and table_name ='".$tableNmae."'")->queryOne();
 $tableComment = $tableCommentObj['table_comment'];
 if(empty($tableComment)){
     $tableComment=$tableCommentObj['table_name'];
