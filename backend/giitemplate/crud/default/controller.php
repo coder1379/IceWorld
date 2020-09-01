@@ -139,7 +139,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
             if(!empty($allAttributeLabels['add_time']) && empty($model->add_time)){
                 $model->add_time = time();
             }
-            
+
             if(!empty($allAttributeLabels['update_time']) && empty($model->update_time)){
                 $model->update_time = time();
             }
@@ -171,7 +171,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
             //维护修改时间如果存在字段
             $allAttributeLabels = $model->attributeLabels();
             if(!empty($allAttributeLabels['update_time'])){
-                $model->update_time = date('Y-m-d H:i:s',time());
+                $model->update_time = time();
             }
             if($model->save()==true){
                 return $this->redirect(['view', <?= $urlParams ?>]);
