@@ -19,6 +19,11 @@ $labels = $generator->generateSearchLabels();
 $searchAttributes = $generator->getSearchAttributes();
 $searchConditions = $generator->generateSearchConditions();
 
+$classM = $generator->modelClass;
+$pks = $classM::primaryKey();
+
+$idKey = current($pks);
+
 if(!empty($searchConditions)){
     $fieldList = explode(',',$searchConditions[0]);
     $newList = [];
