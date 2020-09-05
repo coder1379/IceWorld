@@ -96,6 +96,11 @@ composer 常用流程
 提交更新后的 composer.json 和 composer.lock 到代码版本控制器中，如：git;
 例如：composer require "phpspec/php-diff:^1.1.0"
 
-```
+优化composer 
+composer dump-autoload -o（-o 等同于 --optimize,生产优先使用此优化）
+composer dump-autoload --optimize  //生产优先使用此优化
+或
+composer dump-autoload -o --apcu 
 
+```
 
