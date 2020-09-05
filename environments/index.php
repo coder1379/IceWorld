@@ -38,6 +38,8 @@ return [
             'frontend/web/assets',
             'h5mobile/runtime',
             'h5mobile/web/assets',
+            'api/runtime',
+            'console/runtime',
         ],
         'setExecutable' => [
             'yii',
@@ -58,6 +60,8 @@ return [
             'frontend/web/assets',
             'h5mobile/runtime',
             'h5mobile/web/assets',
+            'api/runtime',
+            'console/runtime',
         ],
         'setExecutable' => [
             'yii',
@@ -77,6 +81,8 @@ return [
             'frontend/web/assets',
             'h5mobile/runtime',
             'h5mobile/web/assets',
+            'api/runtime',
+            'console/runtime',
         ],
         'setExecutable' => [
             'yii',

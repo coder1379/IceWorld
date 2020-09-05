@@ -21,7 +21,8 @@
         "yiisoft/yii2-queue":"*",
         "php-amqplib/php-amqplib": ">=2.6.1",
         "aliyuncs/oss-sdk-php":"*",
-        "yiisoft/yii2-redis": "^2.0"
+        "yiisoft/yii2-redis": "^2.0",
+        "guzzlehttp/guzzle": "^7.0"
 
     },
     "require-dev": {
@@ -33,7 +34,7 @@
     "config": {
         "process-timeout": 1800,
         "github-oauth": {
-            "github.com": "8b9beb5597a8c8ab15b45fd0188868db0a87cc54 "
+            "github.com": "8b9beb5597a8c8ab15b45fd0188868db0a87cc54"
         }
     },
     "extra": {
@@ -41,11 +42,5 @@
             "npm-asset-library": "vendor/npm",
             "bower-asset-library": "vendor/bower"
         }
-    },
-    "repositories": {
-	    "packagist": {
-		"type": "composer",
-		"url": "https://packagist.phpcomposer.com"
-	    }
     }
 }
