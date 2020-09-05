@@ -14,6 +14,6 @@ return [
         'endPoint' => 'oss-cn-beijing.aliyuncs.com',
     ],
     'oss_base_link' => 'http://www.test.com/',//阿里云静态文件自定义前缀
-    'api_root_url' => 'http://test.yii.com/',//api 域名地址
-
+    'api_root_url' => 'http://api.localhost.com/',//api 域名生产地址 local中覆盖测试
+    'admin_root_url' => 'http://admin.localhost.com/',//admin后台域名生产地址 local中覆盖测试
 ];
