@@ -5,4 +5,5 @@ return [
     'staticFilePath'=>'',//前端静态文件目录，静态文件分离时配置
     'adminAutoLoginKey'=>'ienr79iuYte4Kjrb',//后台加密串
     'adminLoginExpireTime'=>864000,//后台登录cookie保存时间
+    'adminSiteShowName'=>'后台管理系统',//显示名称-可在local里覆盖标明测试环境
 ];

@@ -36,7 +36,7 @@
         </form>
     </div>
 </div>
-<div class="footer" style="font-size:20px;">后台管理系统</div>
+<div class="footer" style="font-size:20px;"><?php echo Yii::$app->params['adminSiteShowName']; ?></div>
 <script>
     var errorshow='<?php if(empty($error)!=true){ echo $error; } ?>';
     $(document).ready(function(){
