@@ -16,7 +16,7 @@ class DingTalkRobot
     public $keyReport = '日常报告';
 
     //日志机器人token
-    public $accessTokenLog = '82f41a1776043c675e6d30699936f34bfa1d75b6fa93339e1f428d89714b0886';
+    public $accessTokenLog = '65468494984';//日志机器人accesstoken
 
     /**
      * @var string
