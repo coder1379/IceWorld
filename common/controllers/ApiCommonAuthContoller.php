@@ -15,7 +15,7 @@ class ApiCommonAuthContoller extends ApiCommonContoller
     {
         $this->setUser();
         $actionId=$action->id;
-        if(!in_array($actionId,$this->allowAccessActions)){
+        if(!in_array($actionId,$this->allowAccessActions,true)){
             if(empty($this->user)){
                 //没有权限
                 echo Json::encode($this->getJsonArray([],401,'Not Authored'));

@@ -25,7 +25,7 @@ class AuthController extends BaseContoller
         $this->adminOtherRoleArray = $otherAuthArray; //设置辅助权限控制器全局变量
 
         ////////////////检查是否属于无需权限验证的操作
-        if(in_array($action->id,$this->noLoginAccess)!==true){
+        if(in_array($action->id,$this->noLoginAccess,true)!==true){
             ////需要进行权限验证
             if($backendCommon->checkLogin()===true){
                 if(empty($authList)!=true){
@@ -48,7 +48,7 @@ class AuthController extends BaseContoller
                         }
                     }
 
-                    if(in_array($controllerId.'/'.$actionId,$otherAuthArray)==true){
+                    if(in_array($controllerId.'/'.$actionId,$otherAuthArray,true)==true){
                         //主权验证不通过验证辅权限
                         return true;
                     }
