@@ -3,6 +3,7 @@
 namespace common\controllers;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
 
@@ -12,6 +13,8 @@ use yii\web\Controller;
  */
 class BaseContoller extends Controller
 {
+
+    private $requestParams = null; //get+post参数的合并
 
     /**
      * 获取POST参数
@@ -81,7 +84,7 @@ class BaseContoller extends Controller
      * @return array|mixed|null
      * @throws \Exception
      */
-    public function postToArr($name = null, $defaultValue = [])
+    public function postToJson($name = null, $defaultValue = [])
     {
         $this->checkRequestName($name);
         $tempArr = Yii::$app->request->post($name);
@@ -89,7 +92,10 @@ class BaseContoller extends Controller
         if (is_array($tempArr)) {
             $arr = $tempArr;
         } else {
-            $arr = json_decode(strval($tempArr), true) ?? $defaultValue;
+            $arr = json_decode(strval($tempArr), true);
+            if(!is_array($arr)){
+                $arr = $defaultValue;
+            }
         }
         return $arr;
     }
@@ -150,7 +156,7 @@ class BaseContoller extends Controller
      * @return array|mixed|null
      * @throws \Exception
      */
-    public function getToArr($name = null, $defaultValue = [])
+    public function getToJson($name = null, $defaultValue = [])
     {
         $this->checkRequestName($name);
         $tempArr = Yii::$app->request->get($name);
@@ -158,10 +164,119 @@ class BaseContoller extends Controller
         if (is_array($tempArr)) {
             $arr = $tempArr;
         } else {
-            $arr = json_decode(strval($tempArr), true) ?? $defaultValue;
+            $arr = json_decode(strval($tempArr), true);
+            if(!is_array($arr)){
+                $arr = $defaultValue;
+            }
         }
         return $arr;
     }
+
+    /**
+     * 获取post+get的参数合并数组
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getPostGetArray()
+    {
+        $request = Yii::$app->request;
+        return ArrayHelper::merge($request->getQueryParams(), $request->getBodyParams());
+    }
+
+    /**
+     * 设置post+get合并参数到当前对象降低多次获取的性能消耗
+     * @throws \yii\base\InvalidConfigException
+     */
+    private function setRequestParams()
+    {
+        if ($this->requestParams === null) {
+            $this->requestParams = $this->getPostGetArray();
+        }
+    }
+
+    /**
+     * 获取整形参数
+     * @param null $name get参数名
+     * @param int $defaultValue 默认值为0
+     * @throws \Exception
+     */
+    public function requestToInt($name = null, $defaultValue = 0)
+    {
+        $this->checkRequestName($name);
+        $this->setRequestParams();
+        $temp = $this->requestParams[$name]??null;
+        if(isset($temp)){
+            $temp = intval($temp);
+        }else{
+            $temp = $defaultValue;
+        }
+        return $temp;
+    }
+
+    /**
+     * 获取字符串get参数
+     * @param null $name 参数名
+     * @param string $defaultValue 默认为''
+     * @return string
+     * @throws \Exception
+     */
+    public function requestToStr($name = null, $defaultValue = '')
+    {
+        $this->checkRequestName($name);
+        $this->setRequestParams();
+        $temp = $this->requestParams[$name]??null;
+        if(isset($temp)){
+            $temp = strval($temp);
+        }else{
+            $temp = $defaultValue;
+        }
+        return $temp;
+    }
+
+    /**
+     * 获取浮点get参数
+     * @param null $name
+     * @param int $defaultValue
+     * @return float
+     * @throws \Exception
+     */
+    public function requestToFloat($name = null, $defaultValue = 0)
+    {
+        $this->checkRequestName($name);
+        $this->setRequestParams();
+        $temp = $this->requestParams[$name]??null;
+        if(isset($temp)){
+            $temp = floatval($temp);
+        }else{
+            $temp = $defaultValue;
+        }
+        return $temp;
+    }
+
+    /**
+     * 获取数组get 参数
+     * @param null $name 参数名称
+     * @param array $defaultValue
+     * @return array|mixed|null
+     * @throws \Exception
+     */
+    public function requestToJson($name = null, $defaultValue = [])
+    {
+        $this->checkRequestName($name);
+        $this->setRequestParams();
+        $tempArr = $this->requestParams[$name]??null;
+        $arr = null;
+        if (is_array($tempArr)) {
+            $arr = $tempArr;
+        } else {
+            $arr = json_decode(strval($tempArr), true);
+            if(!is_array($arr)){
+                $arr = $defaultValue;
+            }
+        }
+        return $arr;
+    }
+
+
 
     /**
      * 返回JSON数据格式
