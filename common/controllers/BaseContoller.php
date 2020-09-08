@@ -5,6 +5,7 @@ namespace common\controllers;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
+use common\ComBase;
 
 
 /**
@@ -13,9 +14,6 @@ use yii\web\Controller;
  */
 class BaseContoller extends Controller
 {
-
-    private $requestParams = null; //get+post参数的合并
-
     /**
      * 获取POST参数
      * @param null $name 值为null 将获取所有post参数
@@ -25,79 +23,6 @@ class BaseContoller extends Controller
     public function post($name = null, $defaultValue = null)
     {
         return Yii::$app->request->post($name, $defaultValue);
-    }
-
-    /**
-     * 检查名称是否正常
-     * @param $name
-     * @throws \Exception
-     */
-    private function checkRequestName($name)
-    {
-        if (empty($name)) {
-            throw new \Exception('postInt name is null');
-        }
-    }
-
-    /**
-     * 获取整形参数
-     * @param null $name post参数名
-     * @param int $defaultValue 默认值为0
-     * @throws \Exception
-     */
-    public function postToInt($name = null, $defaultValue = 0)
-    {
-        $this->checkRequestName($name);
-        return intval(Yii::$app->request->post($name, $defaultValue));
-    }
-
-    /**
-     * 获取字符串post参数
-     * @param null $name 参数名
-     * @param string $defaultValue 默认为''
-     * @return string
-     * @throws \Exception
-     */
-    public function postToStr($name = null, $defaultValue = '')
-    {
-        $this->checkRequestName($name);
-        return strval(Yii::$app->request->post($name, $defaultValue));
-    }
-
-    /**
-     * 获取浮点post参数
-     * @param null $name
-     * @param int $defaultValue
-     * @return float
-     * @throws \Exception
-     */
-    public function postToFloat($name = null, $defaultValue = 0)
-    {
-        $this->checkRequestName($name);
-        return floatval(Yii::$app->request->post($name, $defaultValue));
-    }
-
-    /**
-     * 获取数组post 参数
-     * @param null $name 参数名称
-     * @param array $defaultValue
-     * @return array|mixed|null
-     * @throws \Exception
-     */
-    public function postToJson($name = null, $defaultValue = [])
-    {
-        $this->checkRequestName($name);
-        $tempArr = Yii::$app->request->post($name);
-        $arr = null;
-        if (is_array($tempArr)) {
-            $arr = $tempArr;
-        } else {
-            $arr = json_decode(strval($tempArr), true);
-            if(!is_array($arr)){
-                $arr = $defaultValue;
-            }
-        }
-        return $arr;
     }
 
     /**
@@ -112,67 +37,6 @@ class BaseContoller extends Controller
     }
 
     /**
-     * 获取整形参数
-     * @param null $name get参数名
-     * @param int $defaultValue 默认值为0
-     * @throws \Exception
-     */
-    public function getToInt($name = null, $defaultValue = 0)
-    {
-        $this->checkRequestName($name);
-        return intval(Yii::$app->request->get($name, $defaultValue));
-    }
-
-    /**
-     * 获取字符串get参数
-     * @param null $name 参数名
-     * @param string $defaultValue 默认为''
-     * @return string
-     * @throws \Exception
-     */
-    public function getToStr($name = null, $defaultValue = '')
-    {
-        $this->checkRequestName($name);
-        return strval(Yii::$app->request->get($name, $defaultValue));
-    }
-
-    /**
-     * 获取浮点get参数
-     * @param null $name
-     * @param int $defaultValue
-     * @return float
-     * @throws \Exception
-     */
-    public function getToFloat($name = null, $defaultValue = 0)
-    {
-        $this->checkRequestName($name);
-        return floatval(Yii::$app->request->get($name, $defaultValue));
-    }
-
-    /**
-     * 获取数组get 参数
-     * @param null $name 参数名称
-     * @param array $defaultValue
-     * @return array|mixed|null
-     * @throws \Exception
-     */
-    public function getToJson($name = null, $defaultValue = [])
-    {
-        $this->checkRequestName($name);
-        $tempArr = Yii::$app->request->get($name);
-        $arr = null;
-        if (is_array($tempArr)) {
-            $arr = $tempArr;
-        } else {
-            $arr = json_decode(strval($tempArr), true);
-            if(!is_array($arr)){
-                $arr = $defaultValue;
-            }
-        }
-        return $arr;
-    }
-
-    /**
      * 获取post+get的参数合并数组
      * @throws \yii\base\InvalidConfigException
      */
@@ -183,100 +47,52 @@ class BaseContoller extends Controller
     }
 
     /**
-     * 设置post+get合并参数到当前对象降低多次获取的性能消耗
-     * @throws \yii\base\InvalidConfigException
+     * 获取int返回值
+     * @param string $name 参数名称
+     * @param array $params 参数合集
+     * @param int $defaultValue 未设置默认值
+     * @return int|mixed|null
      */
-    private function setRequestParams()
+    public function getIntValBC($name,$params,$defaultValue = 0)
     {
-        if ($this->requestParams === null) {
-            $this->requestParams = $this->getPostGetArray();
-        }
+        return ComBase::getIntVal($name, $params, $defaultValue);
     }
 
     /**
-     * 获取整形参数
-     * @param null $name get参数名
-     * @param int $defaultValue 默认值为0
-     * @throws \Exception
+     * 获取string返回值
+     * @param string $name 参数名称
+     * @param array $params 参数合集
+     * @param int $defaultValue 未设置默认值
+     * @return int|mixed|null
      */
-    public function requestToInt($name = null, $defaultValue = 0)
+    public function getStrValBC($name,$params,$defaultValue = '')
     {
-        $this->checkRequestName($name);
-        $this->setRequestParams();
-        $temp = $this->requestParams[$name]??null;
-        if(isset($temp)){
-            $temp = intval($temp);
-        }else{
-            $temp = $defaultValue;
-        }
-        return $temp;
+        return ComBase::getStrVal($name, $params, $defaultValue);
     }
 
     /**
-     * 获取字符串get参数
-     * @param null $name 参数名
-     * @param string $defaultValue 默认为''
-     * @return string
-     * @throws \Exception
+     * 获取float返回值
+     * @param string $name 参数名称
+     * @param array $params 参数合集
+     * @param int $defaultValue 未设置默认值
+     * @return int|mixed|null
      */
-    public function requestToStr($name = null, $defaultValue = '')
+    public function getFloatValBC($name,$params,$defaultValue = 0)
     {
-        $this->checkRequestName($name);
-        $this->setRequestParams();
-        $temp = $this->requestParams[$name]??null;
-        if(isset($temp)){
-            $temp = strval($temp);
-        }else{
-            $temp = $defaultValue;
-        }
-        return $temp;
+        return ComBase::getFloatVal($name, $params, $defaultValue);
     }
 
     /**
-     * 获取浮点get参数
-     * @param null $name
-     * @param int $defaultValue
-     * @return float
-     * @throws \Exception
+     * 获取json返回值
+     * @param string $name 参数名称
+     * @param array $params 参数合集
+     * @param int $defaultValue 未设置默认值
+     * @return int|mixed|null
      */
-    public function requestToFloat($name = null, $defaultValue = 0)
+    public function getJsonValBC($name,$params,$defaultValue = [])
     {
-        $this->checkRequestName($name);
-        $this->setRequestParams();
-        $temp = $this->requestParams[$name]??null;
-        if(isset($temp)){
-            $temp = floatval($temp);
-        }else{
-            $temp = $defaultValue;
-        }
-        return $temp;
+        return ComBase::getJsonVal($name, $params, $defaultValue);
     }
-
-    /**
-     * 获取数组get 参数
-     * @param null $name 参数名称
-     * @param array $defaultValue
-     * @return array|mixed|null
-     * @throws \Exception
-     */
-    public function requestToJson($name = null, $defaultValue = [])
-    {
-        $this->checkRequestName($name);
-        $this->setRequestParams();
-        $tempArr = $this->requestParams[$name]??null;
-        $arr = null;
-        if (is_array($tempArr)) {
-            $arr = $tempArr;
-        } else {
-            $arr = json_decode(strval($tempArr), true);
-            if(!is_array($arr)){
-                $arr = $defaultValue;
-            }
-        }
-        return $arr;
-    }
-
-
 
     /**
      * 返回JSON数据格式
