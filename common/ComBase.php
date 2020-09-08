@@ -225,4 +225,76 @@ class ComBase
         return $returnList;
     }
 
+    /**
+     * 获取int返回值
+     * @param string $name 参数名称
+     * @param array $params 参数合集
+     * @param int $defaultValue 未设置默认值
+     * @return int|mixed|null
+     */
+    public static function getIntVal($name,$params,$defaultValue = 0){
+        $temp = $params[$name]??null;
+        if(isset($temp)){
+            $temp = intval($temp);
+        }else{
+            $temp = $defaultValue;
+        }
+        return $temp;
+    }
+
+    /**
+     * 获取string返回值
+     * @param string $name 参数名称
+     * @param array $params 参数合集
+     * @param int $defaultValue 未设置默认值
+     * @return int|mixed|null
+     */
+    public static function getStrVal($name,$params,$defaultValue = ''){
+        $temp = $params[$name]??null;
+        if(isset($temp)){
+            $temp = strval($temp);
+        }else{
+            $temp = $defaultValue;
+        }
+        return $temp;
+    }
+
+    /**
+     * 获取float返回值
+     * @param string $name 参数名称
+     * @param array $params 参数合集
+     * @param int $defaultValue 未设置默认值
+     * @return int|mixed|null
+     */
+    public static function getFloatVal($name,$params,$defaultValue = 0){
+        $temp = $params[$name]??null;
+        if(isset($temp)){
+            $temp = floatval($temp);
+        }else{
+            $temp = $defaultValue;
+        }
+        return $temp;
+    }
+
+    /**
+     * 获取json返回值
+     * @param string $name 参数名称
+     * @param array $params 参数合集
+     * @param int $defaultValue 未设置默认值
+     * @return array|mixed|null
+     */
+    public static function getJsonVal($name,$params,$defaultValue = []){
+        $tempArr = $params[$name]??null;
+        $arr = null;
+        if (is_array($tempArr)) {
+            $arr = $tempArr;
+        } else {
+            $arr = json_decode(strval($tempArr), true);
+            if(!is_array($arr)){
+                $arr = $defaultValue;
+            }
+        }
+        return $arr;
+    }
+
 }
