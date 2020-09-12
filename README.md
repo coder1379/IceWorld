@@ -104,3 +104,10 @@ composer dump-autoload -o --apcu
 
 ```
 
+```
+console mysql 长连接配置
+'persistent'            => true,    //长连接
+或
+ // 'attributes'        => array(PDO::ATTR_PERSISTENT => true),    //长连接
+```
+
