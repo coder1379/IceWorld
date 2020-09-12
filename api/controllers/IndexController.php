@@ -3,6 +3,7 @@ namespace api\controllers;
 
 use common\controllers\ApiCommonContoller;
 use common\lib\queue\SendSms;
+use common\queues\TestJobs;
 use Yii;
 use yii\helpers\Json;
 /**
@@ -22,6 +23,19 @@ class IndexController extends ApiCommonContoller
     }
 
     public function actionSend(){
+
+        for($i=0;$i<100;$i++){
+            $arr = [
+                'addtime' => time(),
+            ];
+            Yii::$app->db->createCommand()->insert('m_testjob', $arr)->execute();
+            $tid = Yii::$app->db->getLastInsertID();
+            $id = Yii::$app->queue->push(new TestJobs(['params_1'=>'insert time:'.time(),'params_2'=>$tid]));
+            print_r($id.'_'.$tid);
+        }
+
+        exit();
+
         $sendTxt = "发送短信测试".rand(900,999);
 
         $rtime = rand(2,5);
