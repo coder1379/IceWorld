@@ -4,6 +4,7 @@ namespace common\controllers;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\Controller;
 use common\ComBase;
 
@@ -14,6 +15,8 @@ use common\ComBase;
  */
 class BaseContoller extends Controller
 {
+    public $params;
+
     /**
      * 获取POST参数
      * @param null $name 值为null 将获取所有post参数
@@ -40,10 +43,16 @@ class BaseContoller extends Controller
      * 获取post+get的参数合并数组
      * @throws \yii\base\InvalidConfigException
      */
-    public function getPostGetArray()
+    public function getRequestAll()
     {
         $request = Yii::$app->request;
+
         return ArrayHelper::merge($request->getQueryParams(), $request->getBodyParams());
+    }
+
+    public function setParams($data)
+    {
+        $this->params = $data;
     }
 
     /**
@@ -53,21 +62,30 @@ class BaseContoller extends Controller
      * @param int $defaultValue 未设置默认值
      * @return int|mixed|null
      */
-    public function getIntValBC($name,$params,$defaultValue = 0)
+    public function getParamsIntVal($name, $params = null, $defaultValue = 0)
     {
-        return ComBase::getIntVal($name, $params, $defaultValue);
+        if ($params === null) {
+            return ComBase::getIntVal($name, $this->params, $defaultValue);
+        } else {
+            return ComBase::getIntVal($name, $params, $defaultValue);
+        }
+
     }
 
     /**
      * 获取string返回值
      * @param string $name 参数名称
      * @param array $params 参数合集
-     * @param int $defaultValue 未设置默认值
+     * @param string $defaultValue 未设置默认值
      * @return int|mixed|null
      */
-    public function getStrValBC($name,$params,$defaultValue = '')
+    public function getParamsStrVal($name, $params = null, $defaultValue = '')
     {
-        return ComBase::getStrVal($name, $params, $defaultValue);
+        if ($params === null) {
+            return ComBase::getStrVal($name, $this->params, $defaultValue);
+        } else {
+            return ComBase::getStrVal($name, $params, $defaultValue);
+        }
     }
 
     /**
@@ -77,21 +95,29 @@ class BaseContoller extends Controller
      * @param int $defaultValue 未设置默认值
      * @return int|mixed|null
      */
-    public function getFloatValBC($name,$params,$defaultValue = 0)
+    public function getParamsFloatVal($name, $params = null, $defaultValue = 0)
     {
-        return ComBase::getFloatVal($name, $params, $defaultValue);
+        if ($params === null) {
+            return ComBase::getFloatVal($name, $this->params, $defaultValue);
+        } else {
+            return ComBase::getFloatVal($name, $params, $defaultValue);
+        }
     }
 
     /**
      * 获取json返回值
      * @param string $name 参数名称
      * @param array $params 参数合集
-     * @param int $defaultValue 未设置默认值
+     * @param array $defaultValue 未设置默认值
      * @return int|mixed|null
      */
-    public function getJsonValBC($name,$params,$defaultValue = [])
+    public function getParamsJsonVal($name, $params = null, $defaultValue = [])
     {
-        return ComBase::getJsonVal($name, $params, $defaultValue);
+        if ($params === null) {
+            return ComBase::getJsonVal($name, $this->params, $defaultValue);
+        } else {
+            return ComBase::getJsonVal($name, $params, $defaultValue);
+        }
     }
 
     /**
@@ -111,7 +137,7 @@ class BaseContoller extends Controller
 
     public function getJsonString($data = [], $code = 200, $msg = 'success')
     {
-        return json_encode($this->getJsonArray($data, $code, $msg));
+        return Json::encode($this->getJsonArray($data, $code, $msg));
     }
 
     /**
@@ -122,7 +148,7 @@ class BaseContoller extends Controller
      */
     public function echoJson($data = [], $code = 200, $msg = 'success')
     {
-        echo json_encode($this->getJsonArray($data, $code, $msg));
+        echo Json::encode($this->getJsonArray($data, $code, $msg));
         exit();
     }
 
@@ -132,7 +158,7 @@ class BaseContoller extends Controller
      */
     public function echoJsonWithArray($arrData = [])
     {
-        echo json_encode($arrData);
+        echo Json::encode($arrData);
         exit();
     }
 
