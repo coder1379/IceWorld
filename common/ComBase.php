@@ -8,6 +8,7 @@
 namespace common;
 
 use Yii;
+use yii\helpers\Json;
 
 class ComBase
 {
@@ -53,7 +54,7 @@ class ComBase
      */
     public static function getReturnJson($data = [], $code = 0, $msg = 'success')
     {
-        return json_encode(self::getReturnArray($data, $code, $msg));
+        return Json::encode(self::getReturnArray($data, $code, $msg));
     }
 
     /**
