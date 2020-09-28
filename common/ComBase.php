@@ -12,25 +12,52 @@ use yii\helpers\Json;
 
 class ComBase
 {
-    const MESSAGE_RUN_SUCCESS = '操作成功';
+
     const MESSAGE_CREATE_SUCCESS = '创建成功';
     const MESSAGE_UPDATE_SUCCESS = '修改成功';
     const MESSAGE_DELETE_SUCCESS = '删除成功';
-    const MESSAGE_SERVER_ERROR = '服务端处理失败,请重试';
-    const MESSAGE_PARAM_FORMAT_ERROR = '参数格式校验失败';
-    const MESSAGE_PARAM_ERROR = '参数错误';
-    const MESSAGE_NO_FIND_ERROR = '没有找到指定数据';
 
-    const CODE_RUN_SUCCESS = 200; //运行成功码
-    const CODE_PARAM_ERROR = 10001;//参数错误码
-    const CODE_NO_FIND_ERROR = 10002;//没有找到指定数据错误码
-    const CODE_PARAM_FORMAT_ERROR = 10111;//字段参数错误码
-    const CODE_SERVER_ERROR = 500;//服务端错误码
+
+    //执行成功
+    const CODE_RUN_SUCCESS = 200;
+    const MESSAGE_RUN_SUCCESS = '操作成功';
+
+    //请求无效
+    const CODE_REQUEST_INVALID = 400;
+    const MESSAGE_REQUEST_INVALID = '请求无效';
+
+    //尚未登录
+    const CODE_NO_LOGIN_ERROR = 401;
+    const MESSAGE_NO_LOGIN_ERROR = '尚未登录';
+
+    //没有权限
+    const CODE_NO_AUTH_ERROR = 403;
+    const MESSAGE_NO_AUTH_ERROR = '没有权限';
+
+    //参数错误码
+    const CODE_PARAM_ERROR = 431;
+    const MESSAGE_PARAM_ERROR = '参数错误';
+
+    //数据未找到
+    const CODE_NO_FIND_ERROR = 440;
+    const MESSAGE_NO_FIND_ERROR = '数据未找到';
+
+    //参数格式校验失败
+    const CODE_PARAM_FORMAT_ERROR = 445;
+    const MESSAGE_PARAM_FORMAT_ERROR = '参数格式校验失败';
+
+    //服务端错误码
+    const CODE_SERVER_ERROR = 500;
+    const MESSAGE_SERVER_ERROR = '服务端处理失败,请重试';
+
+    //服务器繁忙
+    const CODE_SERVER_BUSY = 503;
+    const MESSAGE_SERVER_BUSY = '服务端繁忙,请稍后再试';
 
     /**
      * 返回数据格式数组
      * @param array $data 数组数据
-     * @param int $code 状态码 200成功,400 请求格式错误，401未授权，403权限不足，408请求超时，429请求次数过多，503服务不可用，10000自定义错误代码开始值
+     * @param int $code 状态码 200成功,400 请求格式错误，401未授权，403权限不足，408请求超时，429请求次数过多，500服务不可用，10000自定义错误代码开始值
      * @param string $msg 消息
      * @return array 格式数组
      */
@@ -90,7 +117,7 @@ class ComBase
         if (Yii::$app->params['returnAllErrors'] == true) {
             $returnData['allErrors'] = $errors['all'];
         }
-        return self::getReturnArray($returnData, self::CODE_PARAM_FORMAT_ERROR, $errors['first']['k'].':'.$errors['first']['v']);
+        return self::getReturnArray($returnData, self::CODE_PARAM_FORMAT_ERROR, $errors['first']['k'] . ':' . $errors['first']['v']);
     }
 
     /**
@@ -131,19 +158,19 @@ class ComBase
      * @param $model 模型实例
      * @param array $include 需要包含的数据关系 例如
      * $include = [
-            [
-                'name'=>'userRecord', //对面model里 get+name的function
-                'fields'=>['id','name','mobile']|'fields'=>'list|detail等', //Model->getAttributes($fields);,在获取非model数据时fields可以不传,同时可以string，fieldsScenarios的key值，将自动获取对应数组,这里需要注意apiModel与model之间的继承关系，可能hasOne里的父类model没有fieldsScenarios 需要将hasOne或many里面的model指向XxxApiModel
-                'include'=>[ //是否递归子包含
-                ]
-            ],
-            [
-                'name'=>'inviterUserRecordList',
-                'fields'=>['id','name','mobile'],
-                'include'=>[
-                ]
-            ],
-        ];
+     * [
+     * 'name'=>'userRecord', //对面model里 get+name的function
+     * 'fields'=>['id','name','mobile']|'fields'=>'list|detail等', //Model->getAttributes($fields);,在获取非model数据时fields可以不传,同时可以string，fieldsScenarios的key值，将自动获取对应数组,这里需要注意apiModel与model之间的继承关系，可能hasOne里的父类model没有fieldsScenarios 需要将hasOne或many里面的model指向XxxApiModel
+     * 'include'=>[ //是否递归子包含
+     * ]
+     * ],
+     * [
+     * 'name'=>'inviterUserRecordList',
+     * 'fields'=>['id','name','mobile'],
+     * 'include'=>[
+     * ]
+     * ],
+     * ];
      * @return array
      * @throws \Exception
      */
@@ -154,35 +181,35 @@ class ComBase
             foreach ($include as $obj) {
                 $recordName = $obj['name'];
                 $fields = $obj['fields']; //在获取非model数据时fields可以不传
-                $thisInclude = $obj['include']??null;
+                $thisInclude = $obj['include'] ?? null;
                 $thisModel = $model->$recordName;
                 $modelList = null;
                 $modelListFlag = 0;
-                if(is_array($thisModel) && is_object(current($thisModel))) {
+                if (is_array($thisModel) && is_object(current($thisModel))) {
                     $modelList = $thisModel;
                     $modelListFlag = 1;
-                }else{
+                } else {
                     $modelList[] = $thisModel;
                 }
 
                 $dataArray = [];
-                if(!empty($modelList)){
-                    foreach ($modelList as $nextModel){
+                if (!empty($modelList)) {
+                    foreach ($modelList as $nextModel) {
                         $thisArray = null;
-                        if(is_object($nextModel)){
-                            if(is_array($fields)){
+                        if (is_object($nextModel)) {
+                            if (is_array($fields)) {
                                 $thisArray = $nextModel->getAttributes($fields);
-                            }else if(is_string($fields)){
-                                if(empty($nextModel->fieldsScenarios()) || empty($nextModel->fieldsScenarios()[$fields])){
-                                    throw new \Exception('fieldsScenarios is null or fieldsScenarios['.$fields.'] is null');
-                                }else{
+                            } else if (is_string($fields)) {
+                                if (empty($nextModel->fieldsScenarios()) || empty($nextModel->fieldsScenarios()[$fields])) {
+                                    throw new \Exception('fieldsScenarios is null or fieldsScenarios[' . $fields . '] is null');
+                                } else {
                                     $printFields = $nextModel->fieldsScenarios()[$fields];
                                     $thisArray = $nextModel->getAttributes($printFields);
                                 }
 
                             }
 
-                        }else{
+                        } else {
                             $thisArray = $nextModel;
                         }
 
@@ -194,9 +221,9 @@ class ComBase
                                 }
                             }
                         }
-                        if($modelListFlag == 1){
+                        if ($modelListFlag == 1) {
                             $dataArray[] = $thisArray;
-                        }else{
+                        } else {
                             $dataArray = $thisArray;
                         }
                     }
@@ -213,9 +240,10 @@ class ComBase
      * @param array $keyList
      * @return array
      */
-    public static function getReserveArray($params=[],$keyList = []){
+    public static function getReserveArray($params = [], $keyList = [])
+    {
         $returnList = [];
-        if(!empty($params) && !empty($keyList)){
+        if (!empty($params) && !empty($keyList)) {
             foreach ($keyList as $name) {
                 if (isset($params[$name])) {
                     $returnList[$name] = $params[$name];
@@ -233,11 +261,12 @@ class ComBase
      * @param int $defaultValue 未设置默认值
      * @return int|mixed|null
      */
-    public static function getIntVal($name,$params,$defaultValue = 0){
-        $temp = $params[$name]??null;
-        if(isset($temp)){
+    public static function getIntVal($name, $params, $defaultValue = 0)
+    {
+        $temp = $params[$name] ?? null;
+        if (isset($temp)) {
             $temp = intval($temp);
-        }else{
+        } else {
             $temp = $defaultValue;
         }
         return $temp;
@@ -250,11 +279,12 @@ class ComBase
      * @param int $defaultValue 未设置默认值
      * @return int|mixed|null
      */
-    public static function getStrVal($name,$params,$defaultValue = ''){
-        $temp = $params[$name]??null;
-        if(isset($temp)){
+    public static function getStrVal($name, $params, $defaultValue = '')
+    {
+        $temp = $params[$name] ?? null;
+        if (isset($temp)) {
             $temp = strval($temp);
-        }else{
+        } else {
             $temp = $defaultValue;
         }
         return $temp;
@@ -267,11 +297,12 @@ class ComBase
      * @param int $defaultValue 未设置默认值
      * @return int|mixed|null
      */
-    public static function getFloatVal($name,$params,$defaultValue = 0){
-        $temp = $params[$name]??null;
-        if(isset($temp)){
+    public static function getFloatVal($name, $params, $defaultValue = 0)
+    {
+        $temp = $params[$name] ?? null;
+        if (isset($temp)) {
             $temp = floatval($temp);
-        }else{
+        } else {
             $temp = $defaultValue;
         }
         return $temp;
@@ -284,14 +315,15 @@ class ComBase
      * @param int $defaultValue 未设置默认值
      * @return array|mixed|null
      */
-    public static function getJsonVal($name,$params,$defaultValue = []){
-        $tempArr = $params[$name]??null;
+    public static function getJsonVal($name, $params, $defaultValue = [])
+    {
+        $tempArr = $params[$name] ?? null;
         $arr = null;
         if (is_array($tempArr)) {
             $arr = $tempArr;
         } else {
             $arr = json_decode(strval($tempArr), true);
-            if(!is_array($arr)){
+            if (!is_array($arr)) {
                 $arr = $defaultValue;
             }
         }

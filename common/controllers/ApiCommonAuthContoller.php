@@ -1,6 +1,7 @@
 <?php
 namespace common\controllers;
 
+use common\ComBase;
 use Yii;
 use yii\helpers\Json;
 /**
@@ -18,7 +19,7 @@ class ApiCommonAuthContoller extends ApiCommonContoller
         if(!in_array($actionId,$this->allowAccessActions,true)){
             if(empty($this->user)){
                 //没有权限
-                echo Json::encode($this->getJsonArray([],401,'Not Authored'));
+                echo Json::encode($this->getJsonArray([],ComBase::CODE_NO_LOGIN_ERROR,ComBase::MESSAGE_NO_LOGIN_ERROR));
                 exit();
             }
         }
