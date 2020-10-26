@@ -33,7 +33,7 @@ namespace <?= StringHelper::dirname(ltrim($generator->logic, '\\')) ?>;
 
 use Yii;
 use common\ComBase;
-use common\logics\BaseLogic;
+use common\base\BaseLogic;
 
 class <?= $logicModelClass ?> extends BaseLogic
 {

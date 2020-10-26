@@ -1,6 +1,6 @@
 <?php
 
-namespace common\logics;
+namespace common\base;
 
 use Yii;
 use common\ComBase;
@@ -9,7 +9,7 @@ use yii\data\Pagination;
 /**
  * logic 基础类,封装了基本的curd,如果无法满足可以在继承的子类中自行实现
  * Class BaseLogic
- * @package common\logics
+ * @package common\base
  */
 class BaseLogic
 {

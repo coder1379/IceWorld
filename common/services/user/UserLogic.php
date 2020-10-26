@@ -5,7 +5,7 @@ namespace common\services\user;
 use common\lib\StringHandle;
 use common\lib\Validate;
 use Yii;
-use common\BaseCommon;
+use common\base\BaseCommon;
 class UserLogic
 {
     /**

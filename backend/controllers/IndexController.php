@@ -2,7 +2,7 @@
 namespace backend\controllers;
 
 use Yii;
-use common\BackendCommon;
+use common\base\BackendCommon;
 class IndexController extends AuthController
 {
     /**

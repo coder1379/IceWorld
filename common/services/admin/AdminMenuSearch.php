@@ -1,6 +1,6 @@
 <?php
 
-namespace common\services\adminmenu;
+namespace common\services\admin;
 
 use Yii;
 use yii\base\Model;

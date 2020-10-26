@@ -3,7 +3,7 @@
 namespace common\services\mobilesms;
 
 use Yii;
-use common\BaseCommon;
+use common\base\BaseCommon;
 class MobileSmsLogic
 {
     /**

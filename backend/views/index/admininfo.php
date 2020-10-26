@@ -1,5 +1,5 @@
 <?php
-use common\BackendCommon;
+use common\base\BackendCommon;
 $common=new BackendCommon();
 ?>
 <style>

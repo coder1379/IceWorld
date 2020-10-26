@@ -3,13 +3,13 @@
 namespace backend\controllers;
 
 use Yii;
-use common\services\adminmenu\AdminMenuModel;
-use common\services\adminmenu\AdminMenuSearch;
+use common\services\admin\AdminMenuModel;
+use common\services\admin\AdminMenuSearch;
 use backend\controllers\AuthController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
-use common\services\administrator\AdministratorModel;
+use common\services\admin\AdministratorModel;
 
 /**
  * AdminmenuController implements the CRUD actions for AdminMenuModel model.

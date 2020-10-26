@@ -1,10 +1,10 @@
 <?php
 
-namespace common\services\administrator;
+namespace common\services\admin;
 
 use Yii;
-use common\services\adminrole\AdminRoleModel;
-use common\services\admingroup\AdminGroupModel;
+use common\services\admin\AdminRoleModel;
+use common\services\admin\AdminGroupModel;
 use common\services\area\AreaModel;
 
 /**

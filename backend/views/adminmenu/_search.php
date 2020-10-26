@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\services\adminmenu\AdminMenuSearch */
+/* @var $model common\services\admin\AdminMenuSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

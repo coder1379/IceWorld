@@ -5,7 +5,7 @@ namespace backend\controllers;
 use common\services\upload\UploadLogic;
 use Yii;
 use common\lib\upload\Upload;
-use common\BaseCommon;
+use common\base\BaseCommon;
 use yii\helpers\Json;
 
 /**

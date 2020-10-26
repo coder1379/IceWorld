@@ -1,6 +1,6 @@
 <?php
 
-namespace common\services\administrator;
+namespace common\services\admin;
 
 /**
  * This is the ActiveQuery class for [[AdministratorModel]].

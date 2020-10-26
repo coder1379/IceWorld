@@ -1,17 +1,17 @@
 <?php
 
-namespace common\services\adminauth;
+namespace common\services\admin;
 
 /**
- * This is the ActiveQuery class for [[AdminAuthModel]].
+ * This is the ActiveQuery class for [[AdminRoleModel]].
  *
- * @see AdminAuthModel
+ * @see AdminRoleModel
  */
-class AdminAuthQuery extends \yii\db\ActiveQuery
+class AdminRoleQuery extends \yii\db\ActiveQuery
 {
     /**
      * @inheritdoc
-     * @return AdminAuthModel[]|array
+     * @return AdminRoleModel[]|array
      */
     public function all($db = null)
     {
@@ -20,7 +20,7 @@ class AdminAuthQuery extends \yii\db\ActiveQuery
 
     /**
      * @inheritdoc
-     * @return AdminAuthModel|array|null
+     * @return AdminRoleModel|array|null
      */
     public function one($db = null)
     {

@@ -1,13 +1,13 @@
 <?php
 
-namespace common\services\adminrole;
+namespace common\services\admin;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * AdminRoleSearch represents the model behind the search form about `common\services\adminrole\AdminRoleModel`.
+ * AdminRoleSearch represents the model behind the search form about `common\services\admin\AdminRoleModel`.
  */
 class AdminRoleSearch extends AdminRoleModel
 {

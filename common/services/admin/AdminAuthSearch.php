@@ -1,13 +1,13 @@
 <?php
 
-namespace common\services\adminauth;
+namespace common\services\admin;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * AdminAuthSearch represents the model behind the search form about `common\services\adminauth\AdminAuthModel`.
+ * AdminAuthSearch represents the model behind the search form about `common\services\admin\AdminAuthModel`.
  */
 class AdminAuthSearch extends AdminAuthModel
 {

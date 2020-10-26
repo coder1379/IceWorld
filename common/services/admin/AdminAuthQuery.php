@@ -1,17 +1,17 @@
 <?php
 
-namespace common\services\admingroup;
+namespace common\services\admin;
 
 /**
- * This is the ActiveQuery class for [[AdminGroupModel]].
+ * This is the ActiveQuery class for [[AdminAuthModel]].
  *
- * @see AdminGroupModel
+ * @see AdminAuthModel
  */
-class AdminGroupQuery extends \yii\db\ActiveQuery
+class AdminAuthQuery extends \yii\db\ActiveQuery
 {
     /**
      * @inheritdoc
-     * @return AdminGroupModel[]|array
+     * @return AdminAuthModel[]|array
      */
     public function all($db = null)
     {
@@ -20,7 +20,7 @@ class AdminGroupQuery extends \yii\db\ActiveQuery
 
     /**
      * @inheritdoc
-     * @return AdminGroupModel|array|null
+     * @return AdminAuthModel|array|null
      */
     public function one($db = null)
     {

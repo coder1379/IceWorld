@@ -8,7 +8,7 @@
 
 namespace api\controllers;
 
-use common\BaseCommon;
+use common\base\BaseCommon;
 use common\services\upload\UploadLogic;
 use yii\web\Controller;
 use yii\helpers\Json;

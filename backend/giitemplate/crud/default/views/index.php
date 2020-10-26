@@ -33,7 +33,7 @@ echo "<?php\n";
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\GridView;
-use common\BackendCommon;
+use common\base\BackendCommon;
 /* @var $this yii\web\View */
 <?= !empty($generator->searchModelClass) ? "/* @var \$searchModel " . ltrim($generator->searchModelClass, '\\') . " */\n" : '' ?>
 /* @var $dataProvider yii\data\ActiveDataProvider */

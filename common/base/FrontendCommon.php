@@ -5,7 +5,7 @@
  * desc：前台公共类
  */
 
-namespace common;
+namespace common\base;
 
 use Yii;
 class FrontendCommon extends BaseCommon

@@ -4,7 +4,7 @@ namespace backend\controllers;
 
 use Yii;
 use common\controllers\BaseContoller;
-use common\BackendCommon;
+use common\base\BackendCommon;
 
 class AuthController extends BaseContoller
 {

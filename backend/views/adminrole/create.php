@@ -4,7 +4,7 @@ use yii\helpers\Html;
 
 
 /* @var $this yii\web\View */
-/* @var $model common\services\adminrole\AdminRoleModel */
+/* @var $model common\services\admin\AdminRoleModel */
 
 $this->title = '添加 管理员角色';
 $this->params['breadcrumbs'][] = ['label' => '管理员角色', 'url' => ['index']];

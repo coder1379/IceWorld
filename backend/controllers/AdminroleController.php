@@ -3,8 +3,8 @@
 namespace backend\controllers;
 
 use Yii;
-use common\services\adminrole\AdminRoleModel;
-use common\services\adminrole\AdminRoleSearch;
+use common\services\admin\AdminRoleModel;
+use common\services\admin\AdminRoleSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
