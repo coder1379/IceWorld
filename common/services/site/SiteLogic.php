@@ -3,7 +3,7 @@ namespace common\services\site;
 
 use Yii;
 use common\ComBase;
-use common\logics\BaseLogic;
+use common\base\BaseLogic;
 
 class SiteLogic extends BaseLogic
 {

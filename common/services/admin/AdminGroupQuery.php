@@ -1,17 +1,17 @@
 <?php
 
-namespace common\services\adminmenu;
+namespace common\services\admin;
 
 /**
- * This is the ActiveQuery class for [[AdminMenuModel]].
+ * This is the ActiveQuery class for [[AdminGroupModel]].
  *
- * @see AdminMenuModel
+ * @see AdminGroupModel
  */
-class AdminMenuQuery extends \yii\db\ActiveQuery
+class AdminGroupQuery extends \yii\db\ActiveQuery
 {
     /**
      * @inheritdoc
-     * @return AdminMenuModel[]|array
+     * @return AdminGroupModel[]|array
      */
     public function all($db = null)
     {
@@ -20,7 +20,7 @@ class AdminMenuQuery extends \yii\db\ActiveQuery
 
     /**
      * @inheritdoc
-     * @return AdminMenuModel|array|null
+     * @return AdminGroupModel|array|null
      */
     public function one($db = null)
     {

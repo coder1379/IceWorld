@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model common\services\adminauth\AdminAuthModel */
+/* @var $model common\services\admin\AdminAuthModel */
 
 $this->title = '修改管理员权限：' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => '管理员权限', 'url' => ['index']];

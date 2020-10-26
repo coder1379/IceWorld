@@ -9,7 +9,7 @@ use backend\controllers\AuthController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
-use common\services\administrator\AdministratorModel;
+use common\services\admin\AdministratorModel;
 
 /**
  * UserController implements the CRUD actions for UserModel model.

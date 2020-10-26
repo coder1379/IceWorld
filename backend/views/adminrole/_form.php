@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\services\adminrole\AdminRoleModel */
+/* @var $model common\services\admin\AdminRoleModel */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 <style>

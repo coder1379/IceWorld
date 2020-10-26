@@ -5,7 +5,7 @@
  * desc：基础公共类
  */
 
-namespace common;
+namespace common\base;
 
 use Yii;
 class BaseCommon

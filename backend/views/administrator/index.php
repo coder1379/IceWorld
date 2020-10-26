@@ -2,9 +2,9 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\GridView;
-use common\BackendCommon;
+use common\base\BackendCommon;
 /* @var $this yii\web\View */
-/* @var $searchModel common\services\administrator\AdministratorSearch */
+/* @var $searchModel common\services\admin\AdministratorSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = '管理员';

@@ -2,15 +2,15 @@
 
 namespace backend\controllers;
 
-use common\BackendCommon;
+use common\base\BackendCommon;
 use Yii;
-use common\services\administrator\AdministratorModel;
-use common\services\administrator\AdministratorSearch;
+use common\services\admin\AdministratorModel;
+use common\services\admin\AdministratorSearch;
 use backend\controllers\AuthController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use common\services\adminrole\AdminRoleModel;
-use common\services\admingroup\AdminGroupModel;
+use common\services\admin\AdminRoleModel;
+use common\services\admin\AdminGroupModel;
 use common\services\area\AreaModel;
 
 

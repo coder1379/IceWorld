@@ -2,9 +2,9 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\GridView;
-use common\BackendCommon;
+use common\base\BackendCommon;
 /* @var $this yii\web\View */
-/* @var $searchModel backend\models\adminauth\AdminAuthSearch */
+/* @var $searchModel backend\models\admin\AdminAuthSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = '管理员权限';

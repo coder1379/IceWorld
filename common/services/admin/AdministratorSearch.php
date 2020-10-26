@@ -1,13 +1,13 @@
 <?php
 
-namespace common\services\administrator;
+namespace common\services\admin;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * AdministratorSearch represents the model behind the search form about `common\services\administrator\AdministratorModel`.
+ * AdministratorSearch represents the model behind the search form about `common\services\admin\AdministratorModel`.
  */
 class AdministratorSearch extends AdministratorModel
 {

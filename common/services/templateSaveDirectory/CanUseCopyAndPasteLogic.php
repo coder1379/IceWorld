@@ -3,7 +3,7 @@
 namespace common\services\NNNNNNNNNNNNN;
 
 use Yii;
-use common\BaseCommon;
+use common\base\BaseCommon;
 class CanUseCopyAndPasteLogic
 {
     /**

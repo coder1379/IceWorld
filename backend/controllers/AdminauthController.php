@@ -3,8 +3,8 @@
 namespace backend\controllers;
 
 use Yii;
-use common\services\adminauth\AdminAuthModel;
-use common\services\adminauth\AdminAuthSearch;
+use common\services\admin\AdminAuthModel;
+use common\services\admin\AdminAuthSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 /**

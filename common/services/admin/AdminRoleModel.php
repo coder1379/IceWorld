@@ -1,9 +1,9 @@
 <?php
 
-namespace common\services\adminrole;
+namespace common\services\admin;
 
 use Yii;
-use common\services\administrator\AdministratorModel;
+use common\services\admin\AdministratorModel;
 
 /**
  * This is the model class for table "{{%admin_role}}".
