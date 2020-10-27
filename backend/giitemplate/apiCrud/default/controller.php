@@ -70,12 +70,12 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     public $enableCsrfValidation = false;
 
     /**
-    * 获取<?php echo $tableComment; ?>列表
-    * @notes
-    * @param int $page 页数 0 0
-    * @param int $page_size 每页数量 0 10
-    * @return json yes {"data":{"list":[{"@model":"<?php echo $generator->modelClass; ?>","@fields":"list"}],@pagination}}
-    */
+     * 获取<?php echo $tableComment; ?>列表
+     * @notes
+     * @param int $page 页数 0 0
+     * @param int $page_size 每页数量 0 10
+     * @return json yes {"data":{"list":[{"@model":"<?php echo $generator->modelClass; ?>","@fields":"list"}],@pagination}}
+     */
     public function actionList()
     {
         $fieldScenarios = 'list';
@@ -107,10 +107,10 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-    * 获取<?php echo $tableComment; ?>详情
-    * @param int $id ID 1
-    * @return json yes {"data":{"@model":"<?php echo $generator->modelClass; ?>","@fields":"detail"}}
-    */
+     * 获取<?php echo $tableComment; ?>详情
+     * @param int $id ID 1
+     * @return json yes {"data":{"@model":"<?php echo $generator->modelClass; ?>","@fields":"detail"}}
+     */
     public function actionDetail()
     {
         $logic = new <?= $logicClass ?>();
@@ -136,10 +136,10 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-    * 创建<?php echo $tableComment.PHP_EOL; ?>
-    * @param @model <?php echo $generator->modelClass; ?> create
-    * @return json yes {"data":{"id":"[number] ID"}}
-    */
+     * 创建<?php echo $tableComment.PHP_EOL; ?>
+     * @param @model <?php echo $generator->modelClass; ?> create
+     * @return json yes {"data":{"id":"[number] ID"}}
+     */
     public function actionCreate()
     {
         $logic = new <?= $logicClass ?>();
@@ -149,11 +149,11 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-    * 修改<?php echo $tableComment.PHP_EOL; ?>
-    * @param int $id ID 1
-    * @param @model <?php echo $generator->modelClass; ?> update
-    * @return json yes {"data":null}
-    */
+     * 修改<?php echo $tableComment.PHP_EOL; ?>
+     * @param int $id ID 1
+     * @param @model <?php echo $generator->modelClass; ?> update
+     * @return json yes {"data":null}
+     */
     public function actionUpdate()
     {
         $logic = new <?= $logicClass ?>();
@@ -175,10 +175,10 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-    * 删除<?php echo $tableComment.PHP_EOL; ?>
-    * @param int $id ID 1
-    * @return json yes {"data":null}
-    */
+     * 删除<?php echo $tableComment.PHP_EOL; ?>
+     * @param int $id ID 1
+     * @return json yes {"data":null}
+     */
     public function actionDelete()
     {
         $logic = new <?= $logicClass ?>();
@@ -198,10 +198,10 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-    * 物理删除<?= $tableComment ?> 默认屏蔽，需要自行打开
-    * @param int $id ID 1
-    * @return json yes {"data":null}
-    */
+     * 物理删除<?= $tableComment ?> 默认屏蔽，需要自行打开
+     * @param int $id ID 1
+     * @return json yes {"data":null}
+     */
     /*public function actionPhysiedelete()
     {
         $logic = new <?= $logicClass ?>();
