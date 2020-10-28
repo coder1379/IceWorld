@@ -112,3 +112,4 @@ console mysql 长连接配置
  // 'attributes'        => array(PDO::ATTR_PERSISTENT => true),    //长连接
 ```
 
+###自定义ide无提示时在ide_phpstorm_help_1231.php中加入对应对象
