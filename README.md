@@ -113,3 +113,7 @@ console mysql 长连接配置
 ```
 
 ###自定义ide无提示时在ide_phpstorm_help_1231.php中加入对应对象
+
+####or  $searchDataQuery->andWhere(['or',['like', 'name', $keyWord],['like', 'content', $keyWord]]);
+
+#### hasOne hasMany 额外过滤条件andOnCondition()
