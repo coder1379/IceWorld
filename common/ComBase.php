@@ -330,4 +330,22 @@ class ComBase
         return $arr;
     }
 
+    /**
+     * 获取int的数字数组列表，一般为id列表使用
+     * @param $arr
+     * @return array
+     */
+    public static function getIntIdsArray($arr){
+        $intArr = [];
+        if(!empty($arr)){
+            foreach ($arr as $val){
+                $tempV = intval($val);
+                if($tempV>0){
+                    $intArr[] = $tempV;
+                }
+            }
+        }
+        return $intArr;
+    }
+
 }
