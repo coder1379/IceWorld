@@ -45,9 +45,9 @@ use yii\widgets\ActiveForm;
             if(empty($jsonV)!=true){
                 if($jsonV["type"]=="text"){
 
-       echo  " <?php echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["name"].",['prompt' => '全部".$lableArr[0]."'])" ." ?>\n\n";
+       echo  " <?php echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["name"].",['prompt' => '全部'])" ." ?>\n\n";
                 }else if($jsonV["type"]=="db"){
-                    echo  " <?php //echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["functionName"]."List(),['prompt' => '全部".$lableArr[0]."'])" ." ?>\n\n";
+                    echo  " <?php //echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["functionName"]."List(),['prompt' => '全部'])" ." ?>\n\n";
                 }else if($jsonV["type"]=="upload_image"){
 
                 }else if($jsonV["type"]=="rich_text"){
