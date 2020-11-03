@@ -40,11 +40,14 @@ class UploadLogic
     /**
      * UploadLogic constructor.
      */
-    public function __construct($ossBucket,$fileType='image')
+    public function __construct($ossBucket='',$fileType='image')
     {
         //设置oss配置
         $this->ossConfig = Yii::$app->params['oss'];
-        $this->ossConfig['bucket'] = $ossBucket;
+        if(!empty($ossBucket)){
+            $this->ossConfig['bucket'] = $ossBucket;
+        }
+
         //设置默认图片格式
         $this->setFileType($fileType);
     }
@@ -64,7 +67,7 @@ class UploadLogic
         $this->tempFileExt = strtolower($this->tempFileParts['extension']);
         //对上传的文件类型进行判断
         if (!$this->_hasFileExt($this->tempFileExt)) {
-            return ComBase::getReturnArray([], 411, '不支持该类型的文件');
+            return ComBase::getReturnArray([], ComBase::CODE_PARAM_FORMAT_ERROR, '不支持该类型的文件');
         }
         switch ($storageServer) {
             //本地化存储
@@ -81,7 +84,7 @@ class UploadLogic
                 $result = $this->_ossUpload();
                 break;
             default:
-                $result = ComBase::getReturnArray([], 412, '错误的存储方式:' . $storageServer);
+                $result = ComBase::getReturnArray([], ComBase::CODE_PARAM_FORMAT_ERROR, '错误的存储方式:' . $storageServer);
         }
         return $result;
     }
@@ -135,13 +138,12 @@ class UploadLogic
      */
     private function _ossUpload()
     {
-        $imageBaseUrl = Yii::$app->params['oss_base_link'];
-        $oss = new UploadOSS($this->ossConfig, $imageBaseUrl);
+        $oss = new UploadOSS();
         $ossName = $oss->getOssName('.' . $this->tempFileExt);
         $result = $oss->upload($ossName, $this->tempFile);
         unlink($this->tempFile);
         if (!$result) {
-            return ComBase::getReturnArray([], 416, '文件上传失败');
+            return ComBase::getReturnArray([], ComBase::CODE_SERVER_BUSY, '文件上传失败');
         }
         $url = $oss->getOssUrl($ossName);
         return ComBase::getReturnArray(['url' => $url]);
@@ -221,7 +223,7 @@ class UploadLogic
      */
     private function _hasFileExt($ext)
     {
-        if (in_array($ext, $this->fileExt[$this->fileType])) {
+        if (in_array($ext, $this->fileExt[$this->fileType],true)) {
             return true;
         }
         return false;
