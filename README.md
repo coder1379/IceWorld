@@ -132,3 +132,13 @@ opcache.revalidate_freq=3 ;检查时间 测试尽可能短
 ;opcache.save_comments=0
 opcache.consistency_checks=0
 ;opcache.optimization_level=0
+
+
+#### api接口开启debug监控
+if (!YII_ENV_TEST) {
+    // configuration adjustments for 'dev' environment
+    $config['bootstrap'][] = 'debug';
+    $config['modules']['debug']['class'] = 'yii\debug\Module';
+    $config['modules']['debug']['allowedIPs'] = ['127.0.0.1', '*'];#注意可见ip
+    $config['modules']['debug']['historySize'] = 200;
+}
