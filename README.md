@@ -117,3 +117,18 @@ console mysql 长连接配置
 ####or  $searchDataQuery->andWhere(['or',['like', 'name', $keyWord],['like', 'content', $keyWord]]);
 
 #### hasOne hasMany 额外过滤条件andOnCondition()
+
+####open cache最佳配置
+zend_extension=opcache.so
+opcache.enable=1
+opcache.enable_cli=1
+opcache.memory_consumption=256 ;内存大小
+opcache.interned_strings_buffer=8
+opcache.max_accelerated_files=100000 ;缓存文件数量尽可能大 yii2通常在几千内
+opcache.max_wasted_percentage=5
+opcache.use_cwd=1
+opcache.validate_timestamps=1 ;是否开启时间检查 测试环境或非docker内建议开启大概会有1-2毫秒的性能损失，建议生产设置为0不进行检查
+opcache.revalidate_freq=3 ;检查时间 测试尽可能短
+;opcache.save_comments=0
+opcache.consistency_checks=0
+;opcache.optimization_level=0
