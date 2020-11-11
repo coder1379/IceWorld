@@ -142,3 +142,70 @@ if (!YII_ENV_TEST) {
     $config['modules']['debug']['allowedIPs'] = ['127.0.0.1', '*'];#注意可见ip
     $config['modules']['debug']['historySize'] = 200;
 }
+
+
+####du -h --max-depth=1 /data/wwwroot 查看服务器文件大小
+
+#### systemd 常见配置配置
+yii-queue服务端任务队列 systemd
+cd /etc/systemd/system
+vim yii-queue@.service
+``` 内容
+[Unit]
+Description=Yii Queue Worker %I
+After=network.target
+#After=mysql.service
+#Requires=mysql.service
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/local/php74/bin/php /data/wwwroot/yii2/yii queue/listen --verbose
+Restart=always
+RestartSec=5
+StartLimitInterval=0
+
+[Install]
+WantedBy=multi-user.target
+```
+systemctl daemon-reload
+
+//设置3个自启动任务进程 每个tps 10左右
+systemctl enable yii-queue@1 yii-queue@2 yii-queue@3
+
+systemctl start yii-queue@1 yii-queue@2 yii-queue@3
+systemctl status yii-queue@1 yii-queue@2 yii-queue@3
+systemctl restart yii-queue@1 yii-queue@2 yii-queue@3
+
+#systemctl 常用命令
+systemd 命令
+重新加载daemon 修改配置后均需要重进加载配置
+systemctl daemon-reload
+
+开机自启动
+systemctl enable opus.service
+
+关闭开机自启动
+systemctl disable opus.service
+
+开始 start,restart
+systemctl restart opus.service
+
+停止并不在处罚自动重启功能
+systemctl stop opus.service
+
+查看启动状态
+systemctl status opus.service
+
+# 显示尾部的最新10行日志
+$ sudo journalctl -n
+
+# 显示尾部指定行数的日志
+$ sudo journalctl -n 20
+
+# 实时滚动显示最新日志
+$ sudo journalctl -f
+
+# 查看指定服务的日志
+$ sudo journalctl /usr/lib/systemd/systemd
+
