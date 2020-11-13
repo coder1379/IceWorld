@@ -30,7 +30,7 @@ $staticFilePath=empty(Yii::$app->params["staticFilePath"])!=true?Yii::$app->para
 <body>
 <?php $this->beginBody() ?>
 <?= $content ?>
-<?php //$this->endBody() ?>
+<?php $this->endBody() ?>
 </body>
 </html>
 <?php $this->endPage() ?>
