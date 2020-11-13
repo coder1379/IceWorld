@@ -209,3 +209,5 @@ $ sudo journalctl -f
 # 查看指定服务的日志
 $ sudo journalctl /usr/lib/systemd/systemd
 
+
+######yii2-debug 环境配置 environments/dev params-local.php中配置 相关参数

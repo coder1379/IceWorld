@@ -322,7 +322,11 @@ class ComBase
         if (is_array($tempArr)) {
             $arr = $tempArr;
         } else {
-            $arr = json_decode(strval($tempArr), true);
+            try {
+                $arr = json_decode(strval($tempArr), true);
+            } catch (\Exception $exc) {
+                //json格式错误
+            }
             if (!is_array($arr)) {
                 $arr = $defaultValue;
             }
@@ -335,12 +339,13 @@ class ComBase
      * @param $arr
      * @return array
      */
-    public static function getIntIdsArray($arr){
+    public static function getIntIdsArray($arr)
+    {
         $intArr = [];
-        if(!empty($arr)){
-            foreach ($arr as $val){
+        if (!empty($arr)) {
+            foreach ($arr as $val) {
                 $tempV = intval($val);
-                if($tempV>0){
+                if ($tempV > 0) {
                     $intArr[] = $tempV;
                 }
             }

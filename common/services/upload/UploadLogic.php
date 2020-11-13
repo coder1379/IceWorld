@@ -37,6 +37,8 @@ class UploadLogic
         'file' => ['doc', 'rtf', 'docx', 'ppt', 'xlsx'],
     ];
 
+    public $rootFileName = '';//根目录文件名
+
     /**
      * UploadLogic constructor.
      */
@@ -59,12 +61,13 @@ class UploadLogic
      * @return array
      * @throws \OSS\Core\OssException
      */
-    public function upload($file, $storageServer = 'oss')
+    public function upload($file, $storageServer = 'oss',$uploadRootFileName = '')
     {
         //获取缓存文件信息
         $this->tempFile = $file['tmp_name'];
         $this->tempFileParts = pathinfo($file['name']);
         $this->tempFileExt = strtolower($this->tempFileParts['extension']);
+        $this->rootFileName = $uploadRootFileName;
         //对上传的文件类型进行判断
         if (!$this->_hasFileExt($this->tempFileExt)) {
             return ComBase::getReturnArray([], ComBase::CODE_PARAM_FORMAT_ERROR, '不支持该类型的文件');
@@ -139,7 +142,7 @@ class UploadLogic
     private function _ossUpload()
     {
         $oss = new UploadOSS();
-        $ossName = $oss->getOssName('.' . $this->tempFileExt);
+        $ossName = $oss->getOssName('.' . $this->tempFileExt,$this->rootFileName);
         $result = $oss->upload($ossName, $this->tempFile);
         unlink($this->tempFile);
         if (!$result) {
@@ -155,7 +158,7 @@ class UploadLogic
      * @return array
      * @throws \OSS\Core\OssException
      */
-    public function localToOss($file)
+    public function localToOss($file,$uploadRootFileName='')
     {
         if (!file_exists($file)) {
             return ComBase::getReturnArray([], 417, '没有找到要上传的文件');
@@ -163,6 +166,7 @@ class UploadLogic
         $this->tempFile = $file;
         $this->tempFileParts = pathinfo($file);
         $this->tempFileExt = strtolower($this->tempFileParts['extension']);
+        $this->rootFileName = $uploadRootFileName;
         return $this->_ossUpload();
     }
 
