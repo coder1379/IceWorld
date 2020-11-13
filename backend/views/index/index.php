@@ -115,7 +115,7 @@ $staticFilePath=empty(Yii::$app->params["staticFilePath"])!=true?Yii::$app->para
     </div>
 </section>
 
-<?php $this->endBody() ?>
+<?php //$this->endBody() ?>
 </body>
 </html>
 <?php $this->endPage() ?>
