@@ -39,6 +39,7 @@ return [
             'h5mobile/runtime',
             'h5mobile/web/assets',
             'api/runtime',
+            'api/web/assets',
             'console/runtime',
         ],
         'setExecutable' => [
@@ -61,6 +62,7 @@ return [
             'h5mobile/runtime',
             'h5mobile/web/assets',
             'api/runtime',
+            'api/web/assets',
             'console/runtime',
         ],
         'setExecutable' => [
@@ -82,6 +84,7 @@ return [
             'h5mobile/runtime',
             'h5mobile/web/assets',
             'api/runtime',
+            'api/web/assets',
             'console/runtime',
         ],
         'setExecutable' => [
