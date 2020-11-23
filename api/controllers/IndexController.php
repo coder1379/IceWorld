@@ -17,12 +17,13 @@ class IndexController extends ApiCommonContoller
         return Json::encode($this->getJsonArray([],200,''));
     }
 
-
     public function action404(){
         return Json::encode($this->getJsonArray([],404,'error'));
     }
 
     public function actionSend(){
+
+        exit();
 
         for($i=0;$i<100;$i++){
             $arr = [

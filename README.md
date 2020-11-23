@@ -211,3 +211,10 @@ $ sudo journalctl /usr/lib/systemd/systemd
 
 
 ######yii2-debug 环境配置 environments/dev params-local.php中配置 相关参数
+
+##### 通用的跨平台跨语言加解密方案： AES/CBC/PKCS5Padding 按照此标准加解密基本可以通用所有语言
+
+####jwt 通用方案及包
+php jwt ：https://github.com/firebase/php-jwt
+go jwt ：github.com/dgrijalva/jwt-go
+python:pip install PyJWT
