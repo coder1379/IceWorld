@@ -21,5 +21,13 @@ return [
             'password' => 'password',
             'charset' => 'utf8',
         ],
+        'redis' => [
+            'class' => 'yii\redis\Connection',
+            'hostname' => '127.0.0.1',
+            'port' => 6379,
+            'password' => 'password',
+            'database' => 9,
+            'retries' => 1,
+        ],
     ],
 ];
