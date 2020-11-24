@@ -18,13 +18,13 @@ class UploadController extends ApiCommonAuthContoller
 
     /**
      * 二级制图片文件上传
-     * @param array Filedata 文件对象 1
+     * @param array file_data 文件对象 1
      * @return json yes {"data":{"short_url":"[string] 短路径","url":"[string] 路径"}}
      * @throws \OSS\Core\OssException
      */
     public function actionImage()
     {
-        if (!isset($_FILES['Filedata'])) {
+        if (!isset($_FILES['file_data'])) {
             return Json::encode(ComBase::getReturnArray([], ComBase::CODE_PARAM_ERROR, ComBase::MESSAGE_PARAM_ERROR));
         }
         $uploadLogic = new UploadLogic('','image');//上传图片类型
@@ -34,12 +34,12 @@ class UploadController extends ApiCommonAuthContoller
 
     /**
      * 上传图片base64
-     * @param base64 $Filedata 文件 1
+     * @param base64 file_data 文件 1
      * @return json yes {"data":{"short_url":"[string] 短路径","url":"[string] 路径"}}
      */
     public function actionImagebase64()
     {
-        $imgStr = $this->post('Filedata');
+        $imgStr = $this->post('file_data');
         if (empty($imgStr) || !preg_match('/^data:image\/(jpeg|png|jpg|bmp|gif);base64,/', $imgStr)) {
             return Json::encode(ComBase::getReturnArray([], ComBase::CODE_PARAM_ERROR, ComBase::MESSAGE_PARAM_ERROR));
         }

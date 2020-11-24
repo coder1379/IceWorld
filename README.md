@@ -1,5 +1,19 @@
 ICE WORLD
 ===============================
+##新项目复制流程
+1.获取代码,
+2.创建db,
+3.导入db,
+4.配置api,admin域名,
+5.修改environments dev,befprod,prod common/main-local.php common/params-local.php对应参数,
+6.修改commmon/params.php对应参数
+7.添加systemd queue守护进程 详见：systemd 常见配置配置
+8.添加crontab 钉钉错误提醒机器人 
+```
+#yii2 每分钟进行一次系统检测发现异常钉钉推送
+* * * * * /usr/local/php74/bin/php /data/wwwroot/yii2/yii index/systemtour
+```
+===============
 
 程序见数据交换以数据形式传递，object形式均为model实例
 

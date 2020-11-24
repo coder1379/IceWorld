@@ -61,7 +61,7 @@ class ComBase
      * @param string $msg 消息
      * @return array 格式数组
      */
-    public static function getReturnArray($data = [], $code = 0, $msg = 'success')
+    public static function getReturnArray($data = [], $code = 200, $msg = 'success')
     {
         if (empty($data) == true) {
             $data = new \StdClass();//将空数组赋值空对象便于前端兼容处理.
@@ -79,7 +79,7 @@ class ComBase
      * @param string $msg
      * @return false|string
      */
-    public static function getReturnJson($data = [], $code = 0, $msg = 'success')
+    public static function getReturnJson($data = [], $code = 200, $msg = 'success')
     {
         return Json::encode(self::getReturnArray($data, $code, $msg));
     }
