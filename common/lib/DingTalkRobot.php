@@ -12,12 +12,6 @@ use GuzzleHttp\Client;
 class DingTalkRobot
 {
 
-    public $keyLog = '异常日志';
-    public $keyReport = '日常报告';
-
-    //日志机器人token
-    public $accessTokenLog = '65468494984';//日志机器人accesstoken
-
     /**
      * @var string
      */

@@ -27,7 +27,8 @@ class ApitestController extends AuthController
         $token = 0;
         if(!empty($contrl) && !empty($action)){
             $apiReflection = new ApiReflection();
-            $ref = new \ReflectionClass('\\api\\controllers\\' . $contrl.'Controller');
+            $classNameTemp = ucwords($contrl);
+            $ref = new \ReflectionClass('\\api\\controllers\\' . $classNameTemp.'Controller');
             $parendRef = $ref->getParentClass();
                 $methods = $ref->getMethods(\ReflectionMethod::IS_PUBLIC);
                 $parentMethods = $parendRef->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -69,8 +70,8 @@ class ApitestController extends AuthController
                             }
                             $apiRootUrl = Yii::$app->params['api_root_url'];
                             $returnParams['url'] = $apiRootUrl.$contrl.'/'.$action;
-                            $returnParams['params'] = $parm['tags']['param'];
-                            $returnParams['actondesc'] = $parm['tags']['description'];
+                            $returnParams['params'] = $parm['tags']['param']??'';
+                            $returnParams['actondesc'] = $parm['tags']['description']??'';
                         }
 
                     }
