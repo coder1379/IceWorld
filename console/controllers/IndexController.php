@@ -62,6 +62,7 @@ class IndexController extends Controller
         }
 
         //错误队列不为空，发送钉钉推送
+        //异常日志 为钉钉推送关键字，必须包含此文字或指定的钉钉关键字
         if (!empty($errorList)) {
             $ding = new DingTalkRobot();
             $ding->accessToken = Yii::$app->params['dingding_log_robot_token'];

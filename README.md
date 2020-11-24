@@ -5,14 +5,16 @@ ICE WORLD
 2.创建db,
 3.导入db,
 4.配置api,admin域名,
-5.修改environments dev,befprod,prod common/main-local.php common/params-local.php对应参数,
+5.修改environments dev,befprod,prod common/main-local.php common/params-local.php对应参数, 执行init
 6.修改commmon/params.php对应参数
-7.添加systemd queue守护进程 详见：systemd 常见配置配置
-8.添加crontab 钉钉错误提醒机器人 
+7.添加systemd queue守护进程 详见：systemd 常见配置
+8.添加crontab 钉钉错误提醒机器人 crontab代码如下,注意配置钉钉机器人token，并设置消息关键字 异常日志
 ```
 #yii2 每分钟进行一次系统检测发现异常钉钉推送
 * * * * * /usr/local/php74/bin/php /data/wwwroot/yii2/yii index/systemtour
 ```
+9.发布与测试
+
 ===============
 
 程序见数据交换以数据形式传递，object形式均为model实例
