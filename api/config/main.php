@@ -25,6 +25,9 @@ return [
 			'showScriptName' => false,
 			'suffix'=>'',
 		],
+        'cache' => [
+            'class' => 'yii\caching\FileCache',
+        ],
     ],
     'params' => $params,
 ];
