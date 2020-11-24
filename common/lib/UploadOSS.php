@@ -40,13 +40,21 @@ class UploadOSS
         if(!empty($block)){
             $block=$block.'/';
         }
-        return $block.date('Ymd') . '/' . time() . rand(1000000, 9999999) . $ext;
+        $stringHand = new StringHandle();
+        return $block.date('Ymd') . '/' .$stringHand->createMd5().mt_rand(100,999). $ext;
     }
 
 
     public function getOssUrl($ossName)
     {
-        return 'https://' . Yii::$app->params['oss']['bucket'] . '.' . Yii::$app->params['oss']['endPoint'] . '/' . $ossName;
+        #return 'https://' . Yii::$app->params['oss']['bucket'] . '.' . Yii::$app->params['oss']['endPoint'] . '/' . $ossName;
+        $url = '';
+        if(empty(Yii::$app->params['oss_base_link'])){
+            $url = 'https://' . Yii::$app->params['oss']['bucket'] . '.' . Yii::$app->params['oss']['endPoint'] . '/' . $ossName;
+        }else{
+            $url = Yii::$app->params['oss_base_link'] . $ossName;
+        }
+        return $url;
     }
 
     /**

@@ -220,6 +220,16 @@ class StringHandle{
     }
 
     /**
+     * 生成唯一md5值
+     * @return string
+     */
+    function createMd5(){
+        //生成一个不会重复的字符串
+        $str = md5(uniqid(md5(microtime(true)),true).'_'.$this->getRandomString(5));
+        return $str;
+    }
+
+    /**
      * 生成唯一token 用于保存到数据库中
      * @return string
      */

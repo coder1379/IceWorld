@@ -131,7 +131,7 @@ class UploadLogic
             return ComBase::getReturnArray([], 415, '上传文件失败');
         }
         $url = Yii::$app->params['local_static_link'] . $this->filePath;
-        return ComBase::getReturnArray(['url' => $url]);
+        return ComBase::getReturnArray(['short_url'=>$this->filePath,'url' => $url]);
     }
 
     /**
@@ -149,7 +149,7 @@ class UploadLogic
             return ComBase::getReturnArray([], ComBase::CODE_SERVER_BUSY, '文件上传失败');
         }
         $url = $oss->getOssUrl($ossName);
-        return ComBase::getReturnArray(['url' => $url]);
+        return ComBase::getReturnArray(['short_url'=>$ossName,'url' => $url]);
     }
 
     /**
