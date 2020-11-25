@@ -29,7 +29,7 @@ $columnNames = $generator->getColumnNames();
 $includeUserId = 0;
 if(!empty($columnNames)){
     foreach ($columnNames as $c){
-        if($c == 'is_delete'){
+        if($c == 'user_id'){
             $includeUserId = 1;
         }
     }

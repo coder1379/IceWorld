@@ -111,12 +111,12 @@ class BaseContoller extends Controller
      * @param array $defaultValue 未设置默认值
      * @return int|mixed|null
      */
-    public function getParamsJsonVal($name, $params = null, $defaultValue = [])
+    public function getParamsJsonDecodeArrayVal($name, $params = null, $defaultValue = [])
     {
         if ($params === null) {
-            return ComBase::getJsonVal($name, $this->params, $defaultValue);
+            return ComBase::getJsonDecodeArrayVal($name, $this->params, $defaultValue);
         } else {
-            return ComBase::getJsonVal($name, $params, $defaultValue);
+            return ComBase::getJsonDecodeArrayVal($name, $params, $defaultValue);
         }
     }
 
@@ -149,16 +149,6 @@ class BaseContoller extends Controller
     public function echoJson($data = [], $code = 200, $msg = 'success')
     {
         echo Json::encode($this->getJsonArray($data, $code, $msg));
-        exit();
-    }
-
-    /**
-     * 格式化返回数据 为json格式 并直接输出运行结果
-     * @param array $arrData 格式数组
-     */
-    public function echoJsonWithArray($arrData = [])
-    {
-        echo Json::encode($arrData);
         exit();
     }
 
