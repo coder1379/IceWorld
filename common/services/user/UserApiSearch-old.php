@@ -9,7 +9,7 @@ use yii\data\ActiveDataProvider;
 /**
  * UserSearch represents the model behind the search form about `common\services\user\UserModel`.
  */
-class UserApiSearch extends UserApiModel
+class UserApiSearchOLD extends UserApiModel
 {
     /**
      * @inheritdoc
