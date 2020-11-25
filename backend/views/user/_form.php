@@ -1,16 +1,19 @@
 <?php
 
+
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model common\services\user\UserModel */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
+
 
 <div class="user-model-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id'=>'create_update_active_form']); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
@@ -44,15 +47,17 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'birthday')->textInput() ?>
 
- <?= $form->field($model, 'sex')->label('性别')->dropDownList($model->sexPredefine,['prompt' => '请选择性别','options'=>[$model->sex=>['Selected'=>true]]]) ?>
+    <?php echo $form->field($model, 'sex')->label('性别')->dropDownList($model->sexPredefine,['options'=>[$model->sex=>['Selected'=>true]]]); ?>
 
- <?= $form->field($model, 'inviter_user_id')->label('邀请人')->dropDownList($model->getInviterUserRecordList(),['prompt' => '请选择邀请人','options'=>[$model->inviter_user_id=>['Selected'=>true]]]) ?>
+    <?= $form->field($model, 'inviter_user_id')->textInput() ?>
 
     <?= $form->field($model, 'introduce')->textInput(['maxlength' => true]) ?>
 
- <?= $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['prompt' => '请选择状态','options'=>[$model->status=>['Selected'=>true]]]) ?>
+    <?php echo $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['options'=>[$model->status=>['Selected'=>true]]]); ?>
 
- <?= $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '请选择类型','options'=>[$model->type=>['Selected'=>true]]]) ?>
+    <?php echo $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['options'=>[$model->type=>['Selected'=>true]]]); ?>
+
+    <?= $form->field($model, 'user_id')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? '添加' : '修改', ['class' => $model->isNewRecord ? 'btn btn-primary radius' : 'btn btn-primary radius']) ?>
@@ -76,5 +81,12 @@ use yii\widgets\ActiveForm;
             $(':submit').attr('disabled', true).addClass('disabled');
         });
     });
+
+    //禁用input回车提交
+    $(document).on("keydown","#create_update_active_form input[type='text']", function(event) {
+        return event.key != "Enter";
+    });
+
+    
 
 </script>

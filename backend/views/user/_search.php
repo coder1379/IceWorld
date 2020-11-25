@@ -51,13 +51,19 @@ use yii\widgets\ActiveForm;
 
 <?php echo $form->field($model, 'birthday') ?>
 
- <?php echo $form->field($model, 'sex')->label('性别')->dropDownList($model->sexPredefine,['prompt' => '请选择性别']) ?>
+ <?php echo $form->field($model, 'sex')->label('性别')->dropDownList($model->sexPredefine,['prompt' => '全部']) ?>
+
+<?php echo $form->field($model, 'inviter_user_id') ?>
+
+ <?php //echo $form->field($model, 'add_admin_id')->label('添加人')->dropDownList($model->getAddAdminRecordList(),['prompt' => '全部']) ?>
 
 <?php echo $form->field($model, 'introduce') ?>
 
- <?php echo $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['prompt' => '请选择状态']) ?>
+ <?php echo $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['prompt' => '全部']) ?>
 
- <?php echo $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '请选择类型']) ?>
+ <?php echo $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '全部']) ?>
+
+<?php echo $form->field($model, 'user_id') ?>
 
     <div class="form-group">
         <button type="submit" class="btn btn-success radius" ><i class="Hui-iconfont">&#xe665;</i> 查询</button>

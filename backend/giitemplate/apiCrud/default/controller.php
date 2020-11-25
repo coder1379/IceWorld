@@ -54,7 +54,7 @@ echo "<?php\n";
 namespace <?= StringHelper::dirname(ltrim($generator->controllerClass, '\\')) ?>;
 
 use Yii;
-use <?= ltrim($generator->modelClass, '\\') ?>;
+//use <?= ltrim($generator->modelClass, '\\') ?>;
 use <?= ltrim($generator->logic, '\\') ?>;
 use <?= ltrim($generator->baseControllerClass, '\\') ?>;
 use yii\web\NotFoundHttpException;
@@ -70,7 +70,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     public $enableCsrfValidation = false;
 
     /**
-     * 查询列表 <?php echo $tableComment; ?> [list]
+     * 获取<?php echo $tableComment.'列表'.PHP_EOL; ?>
      * @notes
      * @param int $page 页数 0 0
      * @param int $page_size 每页数量 0 10
@@ -84,7 +84,8 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-     * 查询详情 <?php echo $tableComment; ?> {detail}
+     * 获取<?php echo $tableComment.'详情'.PHP_EOL; ?>
+     * @notes
      * @param int $id ID 1
      * @return json yes {"data":{"@model":"<?php echo $generator->modelClass; ?>","@fields":"detail"}}
      */
@@ -96,7 +97,8 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-     * 创建 <?php echo $tableComment.PHP_EOL; ?> (create)
+     * 创建<?php echo $tableComment.PHP_EOL; ?>
+     * @notes
      * @param @model <?php echo $generator->modelClass; ?> create
      * @return json yes {"data":{"id":"[number] ID"}}
      */
@@ -108,7 +110,8 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-     * 修改 <?php echo $tableComment.PHP_EOL; ?> <update>
+     * 修改<?php echo $tableComment.PHP_EOL; ?>
+     * @notes
      * @param int $id ID 1
      * @param @model <?php echo $generator->modelClass; ?> update
      * @return json yes {"data":null}
@@ -122,6 +125,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
 
     /**
      * 删除<?php echo $tableComment.PHP_EOL; ?>
+     * @notes
      * @param int $id ID 1
      * @return json yes {"data":null}
      */
@@ -133,7 +137,8 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     }
 
     /**
-     * 物理删除<?= $tableComment ?> 默认屏蔽，需要自行打开
+     * 物理删除默认屏蔽，需要自行打开<?php echo $tableComment.PHP_EOL; ?>
+     * @notes
      * @param int $id ID 1
      * @return json yes {"data":null}
      */

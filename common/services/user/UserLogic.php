@@ -1,65 +1,12 @@
 <?php
-/**
- * This is the template for generating CRUD search class of the specified model.
- */
 
-use yii\helpers\StringHelper;
-
-$modelClass = StringHelper::basename($generator->modelClass);
-$searchModelClass = StringHelper::basename($generator->searchModelClass);
-$logicModelClass = StringHelper::basename($generator->logic);
-if ($modelClass === $logicModelClass) {
-    $modelAlias = $modelClass . 'Model';
-}
-$rules = $generator->generateSearchRules();
-$labels = $generator->generateSearchLabels();
-$searchAttributes = $generator->getSearchAttributes();
-$searchConditions = $generator->generateSearchConditions();
-
-$columnNames = $generator->getColumnNames();
-$includeIsDelete = 0;
-if(!empty($columnNames)){
-    foreach ($columnNames as $c){
-        if($c == 'is_delete'){
-            $includeIsDelete = 1;
-        }
-    }
-}
-
-$includeUserId = 0;
-if(!empty($columnNames)){
-    foreach ($columnNames as $c){
-        if($c == 'user_id'){
-            $includeUserId = 1;
-        }
-    }
-}
-
-$tempClass = $generator->modelClass;
-$tempClassDb = $tempClass::getDb();
-$dbNameString = $tempClassDb->dsn;
-$dbName1=explode(';',$dbNameString);
-$dbNameArr=explode('=',$dbName1[1]);
-$dbName=$dbNameArr[1];
-$tableNmae = $generator->getTableSchema()->fullName;
-$tableCommentObj = $tempClassDb->createCommand("select table_name,table_comment from information_schema.tables where table_schema = '".$dbName."' and table_name ='".$tableNmae."'")->queryOne();
-$tableComment = $tableCommentObj['table_comment'];
-if(empty($tableComment)){
-    $tableComment=$tableCommentObj['table_name'];
-}
-
-
-echo "<?php\n";
-?>
-
-namespace <?= StringHelper::dirname(ltrim($generator->logic, '\\')) ?>;
+namespace common\services\user;
 
 use Yii;
 use common\ComBase;
 use common\base\BaseLogic;
 
-class <?= $logicModelClass ?>
-
+class UserLogic
 {
     /**
      * 自动获取POST内容新增,复杂逻辑建议额外添加
@@ -73,7 +20,7 @@ class <?= $logicModelClass ?>
     {
 
         $logic = new BaseLogic();
-        $model = new <?php echo $modelClass; ?>();
+        $model = new UserApiModel();
 
         $allAttributeLabels = $model->attributeLabels();
         if (!empty($allAttributeLabels['add_time']) && empty($model->add_time)) {
@@ -81,17 +28,11 @@ class <?= $logicModelClass ?>
         }
 
         if (!empty($params)) {
-            <?php if ($includeUserId == 1) { //包含user_id 默认加入user_id;
-            ?>
-
+            
             if (empty($currentUserId)) {
                 return ComBase::getNoLoginReturnArray();
             }
-            <?php
-                echo "\$params['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
-            }
-            ?>
-
+            $params['user_id'] = $currentUserId;//***默认加入了user_id过滤
         }
         return $logic->baseCreate($model, $params, $scenario, $formName);
     }
@@ -114,27 +55,15 @@ class <?= $logicModelClass ?>
 
         $logic = new BaseLogic();
         $where = ['id' => $id];
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-        ?>
-
+        
         if (empty($currentUserId)) {
             return ComBase::getNoLoginReturnArray();
         }
 
-        <?php
-            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
-        }
-        ?>
-
+        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
         if (!empty($params)) {
-            <?php
-            if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
-                echo "\$where['is_delete'] = 0;//有is_delete表默认加入软删除过滤";
-            }
-            ?>
-
-            $model = <?php echo $modelClass; ?>::findOne($where);
+            $where['is_delete'] = 0;//有is_delete表默认加入软删除过滤
+            $model = UserApiModel::findOne($where);
 
             $allAttributeLabels = $model->attributeLabels();
             if (!empty($allAttributeLabels['update_time'])) {
@@ -164,25 +93,15 @@ class <?= $logicModelClass ?>
 
         $logic = new BaseLogic();
         $where = ['id' => $id];
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
-        }
-        ?>
-
+        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
         //默认可以传入删除时的data,自动加入is_delete标记
         if (empty($params['is_delete'])) {
             $params['is_delete'] = 1;
         }
 
         if (!empty($params)) {
-            <?php
-            if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
-                echo "\$where['is_delete'] = 0;//有is_delete表默认加入软删除过滤";
-            }
-            ?>
-
-            $model = <?php echo $modelClass; ?>::findOne($where);
+            $where['is_delete'] = 0;//有is_delete表默认加入软删除过滤
+            $model = UserApiModel::findOne($where);
             return $logic->baseDelete($model, $params, $scenario, $formName);
         }
         return ComBase::getParamsErrorReturnArray();
@@ -205,13 +124,8 @@ class <?= $logicModelClass ?>
 
         $logic = new BaseLogic();
         $where = ['id' => $id];
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
-        }
-        ?>
-
-        $model = <?php echo $modelClass; ?>::findOne($where);
+        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
+        $model = UserApiModel::findOne($where);
         return $logic->basePhysieDelete($model, $backUp);
     }
 
@@ -231,21 +145,11 @@ class <?= $logicModelClass ?>
             return ComBase::getParamsErrorReturnArray();
         }
         $where = ['id' => $id];
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
-        }
-        ?>
-
-        $detailModel = new <?php echo $modelClass; ?>();
+        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
+        $detailModel = new UserApiModel();
         $detailQuery = $detailModel::find();
         $detailQuery->where($where);
-        <?php
-        if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
-            echo "\$detailQuery->andWhere(['is_delete' => 0]);//有is_delete表默认加入软删除过滤";
-        }
-        ?>
-
+        $detailQuery->andWhere(['is_delete' => 0]);//有is_delete表默认加入软删除过滤
         //获取输出字段
         $printFields = $detailModel->fieldsScenarios()[$fieldScenarios];
 
@@ -266,24 +170,14 @@ class <?= $logicModelClass ?>
         $logic = new BaseLogic();
 
         //创建查询对象
-        $searchModel = new <?= $modelClass ?>();
+        $searchModel = new UserApiModel();
         $searchDataQuery = $searchModel::find();
         $where = [];//添加过滤条件，注意默认是无条件的
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
-        }
-        ?>
-
+        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
         $searchDataQuery->where($where);
         $searchDataQuery->orderBy('id desc');//添加默认排序规则
 
-        <?php
-        if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
-            echo "\$searchDataQuery->andWhere(['is_delete' => 0]);//默认添加标记删除标识";
-        }
-        ?>
-
+        $searchDataQuery->andWhere(['is_delete' => 0]);//默认添加标记删除标识
         //获取输出字段
         $printFields = $searchModel->fieldsScenarios()[$fieldScenarios];
 

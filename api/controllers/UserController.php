@@ -1,77 +1,100 @@
 <?php
+
 namespace api\controllers;
 
-use common\controllers\ApiCommonAuthContoller;
-use common\services\mobilesms\MobileSmsLogic;
-use common\services\user\UserLogic;
-use common\services\user\UserModel;
 use Yii;
+//use common\services\user\UserApiModel;
+use common\services\user\UserLogic;
+use common\controllers\ApiCommonContoller;
+use yii\web\NotFoundHttpException;
 use yii\helpers\Json;
+use common\ComBase;
+
 /**
- * api controller
+ * 用户
+ * UserController implements the CRUD actions for UserApiModel model.
  */
-class UserController extends ApiCommonAuthContoller
+class UserController extends ApiCommonContoller
 {
-    //测试token:314a0d453fea22228db415080e2c541df584cc15
-    //id 32
     public $enableCsrfValidation = false;
-    public $allowAccessActions=['create','signin','signout'];
-    public function actionList(){
+
+    /**
+     * 获取用户列表
+     * @notes
+     * @param int $page 页数 0 0
+     * @param int $page_size 每页数量 0 10
+     * @return json yes {"data":{"list":[{"@model":"common\services\user\UserApiModel","@fields":"list"}],@pagination}}
+     */
+    public function actionList()
+    {
         $logic = new UserLogic();
-        $result = $logic->list($this->get());
+        $result = $logic->list($this->post(), $this->getUserId());
         return Json::encode($result);
     }
 
     /**
-     * targetDoc->common\services\user\UserLogic->detail
-     *
+     * 获取用户详情
+     * @notes
+     * @param int $id ID 1
+     * @return json yes {"data":{"@model":"common\services\user\UserApiModel","@fields":"detail"}}
      */
-    public function actionDetail(){
+    public function actionDetail()
+    {
         $logic = new UserLogic();
-        $result = $logic->detail($this->get());
+        $result = $logic->detail($this->post(), 10);
         return Json::encode($result);
     }
 
     /**
-     * 获取详情 无扣分忘记了费劲儿网络科技风六维空间而非
-     *
-     * @param string $user 手机号 必填
-     * @param string $pwd 密码  与验证码有一个必填
-     * @param string $code 验证码 与密码有一个必填
-     * @return json 成功 {"code":200,"msg":"success","data":{}}，失败 {"code":1001,"msg":"手机已经注册存在","data":{}}
-     *
+     * 创建用户
+     * @notes
+     * @param @model common\services\user\UserApiModel create
+     * @return json yes {"data":{"id":"[number] ID"}}
      */
-    public function actionCreate(){
+    public function actionCreate()
+    {
         $logic = new UserLogic();
-        $result = $logic->create($this->get());
-        if($result['code']==200){
-            $message = new MobileSmsLogic();
-            $message->create(['mobile'=>$this->get('mobile'),'contents'=>'恭喜你注册成功！']);
-        }
+        $result = $logic->create($this->post(), 10);
         return Json::encode($result);
     }
 
-    public function actionUpdate(){
+    /**
+     * 修改用户
+     * @notes
+     * @param int $id ID 1
+     * @param @model common\services\user\UserApiModel update
+     * @return json yes {"data":null}
+     */
+    public function actionUpdate()
+    {
         $logic = new UserLogic();
-        $result = $logic->update($this->get());
+        $result = $logic->update($this->post(), 10);
         return Json::encode($result);
     }
 
-    public function actionDelete(){
+    /**
+     * 删除用户
+     * @notes
+     * @param int $id ID 1
+     * @return json yes {"data":null}
+     */
+    public function actionDelete()
+    {
         $logic = new UserLogic();
-        $result = $logic->delete($this->get());
+        $result = $logic->delete($this->post(), 10);
         return Json::encode($result);
     }
 
-    public function actionSignin(){
+    /**
+     * 物理删除默认屏蔽，需要自行打开用户
+     * @notes
+     * @param int $id ID 1
+     * @return json yes {"data":null}
+     */
+    public function actionPhysiedelete()
+    {
         $logic = new UserLogic();
-        $result = $logic->signin($this->get());
-        return Json::encode($result);
-    }
-
-    public function actionSignout(){
-        $logic = new UserLogic();
-        $result = $logic->signout($this->get());
+        $result = $logic->physieDelete($this->post(), 10);
         return Json::encode($result);
     }
 

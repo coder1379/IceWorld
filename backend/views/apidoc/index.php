@@ -206,7 +206,7 @@
                     ?>
                     <div><?php echo $number; ?>.<a
                                 href="#id=show_method_<?php echo $key; ?>"><?php echo $m['tags']['description'] ?>
-                            -(<?php echo $key; ?>)</a></div>
+                            - (<?php echo $key; ?>)</a></div>
                     <?php
                 }
             }

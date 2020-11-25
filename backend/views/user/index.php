@@ -16,11 +16,11 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'view',null)==true){ $bu
 if($common->checkButtonAuth($mainAuthJson,$controllerId,'update',null)==true){ $buttonList.= '{update}'; }
 if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $buttonList.= '{delete}'; }
 ?>
-<nav class="breadcrumb">
+<nav class="breadcrumb index-nav-list">
     <i class="Hui-iconfont">&#xe67f;</i> 首页
     <span class="c-gray en">&gt;</span> 用户管理
     <span class="c-gray en">&gt;</span> 用户列表
-    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" >
+    <a class="btn btn-success radius r operation-reload-icon" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" >
         <i class="Hui-iconfont">&#xe68f;</i>
     </a>
 </nav>
@@ -30,7 +30,7 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
     
 <?php if($common->checkButtonAuth($mainAuthJson,$controllerId,'create',null)==true){ ?>    <div class="cl pd-5 mt-20">
         <span class="l">
-            <a href="javascript:;" onclick="backend_create_data('添加','<?= Yii::$app->urlManager->createUrl(''.$controllerId.'/create') ?>',layerOpenWindowWidth,layerOpenWindowHeight)" class="btn btn-primary radius">
+            <a href="javascript:;" onclick="backend_create_data('添加','<?= Yii::$app->urlManager->createUrl(''.$controllerId.'/create') ?>',layerOpenWindowWidth,layerOpenWindowHeight)" class="btn btn-primary radius operation-add-icon">
                 <i class="Hui-iconfont">&#xe600;</i> 添加
             </a>
         </span>
@@ -72,22 +72,23 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
 ['class'=>'yii\grid\DataColumn','value'=>'last_login_time','label' => '最后登录时间'],
 ['class'=>'yii\grid\DataColumn','value'=>'head_portrait','label' => '头像'],
 ['class'=>'yii\grid\DataColumn','value'=>'birthday','label' => '生日'],
-['class'=>'yii\grid\DataColumn','value'=>function($data){   return empty($data->sexPredefine[$data['sex']])!=true?$data->sexPredefine[$data['sex']]:'';},'label' => '性别'],
-['class'=>'yii\grid\DataColumn','value'=>function($data){   return empty($data->inviterUserRecord->name)!=true?$data->inviterUserRecord->name:'';},'label' => '邀请人'],
-['class'=>'yii\grid\DataColumn','value'=>function($data){   return empty($data->addAdminRecord->nickname)!=true?$data->addAdminRecord->nickname:'';},'label' => '添加人'],
+//['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->sexPredefine[$data['sex']]??'';},'label' => '性别'],
+['class'=>'yii\grid\DataColumn','value'=>'inviter_user_id','label' => '邀请人'],
+['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->addAdminRecord->nickname??'';},'label' => '添加人'],
 ['class'=>'yii\grid\DataColumn','value'=>'introduce','label' => '自我介绍'],
-['class'=>'yii\grid\DataColumn','value'=>function($data){   return empty($data->statusPredefine[$data['status']])!=true?$data->statusPredefine[$data['status']]:'';},'label' => '状态'],
-['class'=>'yii\grid\DataColumn','value'=>function($data){   return empty($data->typePredefine[$data['type']])!=true?$data->typePredefine[$data['type']]:'';},'label' => '类型'],
+['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->statusPredefine[$data['status']]??'';},'label' => '状态'],
+['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->typePredefine[$data['type']]??'';},'label' => '类型'],
+['class'=>'yii\grid\DataColumn','value'=>'user_id','label' => '用户ID'],
             ['class' => 'yii\grid\ActionColumn',
                 'header' => '操作',
                 'template' => $buttonList,
                 'buttons' => [
     'view' => function ($url, $model, $key) {
-    return '<a title="详情" href="javascript:;" onclick="backend_view_data(\'查看详情\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe665;</i></a>'; },
+    return '<a title="详情" href="javascript:;" onclick="backend_view_data(\'查看详情\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5 operation-icon operation-view-icon" style="text-decoration:none"><i class="Hui-iconfont">&#xe665;</i></a>'; },
                 'update' => function ($url, $model, $key) {
-    return '<a title="编辑" href="javascript:;" onclick="backend_update_data(\'编辑\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>'; },
+    return '<a title="编辑" href="javascript:;" onclick="backend_update_data(\'编辑\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5 operation-icon operation-update-icon" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>'; },
     'delete' => function ($url, $model, $key) {
-    return '<a title="删除" href="javascript:;" clickDelete="0" onclick="backend_delete_data(this,\''.$key.'\',\''.$model->name.'\',\''.$url.'\')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>'; },
+    return '<a title="删除" href="javascript:;" clickDelete="0" onclick="backend_delete_data(this,\''.$key.'\',\''.$model->name.'\',\''.$url.'\')" class="ml-5 operation-icon operation-del-icon" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>'; },
                 ],
     ],
         ],

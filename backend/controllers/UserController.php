@@ -8,7 +8,7 @@ use common\services\user\UserSearch;
 use backend\controllers\AuthController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use common\ComBase;
 use common\services\admin\AdministratorModel;
 
 /**
@@ -73,8 +73,12 @@ class UserController extends AuthController
         if ( $model->load(Yii::$app->request->post())==true) {
             //添加添加时间和添加的管理员代码
             $allAttributeLabels = $model->attributeLabels();
-            if(!empty($allAttributeLabels['add_time']) && (empty($model->add_time) || $model->add_time == '0000-00-00 00:00:00' )){
-                $model->add_time = date('Y-m-d H:i:s',time());
+            if(!empty($allAttributeLabels['add_time']) && empty($model->add_time)){
+                $model->add_time = time();
+            }
+
+            if(!empty($allAttributeLabels['update_time']) && empty($model->update_time)){
+                $model->update_time = time();
             }
 
             if(!empty($allAttributeLabels['add_admin_id']) && empty($model->add_admin_id)){
@@ -101,6 +105,11 @@ class UserController extends AuthController
         $model->scenario = 'update';//修改场景，控制字段安全
         $model->loadDefaultValues();
         if ($model->load(Yii::$app->request->post())==true) {
+            //维护修改时间如果存在字段
+            $allAttributeLabels = $model->attributeLabels();
+            if(!empty($allAttributeLabels['update_time'])){
+                $model->update_time = time();
+            }
             if($model->save()==true){
                 return $this->redirect(['view', 'id' => $model->id]);
             }
@@ -120,14 +129,22 @@ class UserController extends AuthController
     {
         $obj=$this->findModel($id);
         if(empty($obj)==true){
-            return $this->getJsonString([],10001,'参数错误!');
+            return ComBase::getReturnJson([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);
         }else{
-            $obj->scenario = 'delete';//删除场景，控制字段安全
-            $obj->is_delete=1;
-            if($obj->update()==true){
-                return $this->getJsonString([],200,'删除成功!');
+
+            $deleteFlag = 0;
+            if(isset($obj->is_delete)!=true){
+                $deleteFlag = $obj->delete();
             }else{
-                return $this->getJsonString([],10001,'删除失败!');
+                $obj->scenario = 'delete';//删除场景，控制字段安全
+                $obj->is_delete=1;
+                $deleteFlag = $obj->update();
+            }
+
+            if($deleteFlag){
+                return $this->getJsonString([],ComBase::CODE_RUN_SUCCESS,ComBase::MESSAGE_DELETE_SUCCESS);
+            }else{
+                return $this->getJsonString([],ComBase::CODE_SERVER_ERROR,ComBase::MESSAGE_SERVER_ERROR);
             }
         }
     }
