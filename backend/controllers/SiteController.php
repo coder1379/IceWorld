@@ -6,6 +6,7 @@ use Yii;
 use common\services\site\SiteModel;
 use common\services\site\SiteSearch;
 use backend\controllers\AuthController;
+use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\ComBase;
@@ -120,7 +121,7 @@ class SiteController extends AuthController
     {
         $obj=$this->findModel($id);
         if(empty($obj)==true){
-            return ComBase::getReturnJson([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);
+            return Json::encode(ComBase::getReturnArray([], ComBase::CODE_PARAM_ERROR, ComBase::MESSAGE_PARAM_ERROR));
         }else{
             $obj->scenario = 'delete';//删除场景，控制字段安全
             $obj->is_delete=1;

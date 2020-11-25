@@ -1,6 +1,7 @@
 <?php
 namespace console\controllers;
 
+use common\ComBase;
 use common\lib\DingTalkRobot;
 use common\services\systemconfig\SystemConfigModel;
 use GuzzleHttp\Client;
@@ -33,7 +34,7 @@ class IndexController extends Controller
             $text = $httpClient->get(Yii::$app->params['api_root_url'])->getBody()->getContents();
             $textJson = Json::decode($text);
             $code = $textJson['code'] ?? 400;
-            if (intval($code) > 0) {
+            if (intval($code) > ComBase::CODE_RUN_SUCCESS) {
                 //无法访问放入错误数组
                 $errorList[] = 'api接口访问异常';
             }
@@ -66,7 +67,7 @@ class IndexController extends Controller
         if (!empty($errorList)) {
             $ding = new DingTalkRobot();
             $ding->accessToken = Yii::$app->params['dingding_log_robot_token'];
-            $message = $envStr . ' 异常日志 ' . implode("\n\n", $errorList)."\n";
+            $message = $envStr . ' 异常日志 :'."\n". implode("\n", $errorList)."\n";
             $isAtAll = false;
             //生产错误直接at所有人
             if (YII_ENV === 'prod') {

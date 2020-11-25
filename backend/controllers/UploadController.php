@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\ComBase;
 use common\services\upload\UploadLogic;
 use Yii;
 use common\lib\upload\Upload;
@@ -101,9 +102,8 @@ class UploadController extends AuthController
 
     public function actionAjaxuploadvideo()
     {
-        $common = new BaseCommon();
         if (!isset($_FILES['Filedata'])) {
-            return Json::encode($common->getJsonArray([], 411, '参数错误'));
+            return Json::encode(ComBase::getParamsErrorReturnArray());
         }
 
         $upload = new UploadLogic(Yii::$app->params['oss']['bucket'],'audio');
@@ -113,9 +113,8 @@ class UploadController extends AuthController
 
     public function actionAjaxupload()
     {
-        $common = new BaseCommon();
         if (!isset($_FILES['Filedata'])) {
-            return Json::encode($common->getJsonArray([], 410, '参数错误'));
+            return Json::encode(ComBase::getParamsErrorReturnArray());
         }
 
         $upload = new UploadLogic(Yii::$app->params['oss']['bucket'],'image');
@@ -125,9 +124,8 @@ class UploadController extends AuthController
 
     public function actionWangeditorUploadImage()
     {
-        $common = new BaseCommon();
         if (!isset($_FILES['Filedata'])) {
-            return Json::encode($common->getJsonArray([], 410, '参数错误'));
+            return Json::encode(ComBase::getParamsErrorReturnArray());
         }
         $uploadLogic = new UploadLogic(Yii::$app->params['oss']['bucket']);
         $result = $uploadLogic->upload($_FILES['Filedata'], Yii::$app->params['uploadMode']);

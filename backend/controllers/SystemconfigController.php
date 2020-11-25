@@ -6,6 +6,7 @@ use Yii;
 use common\services\systemconfig\SystemConfigModel;
 use common\services\systemconfig\SystemConfigSearch;
 use backend\controllers\AuthController;
+use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\ComBase;
@@ -128,7 +129,7 @@ class SystemconfigController extends AuthController
     {
         $obj=$this->findModel($id);
         if(empty($obj)==true){
-            return ComBase::getReturnJson([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);
+            return Json::encode(ComBase::getReturnArray([], ComBase::CODE_PARAM_ERROR, ComBase::MESSAGE_PARAM_ERROR));
         }else{
 
             $deleteFlag = 0;

@@ -322,7 +322,7 @@ class Uploader
     private function getFilePath()
     {
         $fullname = $this->fullName;
-        $rootPath = ComBase::getUploadRootPath();
+        $rootPath = Yii::getAlias('@static');
 
         if (substr($fullname, 0, 1) != '/') {
             $fullname = '/' . $fullname;

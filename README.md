@@ -13,7 +13,8 @@ ICE WORLD
 #yii2 每分钟进行一次系统检测发现异常钉钉推送
 * * * * * /usr/local/php74/bin/php /data/wwwroot/yii2/yii index/systemtour
 ```
-9.发布与测试
+9.根据需求修改模板框架以提高开发速度
+10.发布与测试
 
 ===============
 
@@ -234,3 +235,5 @@ $ sudo journalctl /usr/lib/systemd/systemd
 php jwt ：https://github.com/firebase/php-jwt
 go jwt ：github.com/dgrijalva/jwt-go
 python:pip install PyJWT
+
+#### office excel 改用 phpoffice/phpspreadsheet包，PHPExcel已经停止维护

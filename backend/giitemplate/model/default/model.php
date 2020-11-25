@@ -88,6 +88,9 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . 
 
      //获取<?php echo $name; ?>,<?php echo $lableArr[0]; ?> 的LIST
      public function <?php echo $jsonV["functionName"]; ?>List(){
+            return [];
+            //根据实际使用完善下方获取列表功能
+            /*
             $array = <?php echo $jsonV["modelName"]; ?>::find()->select('<?php echo $jsonV["selectFeild"]; ?>')->where(['is_delete'=>0])->orderBy("<?php echo $idFeildArr[0]; ?> desc")->limit(100)->asArray()->all();
             $newArr = [];
 
@@ -97,6 +100,7 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . 
                 }
             }
             return $newArr;
+            */
       }
 
 <?php

@@ -26,6 +26,15 @@ if(!empty($columnNames)){
     }
 }
 
+$includeUserId = 0;
+if(!empty($columnNames)){
+    foreach ($columnNames as $c){
+        if($c == 'user_id'){
+            $includeUserId = 1;
+        }
+    }
+}
+
 
 echo "<?php\n";
 ?>

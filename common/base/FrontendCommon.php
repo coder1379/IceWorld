@@ -41,23 +41,6 @@ class FrontendCommon extends BaseCommon
         }
     }
 
-
-    /**
-     * 获取当前用户已登陆的统一提示
-     * @return array
-     */
-    public function getReadyLoginMassage(){
-        return $this->getJsonArray([],10001,'当前用户已经登录!');
-    }
-
-    /**
-     * 获取当前用户登录过期的统一提示
-     * @return array
-     */
-    public function getNoLoginMassage(){
-        return $this->getJsonArray([],10001,'登录已过期,请重新登录!');
-    }
-
     public function getOrderNo(){
         $yCode = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J');
         $orderSn = $yCode[intval(date('Y')) - 2011] . strtoupper(dechex(date('m'))) . date('d') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf('%02d', rand(0, 99));

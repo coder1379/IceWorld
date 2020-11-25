@@ -121,7 +121,7 @@ class UploadLogic
     private function _localUpload()
     {
         //获取绝对路径
-        $absolutePath = ComBase::getUploadRootPath() . $this->filePath;
+        $absolutePath = Yii::getAlias('@static') . $this->filePath;
         $mkdirPath = dirname($absolutePath);
         //创建文件夹
         if (!file_exists($mkdirPath) && !mkdir($mkdirPath, 0644, true)) {
@@ -202,7 +202,8 @@ class UploadLogic
 
     public function getUploadPath($dirName = 'upload'){
         $filePath = '/'.$dirName.'/' . date('Ymd');
-        $filePath .= '/' . md5(time() .'_'. mt_rand(1000000, 9000000).ComBase::getMd5Key());
+        $md5Key = Yii::$app->params['md5Key'];
+        $filePath .= '/' . md5(time() .'_'. mt_rand(1000000, 9000000).$md5Key);
         return $filePath;
     }
 

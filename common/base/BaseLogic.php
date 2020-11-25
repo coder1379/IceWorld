@@ -13,6 +13,127 @@ use yii\data\Pagination;
  */
 class BaseLogic
 {
+
+    /*
+     * 根据配置的关系数组自动获取数据,如果此方法无法满足使用则在XxxLogic中自行根据业务获取数据
+     * 由于model主要是以实例对象的形式使用，所有当判断返回的为数组时只可能是model list和返回数据为array
+     * @param $model 模型实例
+     * @param array $include 需要包含的数据关系 例如
+      $include = [
+                    [
+                        'name'=>'userRecord',
+                        //对应model里 get+name的function
+
+                        'fields'=>'list|detail等', //也可使用 'fields'=>['id','name','mobile']，直接指定要获取哪些字段但此方式不便于多地方调用时的维护
+                        //list,detail为model里面fieldsScenarios的场景可显示字段数组的key，推荐使用此方式便于后续增减字段 在Model->getAttributes($fields)时调用
+                        //在获取非model数据时fields可以不传,同时可以string，fieldsScenarios的key值，将自动获取对应数组,这里需要注意apiModel与model之间的继承关系，可能hasOne里的父类model没有fieldsScenarios 需要将hasOne或many里面的model指向XxxApiModel
+
+                        'include'=>[ //是否递归子包含],//递归包含的子项，参数同上，在多表递归关联的时候推荐使用
+                    ],
+
+                    [
+                        'name'=>'inviterUserRecordList','fields'=>['id','name','mobile'],'include'=>[ ],//包含的第二个数据，可以同时引入多个规则同上
+                    ],
+                ];
+     * @return array
+     * @throws \Exception
+     */
+    public function getLogicInclude($model, $include = [])
+    {
+        if (!empty($include)) {
+            $returnList = [];
+            foreach ($include as $obj) {
+                $recordName = $obj['name'];
+                $fields = $obj['fields']; //在获取非model数据时fields可以不传
+                $thisInclude = $obj['include'] ?? null;
+                $thisModel = $model->$recordName;
+                $modelList = null;
+                $modelListFlag = 0;
+                if (is_array($thisModel) && is_object(current($thisModel))) {
+                    $modelList = $thisModel;
+                    $modelListFlag = 1;
+                } else {
+                    $modelList[] = $thisModel;
+                }
+
+                $dataArray = [];
+                if (!empty($modelList)) {
+                    foreach ($modelList as $nextModel) {
+                        $thisArray = null;
+                        if (is_object($nextModel)) {
+                            if (is_array($fields)) {
+                                $thisArray = $nextModel->getAttributes($fields);
+                            } else if (is_string($fields)) {
+                                if (empty($nextModel->fieldsScenarios()) || empty($nextModel->fieldsScenarios()[$fields])) {
+                                    throw new \Exception('fieldsScenarios is null or fieldsScenarios[' . $fields . '] is null');
+                                } else {
+                                    $printFields = $nextModel->fieldsScenarios()[$fields];
+                                    $thisArray = $nextModel->getAttributes($printFields);
+                                }
+
+                            }
+
+                        } else {
+                            $thisArray = $nextModel;
+                        }
+
+                        if (!empty($thisInclude) && !empty($nextModel)) {
+                            $includeArray = self::getLogicInclude($nextModel, $thisInclude);
+                            if (!empty($includeArray)) {
+                                foreach ($includeArray as $inc) {
+                                    $thisArray[$inc['name']] = $inc['data'];
+                                }
+                            }
+                        }
+                        if ($modelListFlag == 1) {
+                            $dataArray[] = $thisArray;
+                        } else {
+                            $dataArray = $thisArray;
+                        }
+                    }
+                }
+                $returnList[] = ['name' => $recordName, 'data' => $dataArray];
+            }
+        }
+        return $returnList;
+    }
+
+    /**
+     * 获取模型的错误数组模式，并将第一个错误格式化到返回错误中
+     * @param $errors
+     * @return array
+     */
+    public function getModelErrorsToArray($errors)
+    {
+        $returnErrors = ['all' => [], 'first' => ['k' => 0, 'v' => '']];
+        if (!empty($errors)) {
+            $firstFlag = true;
+            foreach ($errors as $k => $v) {
+                $returnErrors['all'][] = [$k => $v[0]];
+                if ($firstFlag == true) {
+                    $returnErrors['first']['k'] = $k;
+                    $returnErrors['first']['v'] = $v[0];
+                    $firstFlag = false;
+                }
+            }
+        }
+        return $returnErrors;
+    }
+
+    /**
+     *  将 getModelErrorsToArray 格式化后的数据再次格式化为直接能返回前端的数据,根据params设置的returnAllErrors 控制是否输出全部错误
+     * @param $errors
+     * @return array
+     */
+    public function getFormatErrorsArray($errors)
+    {
+        $returnData = ['firstKey' => $errors['first']['k']];
+        if (Yii::$app->params['returnAllErrors'] == true) {
+            $returnData['allErrors'] = $errors['all'];
+        }
+        return ComBase::getReturnArray($returnData, ComBase::CODE_PARAM_FORMAT_ERROR, $errors['first']['k'] . ':' . $errors['first']['v']);
+    }
+
     /**
      * 创建
      * @param object $model 调用方new的实体对象
@@ -40,15 +161,15 @@ class BaseLogic
                     return ComBase::getReturnArray(['id' => Yii::$app->db->getLastInsertID()], ComBase::CODE_RUN_SUCCESS, ComBase::MESSAGE_CREATE_SUCCESS);
                 } else {
                     //创建失败
-                    return ComBase::getReturnArray([], ComBase::CODE_SERVER_ERROR, ComBase::MESSAGE_SERVER_ERROR);
+                    return ComBase::getServerBusyReturnArray();
                 }
             } else {
                 //获取并返回错误内容数组
-                return ComBase::getFormatErrorsArray(ComBase::getModelErrorsToArray($model->getErrors()));
+                return self::getFormatErrorsArray(self::getModelErrorsToArray($model->getErrors()));
             }
         }
 
-        return ComBase::getReturnArray([], ComBase::CODE_PARAM_ERROR, ComBase::MESSAGE_PARAM_ERROR);//返回参数错误
+        return ComBase::getParamsErrorReturnArray();
     }
 
     /**
@@ -66,7 +187,7 @@ class BaseLogic
         }
 
         if (empty($model)) {
-            return ComBase::getReturnArray([], ComBase::CODE_NO_FIND_ERROR, ComBase::MESSAGE_NO_FIND_ERROR);//返回 没有找到指定数据
+            return ComBase::getNoFindReturnArray();
         }
 
         if (!empty($data)) {
@@ -78,15 +199,15 @@ class BaseLogic
                     return ComBase::getReturnArray([], ComBase::CODE_RUN_SUCCESS, ComBase::MESSAGE_UPDATE_SUCCESS);
                 } else {
                     //修改失败
-                    return ComBase::getReturnArray([], ComBase::CODE_SERVER_ERROR, ComBase::MESSAGE_SERVER_ERROR);
+                    return ComBase::getServerBusyReturnArray();
                 }
             } else {
                 //获取并返回错误内容数组
-                return ComBase::getFormatErrorsArray(ComBase::getModelErrorsToArray($model->getErrors()));
+                return self::getFormatErrorsArray(self::getModelErrorsToArray($model->getErrors()));
             }
         }
 
-        return ComBase::getReturnArray([], ComBase::CODE_PARAM_ERROR, ComBase::MESSAGE_PARAM_ERROR);//返回参数错误
+        return ComBase::getParamsErrorReturnArray();
     }
 
     /**
@@ -104,7 +225,7 @@ class BaseLogic
         }
 
         if (empty($model)) {
-            return ComBase::getReturnArray([], ComBase::CODE_NO_FIND_ERROR, ComBase::MESSAGE_NO_FIND_ERROR);//返回 没有找到指定数据
+            return ComBase::getNoFindReturnArray();
         }
 
         if (!empty($data)) {
@@ -116,15 +237,15 @@ class BaseLogic
                     return ComBase::getReturnArray([], ComBase::CODE_RUN_SUCCESS, ComBase::MESSAGE_DELETE_SUCCESS);
                 } else {
                     //删除失败
-                    return ComBase::getReturnArray([], ComBase::CODE_SERVER_ERROR, ComBase::MESSAGE_SERVER_ERROR);
+                    return ComBase::getServerBusyReturnArray();
                 }
             } else {
                 //获取并返回错误内容数组
-                return ComBase::getFormatErrorsArray(ComBase::getModelErrorsToArray($model->getErrors()));
+                return self::getFormatErrorsArray(self::getModelErrorsToArray($model->getErrors()));
             }
         }
 
-        return ComBase::getReturnArray([], ComBase::CODE_PARAM_ERROR, ComBase::MESSAGE_PARAM_ERROR);//返回参数错误
+        return ComBase::getParamsErrorReturnArray();
     }
 
     /**
@@ -136,7 +257,7 @@ class BaseLogic
     public function basePhysieDelete($model, $backUp = false)
     {
         if (empty($model)) {
-            return ComBase::getReturnArray([], ComBase::CODE_NO_FIND_ERROR, ComBase::MESSAGE_NO_FIND_ERROR);//返回 没有找到指定数据
+            return ComBase::getNoFindReturnArray();
         }
 
         if ($backUp == true) {
@@ -150,7 +271,7 @@ class BaseLogic
             return ComBase::getReturnArray([], ComBase::CODE_RUN_SUCCESS, ComBase::MESSAGE_DELETE_SUCCESS);
         } else {
             //删除失败
-            return ComBase::getReturnArray([], ComBase::CODE_SERVER_ERROR, ComBase::MESSAGE_SERVER_ERROR);
+            return ComBase::getServerBusyReturnArray();
         }
     }
 
@@ -172,20 +293,20 @@ class BaseLogic
         }
         $model = $detailQuery->one(); //获取一条数据
         if (empty($model)) {
-            return ComBase::getReturnArray([], ComBase::CODE_NO_FIND_ERROR, ComBase::MESSAGE_NO_FIND_ERROR);//返回 没有找到指定数据
+            return ComBase::getNoFindReturnArray();
         }
 
         //直接获取数组数据并返回，可以将关联数据在此加入或者将预定义状态等返回
         $modelArray = $model->getAttributes($printFields);
         if (!empty($include)) {
-            $includeList = ComBase::getLogicInclude($model, $include);
+            $includeList = self::getLogicInclude($model, $include);
             if (!empty($includeList)) {
                 foreach ($includeList as $inc) {
                     $modelArray[$inc['name']] = $inc['data'];
                 }
             }
         }
-        return ComBase::getReturnArray($modelArray, ComBase::CODE_RUN_SUCCESS);
+        return ComBase::getReturnArray($modelArray);
     }
 
     /**
@@ -229,7 +350,7 @@ class BaseLogic
             foreach ($listObjects as $model) {
                 $modelArray = $model->getAttributes($printFields);
                 if (!empty($include)) {
-                    $includeList = ComBase::getLogicInclude($model, $include);
+                    $includeList = self::getLogicInclude($model, $include);
                     if (!empty($includeList)) {
                         foreach ($includeList as $inc) {
                             $modelArray[$inc['name']] = $inc['data'];
@@ -252,7 +373,7 @@ class BaseLogic
             'pagination' => $pagination,
         ];
 
-        return ComBase::getReturnArray($listArray, ComBase::CODE_RUN_SUCCESS);
+        return ComBase::getReturnArray($listArray);
     }
 
     /**
@@ -283,29 +404,4 @@ class BaseLogic
         $pagination['page'] = $page;
         return $pagination;
     }
-
-    /**
-     * 统一获取参数错误返回,可在子类中自行覆盖
-     * @return array
-     */
-    public function getParamsErrorReturnArray(){
-        return ComBase::getReturnArray([], ComBase::CODE_PARAM_ERROR, ComBase::MESSAGE_PARAM_ERROR);
-    }
-
-    /**
-     * 统一获取服务器异常返回,可在子类中自行覆盖
-     * @return array
-     */
-    public function getServerErrorReturnArray(){
-        return ComBase::getReturnArray([], ComBase::CODE_SERVER_ERROR, ComBase::MESSAGE_SERVER_ERROR);
-    }
-
-    /**
-     * 统一获取服务器繁忙，可在子类自行覆盖
-     * @return array
-     */
-    public function getServerBusyReturnArray(){
-        return ComBase::getReturnArray([], ComBase::CODE_SERVER_BUSY, ComBase::MESSAGE_SERVER_BUSY);
-    }
-
 }

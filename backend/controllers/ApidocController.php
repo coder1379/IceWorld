@@ -25,7 +25,7 @@ class ApidocController extends AuthController
         $clickName = $this->get('cname', '');
 
         $docList = [];
-        $except = ['IndexController.php',];
+        $except = ['IndexController.php','TestController.php'];
         $path = FileHelper::normalizePath(Yii::getAlias('@api') . '/controllers');
 
         $options = [

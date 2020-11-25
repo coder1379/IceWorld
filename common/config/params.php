@@ -1,7 +1,8 @@
 <?php
 return [
     'project_name' => 'ICE',//项目名称用于各类提示信息title
-    'md5Key' => 'ice_world',//md5加密秘钥 不可修改
+    'md5Key' => 'ice_world',//md5加密秘钥 可变更不影响使用
+    'md5PWDKey' => 'ice_world',//md5 PWD加密key 项目初始化时修改后将不能再修改避免影响登录
     'adminEmail' => '',
     'supportEmail' => '',
     'user.passwordResetTokenExpire' => 3600,

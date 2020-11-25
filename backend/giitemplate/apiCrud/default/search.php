@@ -88,7 +88,7 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
         if(empty($searchScenarios)){
             throw new \Exception('Unknown scenario:'.$scenario);
         }
-        $where = ['is_delete' => 0]; //必须字段直接在此处添加,注意不要在searh场景内覆盖了
+        $where = ['is_delete' => 0]; //必须字段直接在此处添加,注意不要在search场景内覆盖了
         $query->where($where);
         $searchParams = ComBase::getReserveArray($params,$searchScenarios);
         $query->andFilterWhere($searchParams);
