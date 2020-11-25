@@ -70,7 +70,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     public $enableCsrfValidation = false;
 
     /**
-     * 获取<?php echo $tableComment; ?>列表
+     * 查询列表 <?php echo $tableComment; ?> [list]
      * @notes
      * @param int $page 页数 0 0
      * @param int $page_size 每页数量 0 10
@@ -78,78 +78,37 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
      */
     public function actionList()
     {
-        $fieldScenarios = 'list';
         $logic = new <?= $logicClass ?>();
-        $params = $this->post();//获取前端上传的参数
-
-        //创建查询对象
-        $searchModel = new <?= $modelClass ?>();
-        $searchDataQuery = $searchModel::find();
-        $where = [];//添加过滤条件，注意默认是无条件的
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$this->getUserId();//***默认加入了user_id过滤";
-        }
-        ?>
-
-        $searchDataQuery->where($where);
-        $searchDataQuery->orderBy('id desc');//添加默认排序规则
-
-        //获取输出字段
-        $printFields = $searchModel->fieldsScenarios()[$fieldScenarios];
-
-        //获取post内的分页数据并格式化
-        $paginationParams = $logic->getPaginationParams($params);
-
-        //$include = [ [ 'name'=>'xxxRecord', 'fields'=>['id','name'] ] ];//支持关联数据获取
-        $result = $logic->list($searchDataQuery, $printFields,$paginationParams);
+        $result = $logic->list($this->post(), $this->getUserId());
         return Json::encode($result);
     }
 
     /**
-     * 获取<?php echo $tableComment; ?>详情
+     * 查询详情 <?php echo $tableComment; ?> {detail}
      * @param int $id ID 1
      * @return json yes {"data":{"@model":"<?php echo $generator->modelClass; ?>","@fields":"detail"}}
      */
     public function actionDetail()
     {
         $logic = new <?= $logicClass ?>();
-        $id = intval($this->post('id',0));
-        if(empty($id)){
-            return Json::encode(ComBase::getReturnArray([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR));
-        }
-        $fieldScenarios = 'detail';
-        $where = ['id'=>$id];
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$this->getUserId();//***默认加入了user_id过滤";
-        }
-        ?>
-
-        $detailModel = new <?php echo $modelClass; ?>();
-        $detailQuery = $detailModel::find();
-        $detailQuery->where($where);
-        $printFields = $detailModel->fieldsScenarios()[$fieldScenarios];
-        //$include = [ [ 'name'=>'xxxRecord', 'fields'=>['id','name'] ] ];//支持关联数据获取
-        $result = $logic->detail($detailQuery,$printFields);
+        $result = $logic->detail($this->post(), $this->getUserId());
         return Json::encode($result);
     }
 
     /**
-     * 创建<?php echo $tableComment.PHP_EOL; ?>
+     * 创建 <?php echo $tableComment.PHP_EOL; ?> (create)
      * @param @model <?php echo $generator->modelClass; ?> create
      * @return json yes {"data":{"id":"[number] ID"}}
      */
     public function actionCreate()
     {
         $logic = new <?= $logicClass ?>();
-        $params = $this->post();
-        $result = $logic->create($params);
+        $result = $logic->create($this->post(), $this->getUserId());
         return Json::encode($result);
     }
 
     /**
-     * 修改<?php echo $tableComment.PHP_EOL; ?>
+     * 修改 <?php echo $tableComment.PHP_EOL; ?> <update>
      * @param int $id ID 1
      * @param @model <?php echo $generator->modelClass; ?> update
      * @return json yes {"data":null}
@@ -157,20 +116,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     public function actionUpdate()
     {
         $logic = new <?= $logicClass ?>();
-        $params = $this->post();
-        $id = $params['id']??0;
-        $id = intval($id);
-        if($id == 0){
-            return Json::encode(ComBase::getReturnArray([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR));
-        }
-        $where = ['id'=>$id];
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$this->getUserId();//***默认加入了user_id过滤";
-        }
-        ?>
-
-        $result = $logic->update($where, $params);
+        $result = $logic->update($this->post(), $this->getUserId());
         return Json::encode($result);
     }
 
@@ -182,18 +128,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     public function actionDelete()
     {
         $logic = new <?= $logicClass ?>();
-        $id = intval($this->post('id',0));
-        if(empty($id)){
-            return Json::encode(ComBase::getReturnArray([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR));
-        }
-        $where = ['id'=>$id];
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$this->getUserId();//***默认加入了user_id过滤";
-        }
-        ?>
-
-        $result = $logic->delete($where);
+        $result = $logic->delete($this->post(), $this->getUserId());
         return Json::encode($result);
     }
 
@@ -205,18 +140,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     /*public function actionPhysiedelete()
     {
         $logic = new <?= $logicClass ?>();
-        $id = intval($this->post('id',0));
-        if(empty($id)){
-            return Json::encode(ComBase::getReturnArray([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR));
-        }
-        $where = ['id'=>$id];
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$this->getUserId();//***默认加入了user_id过滤";
-        }
-        ?>
-
-        $result = $logic->physieDelete($where);
+        $result = $logic->physieDelete($this->post(), $this->getUserId());
         return Json::encode($result);
     }*/
 

@@ -7,7 +7,8 @@ use common\ComBase;
 use yii\data\Pagination;
 
 /**
- * logic 基础类,封装了基本的curd,如果无法满足可以在继承的子类中自行实现
+ * logic 基础类,封装了基本的curd,通过model处理，与业务代码完全解耦。
+ * 复杂业务在具体logic中直接实现
  * Class BaseLogic
  * @package common\base
  */
@@ -211,7 +212,7 @@ class BaseLogic
     }
 
     /**
-     * 标记删除
+     * 标记删除 默认使用标记删除
      * @param object $model 调用方需要修改数据实体并已经执行查询的返回model
      * @param array $data sql数据
      * @param string $scenario 场景
@@ -249,10 +250,11 @@ class BaseLogic
     }
 
     /**
-     * 物理删除,可以设置是否同时记录一份删除的内容到warning中
+     * 物理删除,可以设置是否同时记录一份删除的内容到warning中,**默认优先使用标记删除 delete
      * @param object $model 调用方需要删除数据实体并已经执行查询的返回model
-     * @param bool $backup 是否备份删除数据到warning 默认false
+     * @param bool $backUp 是否备份删除数据到warning 默认false
      * @return array
+     * @throws \Exception
      */
     public function basePhysieDelete($model, $backUp = false)
     {
@@ -278,9 +280,10 @@ class BaseLogic
     /**
      * 获取详情并根据参数附带关联数据
      * @param object $detailQuery 获取model的query对象，已经包含了所有的查询条件
-     * @param array $printFields 输出字段数组
-     * @param array $include 包含数据，结合Model 的 hasOne,hasMany,getFunction 包含进来关系数据 详见 ComBase::getLogicInclude
+     * @param array $printFields 输出字段数组对应 apiModel里面的fieldsScenarios对应字段,可自定义每一个字段而不使用场景字段
+     * @param array $include 包含数据，结合Model 的 hasOne,hasMany,getFunction 包含进来关系数据 详见 ComBase::getLogicInclude 使用延迟加载有效提高效率
      * @return array | model
+     * @throws \Exception
      */
     public function baseDetail($detailQuery, $printFields, $include = [])
     {
@@ -311,12 +314,12 @@ class BaseLogic
 
     /**
      * 获取列表 并根据参数附带关联数据
-     * @param object $searchDataQuery 获取model list的query对象，已经包含了除分页外所有的查询条件及排序
-     * @param array $printFields 输出字段数组
-     * @param array $paginationParams 格式化后的分页参数 通过调用 baseLogic->getPaginationParams 获取
-     * @param array $include 包含数据，结合Model 的 hasOne,hasMany,getFunction 包含进来关系数据 详见 ComBase::getLogicInclude
-     * @param string $formName 表单名称
+     * @param object $searchDataQuery 获取model list的query对象，已经包含了除分页外所有的查询条件及排序  参考model::find();
+     * @param array $printFields 输出字段数组对应 apiModel里面的fieldsScenarios对应字段,可自定义每一个字段而不使用场景字段
+     * @param array $paginationParams 格式化后的分页参数 通过调用 baseLogic->getPaginationParams($params) 获取对应格式化后的值
+     * @param array $include 包含数据，结合Model 的 hasOne,hasMany,getFunction 包含进来关系数据 详见 ComBase::getLogicInclude  在query 加入 ->with('userRecord') 可以有效提升效率，详情参考yii2:及时加载与延迟加载区别
      * @return array
+     * @throws \Exception
      */
     public function baseList($searchDataQuery, $printFields, $paginationParams, $include = [])
     {

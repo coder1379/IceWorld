@@ -35,6 +35,19 @@ if(!empty($columnNames)){
     }
 }
 
+$tempClass = $generator->modelClass;
+$tempClassDb = $tempClass::getDb();
+$dbNameString = $tempClassDb->dsn;
+$dbName1=explode(';',$dbNameString);
+$dbNameArr=explode('=',$dbName1[1]);
+$dbName=$dbNameArr[1];
+$tableNmae = $generator->getTableSchema()->fullName;
+$tableCommentObj = $tempClassDb->createCommand("select table_name,table_comment from information_schema.tables where table_schema = '".$dbName."' and table_name ='".$tableNmae."'")->queryOne();
+$tableComment = $tableCommentObj['table_comment'];
+if(empty($tableComment)){
+    $tableComment=$tableCommentObj['table_name'];
+}
+
 
 echo "<?php\n";
 ?>
@@ -44,31 +57,68 @@ use Yii;
 use common\ComBase;
 use common\base\BaseLogic;
 
-class <?= $logicModelClass ?> extends BaseLogic
+class <?= $logicModelClass ?>
 {
+
+
     /**
-     * 创建
-     * @param array $data 数据
+     * 基础创建,复杂逻辑建议额外添加
+     * @param array $params 前端传递post数据
+     * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
      * @param string $scenario 场景
      * @param string $formName 表单数组name
      * @return array
      */
-    public function create($data = [], $scenario = 'create' , $formName = '' ){
+    public function create($params = null, $currentUserId, $scenario = 'create' , $formName = '' ){
+
+        $logic = new BaseLogic();
         $model = new <?php echo $modelClass; ?>();
         $model->add_time = date('Y-m-d H:i:s',time());
-        return $this->baseCreate($model, $data, $scenario, $formName);
+        if(!empty($params)){
+            <?php
+            if($includeUserId == 1){ //包含user_id 默认加入user_id;
+            ?>
+            if(empty($currentUserId)){
+                return ComBase::getNoLoginReturnArray();
+            }
+            <?php
+                echo "\$params['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
+            }
+            ?>
+        }
+        return $logic->baseCreate($model, $params, $scenario, $formName);
     }
 
     /**
-     * 修改
-     * @param array $where 更新数据的查询条件 $where 不能直接使用前端推送过来的数组,直接获取赋值传入
-     * @param array $data 数据
+     * 基础修改功能,复杂逻辑建议新建
+     * @param array $params 前端post数据
+     * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
      * @param string $scenario 场景
      * @param string $formName 表单数组name
      * @return array
      */
-    public function update($where, $data = [], $scenario = 'update', $formName = ''){
-        if(!empty($where) && !empty($data)){
+    public function update($params = null, $currentUserId, $scenario = 'update', $formName = ''){
+
+        $id = ComBase::getIntVal('id', $params);
+        if(empty($id)){
+            return ComBase::getParamsErrorReturnArray();
+        }
+
+        $logic = new BaseLogic();
+        $where = ['id'=>$id];
+        <?php
+        if($includeUserId == 1){ //包含user_id 默认加入user_id;
+        ?>
+        if(empty($currentUserId)){
+            return ComBase::getNoLoginReturnArray();
+        }
+
+        <?php
+            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
+        }
+        ?>
+
+        if(!empty($params)){
             <?php
             if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
                 echo "\$where['is_delete'] = 0;//有is_delete表默认加入软删除过滤";
@@ -76,31 +126,40 @@ class <?= $logicModelClass ?> extends BaseLogic
             ?>
 
             $model = <?php echo $modelClass; ?>::findOne($where);
-            return $this->baseUpdate($model, $data, $scenario, $formName);
+            return $logic->baseUpdate($model, $params, $scenario, $formName);
         }
-        return ComBase::getReturnArray([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);//返回参数错误
+        return ComBase::getParamsErrorReturnArray();
     }
 
     /**
-     * 标记删除 默认使用标记删除
-     * @param array $where 更新数据的查询条件 $where 不能直接使用前端推送过来的数组,直接获取赋值传入
-     * @param array $data 数据
+     * 标记删除 优先使用标记删除
+     * @param array $params 前端post数据
+     * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
      * @param string $scenario 场景
      * @param string $formName 表单数组name
      * @return array
      */
-    public function delete($where, $data = [], $scenario = 'delete', $formName = ''){
-        //默认可以传入删除时的data,自动加入is_delete标记
-        if(empty($data)){
-            $data = ['is_delete' => 1];
+    public function delete($params = null, $currentUserId, $scenario = 'delete', $formName = ''){
+
+        $id = ComBase::getIntVal('id', $params);
+        if(empty($id)){
+            return ComBase::getParamsErrorReturnArray();
         }
 
+        $logic = new BaseLogic();
+        $where = ['id'=>$id];
+        <?php
+        if($includeUserId == 1){ //包含user_id 默认加入user_id;
+            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
+        }
+        ?>
+
         //默认可以传入删除时的data,自动加入is_delete标记
-        if(empty($data['is_delete'])){
-            $data['is_delete'] = 1;
+        if(empty($params['is_delete'])){
+            $params['is_delete'] = 1;
         }
 
-        if(!empty($where) && !empty($data)){
+        if(!empty($params)){
             <?php
             if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
                 echo "\$where['is_delete'] = 0;//有is_delete表默认加入软删除过滤";
@@ -108,58 +167,110 @@ class <?= $logicModelClass ?> extends BaseLogic
             ?>
 
             $model = <?php echo $modelClass; ?>::findOne($where);
-            return $this->baseDelete($model, $data, $scenario, $formName);
+            return $logic->baseDelete($model, $params, $scenario, $formName);
         }
-        return ComBase::getReturnArray([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);//返回参数错误
+        return ComBase::getParamsErrorReturnArray();
     }
 
     /**
      * 物理删除 **默认优先使用标记删除 delete
-     * @param array $where 更新数据的查询条件 $where 不能直接使用前端推送过来的数组,直接获取赋值传入
+     * @param array $params 前端post数据
+     * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
      * @param boll $backUp 是否备份删除数据到warning日志 默认false
      * @return array
      */
-    public function physieDelete($where, $backUp = false){
-        if(!empty($where)){
-            $model = <?php echo $modelClass; ?>::findOne($where);
-            return $this->basePhysieDelete($model, $backUp);
+    public function physieDelete($params = null, $currentUserId, $backUp = false){
+
+        $id = ComBase::getIntVal('id', $params);
+        if(empty($id)){
+            return ComBase::getParamsErrorReturnArray();
         }
-        return ComBase::getReturnArray([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);//返回参数错误
+
+        $logic = new BaseLogic();
+        $where = ['id'=>$id];
+        <?php
+        if($includeUserId == 1){ //包含user_id 默认加入user_id;
+            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
+        }
+        ?>
+
+        $model = <?php echo $modelClass; ?>::findOne($where);
+        return $logic->basePhysieDelete($model, $backUp);
     }
 
     /**
-     * 获取详情并根据参数附带关联数据
-     * @param object $detailQuery 包含查询条件的query
-     * @param string $printFields 输出字段数组,可自定义而不使用场景字段
-     * @param array $include 包含数据，结合Model 的 hasOne,hasMany,getFunction 包含进来关系数据 详见 ComBase::getLogicInclude
+     * 基础获取详情,复杂逻辑建议新建查询
+     * @param array $params 前端传入数据
+     * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
+     * @param string $fieldScenarios 场景默认 detail
      * @return array
      */
-    public function detail($detailQuery, $printFields, $include = []){
+    public function detail($params = null, $currentUserId,$fieldScenarios = 'detail'){
+
+        $logic = new BaseLogic();
+        $id = ComBase::getIntVal('id', $params);
+        if(empty($id)){
+            return ComBase::getParamsErrorReturnArray();
+        }
+        $where = ['id'=>$id];
+        <?php
+        if($includeUserId == 1){ //包含user_id 默认加入user_id;
+            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
+        }
+        ?>
+
+        $detailModel = new <?php echo $modelClass; ?>();
+        $detailQuery = $detailModel::find();
+        $detailQuery->where($where);
         <?php
         if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
             echo "\$detailQuery->andWhere(['is_delete'=>0]);//有is_delete表默认加入软删除过滤";
         }
         ?>
+        $printFields = $detailModel->fieldsScenarios()[$fieldScenarios];
 
-        return $this->baseDetail($detailQuery, $printFields, $include);
+        $include = null;//[ [ 'name'=>'xxxRecord', 'fields'=>'api_detail' ] ];//支持关联数据获取
+
+        return $logic->baseDetail($detailQuery, $printFields, $include);
     }
 
     /**
-     * 通用获取列表 通过include获取关联model的值
-     * @param object $searchDataQuery 已经加入了数据过滤条件和排序的model::find();
-     * @param array $printFields 输出字段数组,可自定义而不使用场景字段
-     * @param array $paginationParams 格式化后的分页数据 包含page和pageSize
-     * @param array $include 包含数据，结合Model 的 hasOne,hasMany,getFunction 包含进来关系数据 详见 ComBase::getLogicInclude 注意：由于循环关联数据可能存在多次查询数据库，所以建议当使用此参数时 在控制器中的query 加入 ->with('userRecord') 此类的及时加载关联可以有效提升效率，详情参考yii2:及时加载与延迟加载区别
+     * 基础获取列表,复杂逻辑建议新建查询
+     * @param array $params 前端传入数据
+     * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
+     * @param string $fieldScenarios 场景默认 list
      * @return array
      */
-    public function list($searchDataQuery, $printFields, $paginationParams, $include = []){
+    public function list($params = null, $currentUserId,$fieldScenarios = 'list'){
+        $logic = new BaseLogic();
 
+        //创建查询对象
+        $searchModel = new <?= $modelClass ?>();
+        $searchDataQuery = $searchModel::find();
+        $where = [];//添加过滤条件，注意默认是无条件的
         <?php
-        if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
-            echo "\$searchDataQuery->andwhere(['is_delete' => 0 ]);//默认添加标记删除标识";
+        if($includeUserId == 1){ //包含user_id 默认加入user_id;
+            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
         }
         ?>
 
-        return $this->baseList($searchDataQuery, $printFields, $paginationParams, $include);
+        $searchDataQuery->where($where);
+        $searchDataQuery->orderBy('id desc');//添加默认排序规则
+
+        <?php
+        if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
+            echo "\$searchDataQuery->andWhere(['is_delete' => 0 ]);//默认添加标记删除标识";
+        }
+        ?>
+
+        //获取输出字段
+        $printFields = $searchModel->fieldsScenarios()[$fieldScenarios];
+
+        //获取post内的分页数据并格式化
+        $paginationParams = $logic->getPaginationParams($params);
+
+        $include = null; //[ [ 'name'=>'xxxRecord', 'fields'=>'api_detail' ] ];//支持关联数据获取
+
+        return $logic->baseList($searchDataQuery, $printFields, $paginationParams, $include);
     }
 }
