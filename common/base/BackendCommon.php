@@ -12,16 +12,16 @@ class BackendCommon extends BaseCommon
 {
     public function setLoginRedirect()
     {
-        Yii::$app->session['login.redirect.url']="http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        Yii::$app->session->set('login.redirect.url', "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
     }
 
     private function setLoginInfoToSession($adminRecord){
-        Yii::$app->session["admin.status"]=true;
-        Yii::$app->session["admin.adminid"]=$adminRecord['id'];
-        Yii::$app->session["admin.adminname"]=$adminRecord['login_username'];
-        Yii::$app->session["admin.nickname"]=$adminRecord['nickname'];
-        Yii::$app->session["admin.realname"]=$adminRecord['realname'];
-        Yii::$app->session["admin.roleid"]=$adminRecord['role_id'];
+        Yii::$app->session->set("admin.status",true);
+        Yii::$app->session->set("admin.adminid",$adminRecord['id']);
+        Yii::$app->session->set("admin.adminname",$adminRecord['login_username']);
+        Yii::$app->session->set("admin.nickname", $adminRecord['nickname']);
+        Yii::$app->session->set("admin.realname", $adminRecord['realname']);
+        Yii::$app->session->set("admin.roleid", $adminRecord['role_id']);
         return true;
     }
 

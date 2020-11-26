@@ -106,7 +106,7 @@ class UploadController extends AuthController
             return Json::encode(ComBase::getParamsErrorReturnArray());
         }
 
-        $upload = new UploadLogic(Yii::$app->params['oss']['bucket'],'audio');
+        $upload = new UploadLogic('','audio');
         $result = $upload->upload($_FILES['Filedata'],Yii::$app->params['uploadMode']);
         return Json::encode($result);
     }
@@ -117,7 +117,7 @@ class UploadController extends AuthController
             return Json::encode(ComBase::getParamsErrorReturnArray());
         }
 
-        $upload = new UploadLogic(Yii::$app->params['oss']['bucket'],'image');
+        $upload = new UploadLogic();
         $result = $upload->upload($_FILES['Filedata'],Yii::$app->params['uploadMode']);
         return Json::encode($result);
     }
@@ -127,7 +127,7 @@ class UploadController extends AuthController
         if (!isset($_FILES['Filedata'])) {
             return Json::encode(ComBase::getParamsErrorReturnArray());
         }
-        $uploadLogic = new UploadLogic(Yii::$app->params['oss']['bucket']);
+        $uploadLogic = new UploadLogic();
         $result = $uploadLogic->upload($_FILES['Filedata'], Yii::$app->params['uploadMode']);
         //返回特定的格式
         $newArr = [

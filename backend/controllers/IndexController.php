@@ -41,6 +41,11 @@ class IndexController extends AuthController
         $backendCommon = new BackendCommon();
         if($backendCommon->checkLogin()===true){
             $this->layout="main";
+            //检查adminMainRoleJson是否为空,为空重新获取一次解决auth先验证session在写入导致首页全新列表为显示问题 start
+            $authList  = $backendCommon->getAuthList();
+            $authJson = json_decode(empty($authList['auth_list'])==true?'':$authList['auth_list']);//获取主权限json
+            $this->adminMainRoleJson = $authJson; //设置controler全局权限变量
+            ///end
             return $this->render('index',['menuList'=>$this->getMenuList()]);
         }else{
             return $this->redirect(array('index/login'));

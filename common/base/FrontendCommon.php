@@ -12,7 +12,7 @@ class FrontendCommon extends BaseCommon
 {
     public function setLoginRedirect()
     {
-        Yii::$app->session['login.redirect.url']="http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        Yii::$app->session->set('login.redirect.url',"http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
     }
 
     /**
