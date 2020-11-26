@@ -3,12 +3,9 @@
 namespace api\controllers;
 
 use Yii;
-//use common\services\user\UserApiModel;
 use common\services\user\UserLogic;
 use common\controllers\ApiCommonContoller;
-use yii\web\NotFoundHttpException;
 use yii\helpers\Json;
-use common\ComBase;
 
 /**
  * 用户
@@ -28,7 +25,7 @@ class UserController extends ApiCommonContoller
     public function actionList()
     {
         $logic = new UserLogic();
-        $result = $logic->list($this->post(), $this->getUserId());
+        $result = $logic->list($this->post(), 10);
         return Json::encode($result);
     }
 
@@ -81,7 +78,7 @@ class UserController extends ApiCommonContoller
     public function actionDelete()
     {
         $logic = new UserLogic();
-        $result = $logic->delete($this->post(), 10);
+        $result = $logic->delete($this->post(),10);
         return Json::encode($result);
     }
 

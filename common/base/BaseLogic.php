@@ -39,7 +39,7 @@ class BaseLogic
      * @return array
      * @throws \Exception
      */
-    public function getLogicInclude($model, $include = [])
+    public static function getLogicInclude($model, $include = [])
     {
         if (!empty($include)) {
             $returnList = [];
@@ -104,7 +104,7 @@ class BaseLogic
      * @param $errors
      * @return array
      */
-    public function getModelErrorsToArray($errors)
+    public static function getModelErrorsToArray($errors)
     {
         $returnErrors = ['all' => [], 'first' => ['k' => 0, 'v' => '']];
         if (!empty($errors)) {
@@ -126,13 +126,13 @@ class BaseLogic
      * @param $errors
      * @return array
      */
-    public function getFormatErrorsArray($errors)
+    public static function getFormatErrorsArray($errors)
     {
         $returnData = ['firstKey' => $errors['first']['k']];
         if (Yii::$app->params['returnAllErrors'] == true) {
             $returnData['allErrors'] = $errors['all'];
         }
-        return ComBase::getReturnArray($returnData, ComBase::CODE_PARAM_FORMAT_ERROR, $errors['first']['k'] . ':' . $errors['first']['v']);
+        return ComBase::getReturnArray($returnData, ComBase::CODE_PARAM_FORMAT_ERROR, $errors['first']['v']);
     }
 
     /**
@@ -142,8 +142,9 @@ class BaseLogic
      * @param string $scenario 场景
      * @param string $formName 表单数组前缀
      * @return array
+     * @throws \Exception
      */
-    public function baseCreate($model, $data, $scenario, $formName = '')
+    public static function baseCreate($model, $data, $scenario, $formName = '')
     {
         if (empty($model)) {
             throw new \Exception('model cant null');
@@ -180,8 +181,9 @@ class BaseLogic
      * @param string $scenario 场景
      * @param string $formName 表单数组前缀
      * @return array
+     * @throws \Exception
      */
-    public function baseUpdate($model, $data, $scenario, $formName = '')
+    public static function baseUpdate($model, $data, $scenario, $formName = '')
     {
         if (empty($scenario)) {
             throw new \Exception('scenario cant null');
@@ -218,8 +220,9 @@ class BaseLogic
      * @param string $scenario 场景
      * @param string $formName 表单名称
      * @return array
+     * @throws \Exception
      */
-    public function baseDelete($model, $data, $scenario = 'delete', $formName = '')
+    public static function baseDelete($model, $data, $scenario = 'delete', $formName = '')
     {
         if (empty($scenario)) {
             throw new \Exception('scenario cant null');
@@ -256,7 +259,7 @@ class BaseLogic
      * @return array
      * @throws \Exception
      */
-    public function basePhysieDelete($model, $backUp = false)
+    public static function basePhysieDelete($model, $backUp = false)
     {
         if (empty($model)) {
             return ComBase::getNoFindReturnArray();
@@ -285,7 +288,7 @@ class BaseLogic
      * @return array | model
      * @throws \Exception
      */
-    public function baseDetail($detailQuery, $printFields, $include = [])
+    public static function baseDetail($detailQuery, $printFields, $include = [])
     {
         if (empty($detailQuery)) {
             throw new \Exception('detailQuery cant null');
@@ -321,7 +324,7 @@ class BaseLogic
      * @return array
      * @throws \Exception
      */
-    public function baseList($searchDataQuery, $printFields, $paginationParams, $include = [])
+    public static function baseList($searchDataQuery, $printFields, $paginationParams, $include = [])
     {
         if (empty($searchDataQuery)) {
             throw new \Exception('searchDataQuery cant null');
@@ -387,7 +390,7 @@ class BaseLogic
      * @param string $pageSizeParamName 默认key名
      * @return array
      */
-    public function getPaginationParams($params, $pageSize = 10, $pageParamName = 'page', $pageSizeParamName = 'page_size')
+    public static function getPaginationParams($params, $pageSize = 10, $pageParamName = 'page', $pageSizeParamName = 'page_size')
     {
         $pagination = [];
         $page = 0;

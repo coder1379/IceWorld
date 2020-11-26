@@ -62,17 +62,25 @@ class <?= $logicModelClass ?>
 
 {
     /**
-     * 自动获取POST内容新增,复杂逻辑建议额外添加
+     * 自动获取POST内容新增数据
      * @param array $params 前端传递post数据
      * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
      * @param string $scenario 场景
      * @param string $formName 表单数组name
      * @return array
+     * @throws \Exception
      */
     public function create($params, $currentUserId, $scenario = 'create', $formName = '')
     {
+        if (empty($params)) {
+            return ComBase::getParamsErrorReturnArray();
+        }
 
-        $logic = new BaseLogic();
+        if (empty($currentUserId)) {
+            //判断uid是否为空
+            return ComBase::getNoLoginReturnArray();
+        }
+
         $model = new <?php echo $modelClass; ?>();
 
         $allAttributeLabels = $model->attributeLabels();
@@ -80,89 +88,90 @@ class <?= $logicModelClass ?>
             $model->add_time = time();
         }
 
-        if (!empty($params)) {
-            <?php if ($includeUserId == 1) { //包含user_id 默认加入user_id;
-            ?>
+        <?php if ($includeUserId == 1) { echo "\$params['user_id'] = \$currentUserId;//***默认加入user_id参数"; } ?>
 
-            if (empty($currentUserId)) {
-                return ComBase::getNoLoginReturnArray();
-            }
-            <?php
-                echo "\$params['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
-            }
-            ?>
 
-        }
-        return $logic->baseCreate($model, $params, $scenario, $formName);
+        return BaseLogic::baseCreate($model, $params, $scenario, $formName);
     }
 
     /**
-     * 自动获取POST内容功能,复杂逻辑建议新建
+     * 自动获取POST内容进行更新
      * @param array $params 前端post数据
      * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
      * @param string $scenario 场景
      * @param string $formName 表单数组name
      * @return array
+     * @throws \Exception
      */
     public function update($params, $currentUserId, $scenario = 'update', $formName = '')
     {
+        if (empty($params)) {
+            return ComBase::getParamsErrorReturnArray();
+        }
+
+        if (empty($currentUserId)) {
+            //判断uid是否为空
+            return ComBase::getNoLoginReturnArray();
+        }
 
         $id = ComBase::getIntVal('id', $params);
         if (empty($id)) {
             return ComBase::getParamsErrorReturnArray();
         }
 
-        $logic = new BaseLogic();
         $where = ['id' => $id];
         <?php
         if($includeUserId == 1){ //包含user_id 默认加入user_id;
-        ?>
-
-        if (empty($currentUserId)) {
-            return ComBase::getNoLoginReturnArray();
-        }
-
-        <?php
             echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
         }
         ?>
 
-        if (!empty($params)) {
-            <?php
-            if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
-                echo "\$where['is_delete'] = 0;//有is_delete表默认加入软删除过滤";
-            }
-            ?>
-
-            $model = <?php echo $modelClass; ?>::findOne($where);
-
-            $allAttributeLabels = $model->attributeLabels();
-            if (!empty($allAttributeLabels['update_time'])) {
-                $model->update_time = time();
-            }
-
-            return $logic->baseUpdate($model, $params, $scenario, $formName);
+        <?php
+        if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
+            echo "\$where['is_delete'] = 0;//有is_delete表默认加入软删除过滤";
         }
-        return ComBase::getParamsErrorReturnArray();
+        ?>
+
+        $model = <?php echo $modelClass; ?>::findOne($where);
+
+        if (empty($model)) {
+            return ComBase::getNoFindReturnArray();
+        }
+
+        $allAttributeLabels = $model->attributeLabels();
+        if (!empty($allAttributeLabels['update_time'])) {
+            //默认修改更新时间，不需要自行移除
+            $model->update_time = time();
+        }
+
+        return BaseLogic::baseUpdate($model, $params, $scenario, $formName);
     }
 
     /**
-     * 标记删除 优先使用标记删除
+     * 标记软删除
      * @param array $params 前端post数据
      * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
      * @param string $scenario 场景
      * @param string $formName 表单数组name
      * @return array
+     * @throws \Exception
      */
     public function delete($params, $currentUserId, $scenario = 'delete', $formName = '')
     {
+        if (empty($params)) {
+            return ComBase::getParamsErrorReturnArray();
+        }
+
+        if (empty($currentUserId)) {
+            //判断uid是否为空
+            return ComBase::getNoLoginReturnArray();
+        }
 
         $id = ComBase::getIntVal('id', $params);
         if (empty($id)) {
             return ComBase::getParamsErrorReturnArray();
         }
 
-        $logic = new BaseLogic();
         $where = ['id' => $id];
         <?php
         if($includeUserId == 1){ //包含user_id 默认加入user_id;
@@ -170,22 +179,24 @@ class <?= $logicModelClass ?>
         }
         ?>
 
-        //默认可以传入删除时的data,自动加入is_delete标记
+        //设置is_delete标记=1
         if (empty($params['is_delete'])) {
             $params['is_delete'] = 1;
         }
 
-        if (!empty($params)) {
-            <?php
-            if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
-                echo "\$where['is_delete'] = 0;//有is_delete表默认加入软删除过滤";
-            }
-            ?>
-
-            $model = <?php echo $modelClass; ?>::findOne($where);
-            return $logic->baseDelete($model, $params, $scenario, $formName);
+        <?php
+        if($includeIsDelete == 1){ //包含is_delete 默认加入is_delete = 0;
+            echo "\$where['is_delete'] = 0;//有is_delete表默认加入软删除过滤";
         }
-        return ComBase::getParamsErrorReturnArray();
+        ?>
+
+        $model = <?php echo $modelClass; ?>::findOne($where);
+
+        if (empty($model)) {
+            return ComBase::getNoFindReturnArray();
+        }
+
+        return BaseLogic::baseDelete($model, $params, $scenario, $formName);
     }
 
     /**
@@ -194,16 +205,24 @@ class <?= $logicModelClass ?>
      * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
      * @param bool $backUp 是否备份删除数据到warning日志 默认false
      * @return array
+     * @throws \Exception
      */
     public function physieDelete($params, $currentUserId, $backUp = false)
     {
+        if (empty($params)) {
+            return ComBase::getParamsErrorReturnArray();
+        }
+
+        if (empty($currentUserId)) {
+            //判断uid是否为空
+            return ComBase::getNoLoginReturnArray();
+        }
 
         $id = ComBase::getIntVal('id', $params);
         if (empty($id)) {
             return ComBase::getParamsErrorReturnArray();
         }
 
-        $logic = new BaseLogic();
         $where = ['id' => $id];
         <?php
         if($includeUserId == 1){ //包含user_id 默认加入user_id;
@@ -212,24 +231,34 @@ class <?= $logicModelClass ?>
         ?>
 
         $model = <?php echo $modelClass; ?>::findOne($where);
-        return $logic->basePhysieDelete($model, $backUp);
+
+        if (empty($model)) {
+            return ComBase::getNoFindReturnArray();
+        }
+
+        return BaseLogic::basePhysieDelete($model, $backUp);
     }
 
     /**
-     * 基础获取详情,复杂逻辑建议新建查询
+     * 获取详情
      * @param array $params 前端传入数据
      * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
      * @param string $fieldScenarios 场景默认 detail
      * @return array
+     * @throws \Exception
      */
     public function detail($params, $currentUserId, $fieldScenarios = 'detail')
     {
+        if (empty($currentUserId)) {
+            //判断uid是否为空
+            return ComBase::getNoLoginReturnArray();
+        }
 
-        $logic = new BaseLogic();
         $id = ComBase::getIntVal('id', $params);
         if (empty($id)) {
             return ComBase::getParamsErrorReturnArray();
         }
+
         $where = ['id' => $id];
         <?php
         if($includeUserId == 1){ //包含user_id 默认加入user_id;
@@ -251,19 +280,24 @@ class <?= $logicModelClass ?>
 
         $include = null;//[ [ 'name'=>'xxxRecord', 'fields'=>'api_detail' ] ];//支持关联数据获取
 
-        return $logic->baseDetail($detailQuery, $printFields, $include);
+        return BaseLogic::baseDetail($detailQuery, $printFields, $include);
     }
 
     /**
-     * 基础获取列表,复杂逻辑建议新建查询
+     * 获取列表
      * @param array $params 前端传入数据
      * @param int $currentUserId 当前用户id未登录为0，只能通过参数传递不从params中获取
      * @param string $fieldScenarios 场景默认 list
      * @return array
+     * @throws \Exception
      */
     public function list($params, $currentUserId, $fieldScenarios = 'list')
     {
-        $logic = new BaseLogic();
+        if (empty($currentUserId)) {
+            //判断uid是否为空
+            return ComBase::getNoLoginReturnArray();
+        }
+
 
         //创建查询对象
         $searchModel = new <?= $modelClass ?>();
@@ -288,10 +322,10 @@ class <?= $logicModelClass ?>
         $printFields = $searchModel->fieldsScenarios()[$fieldScenarios];
 
         //获取post内的分页数据并格式化
-        $paginationParams = $logic->getPaginationParams($params);
+        $paginationParams = BaseLogic::getPaginationParams($params);
 
         $include = null; //[ [ 'name'=>'xxxRecord', 'fields'=>'api_detail' ] ];//支持关联数据获取
 
-        return $logic->baseList($searchDataQuery, $printFields, $paginationParams, $include);
+        return BaseLogic::baseList($searchDataQuery, $printFields, $paginationParams, $include);
     }
 }
