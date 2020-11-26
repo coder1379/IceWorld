@@ -5,10 +5,9 @@ use Yii;
 
 class RememberLogin
 {
-//待修改和完善
 
 	/*
-	 * 设置登录加密信息到cookie中
+	 * 设置登录加密信息到cookie中 待修改和完善
 	 * $cookieprefix 前缀标识
 	 * $cookiemd5key 加密字符串
 	 * $loginflag登录标识-手机号，userid等
@@ -39,7 +38,6 @@ class RememberLogin
 			]));
 		}
 	}
-
 
 	/*
 	 * 登录COOKIE验证并设置登录加密信息到cookie中
