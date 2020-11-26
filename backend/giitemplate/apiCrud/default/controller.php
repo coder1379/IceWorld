@@ -54,12 +54,10 @@ echo "<?php\n";
 namespace <?= StringHelper::dirname(ltrim($generator->controllerClass, '\\')) ?>;
 
 use Yii;
-//use <?= ltrim($generator->modelClass, '\\') ?>;
+<?php //echo "use  ".ltrim($generator->modelClass, '\\').";"; ?>
 use <?= ltrim($generator->logic, '\\') ?>;
 use <?= ltrim($generator->baseControllerClass, '\\') ?>;
-use yii\web\NotFoundHttpException;
 use yii\helpers\Json;
-use common\ComBase;
 
 /**
  * <?php echo $tableComment.PHP_EOL; ?>
