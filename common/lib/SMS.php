@@ -9,10 +9,7 @@
 namespace common\lib;
 
 use Yii;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-use common\services\sms\SmsLogic;
-use common\lib\sms\aliyun\AliSms;
+
 class SMS
 {
 
