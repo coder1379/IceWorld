@@ -4,6 +4,7 @@ namespace api\controllers;
 use common\ComBase;
 use common\controllers\ApiCommonContoller;
 use common\queues\TestJobs;
+use Firebase\JWT\JWT;
 use Yii;
 use yii\helpers\Json;
 
@@ -48,6 +49,24 @@ class TestController extends ApiCommonContoller
         exit();
         Yii::$app->db->createCommand("insert into {{%test_use_table}} (name,status,add_time,content) values (1,1,1,'1')")->execute();
         return Json::encode(ComBase::getReturnArray(['id' => Yii::$app->db->getLastInsertID()]));
+    }
+
+    /**
+     * jwt测试
+     */
+    public function actionJwtentest(){
+        exit();
+        $key = "example_key";
+        $payload = array(
+            "iss" => "http://example.org",
+            "aud" => "http://example.com",
+            "iat" => 1356999524,
+            "nbf" => 1357000000
+        );
+
+        $jwt = JWT::encode($payload, $key);
+        $deJwt =  JWT::decode($jwt, $key, array('HS256'));
+        return Json::encode(ComBase::getReturnArray(['jwt'=>$jwt,'djwt'=>$deJwt]));
     }
 
 
