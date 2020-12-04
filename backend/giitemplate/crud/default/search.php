@@ -19,6 +19,8 @@ $labels = $generator->generateSearchLabels();
 $searchAttributes = $generator->getSearchAttributes();
 $searchConditions = $generator->generateSearchConditions();
 
+$includeDelete = 0;
+
 $classM = $generator->modelClass;
 $pks = $classM::primaryKey();
 
@@ -31,11 +33,13 @@ if(!empty($searchConditions)){
         foreach ($fieldList as $f){
             $names = explode('=>',$f);
 
-            if(trim($names[0])=="'is_delete'"){
-                $newList[] = "\n" . str_repeat(' ', 12)."'is_delete' => 0";
-            }else{
-                $newList[] = $f;
+            if(trim($names[0])=="'status'"){
+                $includeDelete = 1;
+                //$newList[] = "\n" . str_repeat(' ', 12)."'is_delete' => 0";
             }
+
+            $newList[] = $f;
+
 
         }
         $searchConditions[0] = implode(',', $newList);
@@ -50,6 +54,7 @@ namespace <?= StringHelper::dirname(ltrim($generator->searchModelClass, '\\')) ?
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use common\ComBase;
 use <?= ltrim($generator->modelClass, '\\') . (isset($modelAlias) ? " as $modelAlias" : "") ?>;
 
 /**
@@ -104,6 +109,14 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
 
         // grid filtering conditions
         <?= implode("\n        ", $searchConditions) ?>
+
+
+        <?php
+        if($includeDelete==1){
+            echo "\$query->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤";
+        }
+        ?>
+
 
         <?php
         //////获取并设置备注里面的ralation 自动生成

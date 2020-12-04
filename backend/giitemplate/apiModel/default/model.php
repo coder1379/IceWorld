@@ -73,7 +73,7 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . 
 
             'update' => [<?php echo $tempstr; ?>],//修改场景
 
-            'delete' => ['is_delete'],//删除场景
+            'delete' => ['status'],//删除场景 status = -1
         ];
     }*/
 

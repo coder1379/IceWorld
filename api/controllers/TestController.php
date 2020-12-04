@@ -4,9 +4,12 @@ namespace api\controllers;
 use common\ComBase;
 use common\controllers\ApiCommonContoller;
 use common\queues\TestJobs;
+use common\services\systemconfig\SystemConfigModel;
+use common\services\systemconfig\SystemConfigQuery;
 use Firebase\JWT\JWT;
 use Yii;
 use yii\helpers\Json;
+use function GuzzleHttp\Promise\all;
 
 
 /**
@@ -56,6 +59,12 @@ class TestController extends ApiCommonContoller
      */
     public function actionJwtentest(){
         exit();
+        $qu = SystemConfigModel::find()->select()->where()->andWhere(['id'=>5])->andWhere(['>','name',5]);
+        $qu->andWhere(['add_time' => 10]);
+        $mo = $qu->one();
+
+        print_r($mo);
+        exit();
         $key = "example_key";
         $payload = array(
             "iss" => "http://example.org",
@@ -68,6 +77,5 @@ class TestController extends ApiCommonContoller
         $deJwt =  JWT::decode($jwt, $key, array('HS256'));
         return Json::encode(ComBase::getReturnArray(['jwt'=>$jwt,'djwt'=>$deJwt]));
     }
-
 
 }
