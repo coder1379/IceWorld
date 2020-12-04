@@ -80,6 +80,7 @@ class ComposerStaticInitaed39ad1b5103541f523a8477fafa0f1
         ),
         'F' => 
         array (
+            'Firebase\\JWT\\' => 13,
             'Faker\\' => 6,
         ),
         'E' => 
@@ -232,6 +233,10 @@ class ComposerStaticInitaed39ad1b5103541f523a8477fafa0f1
         'GuzzleHttp\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
+        ),
+        'Firebase\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
         'Faker\\' => 
         array (
