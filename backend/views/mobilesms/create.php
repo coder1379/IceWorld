@@ -4,10 +4,10 @@ use yii\helpers\Html;
 
 
 /* @var $this yii\web\View */
-/* @var $model common\services\mobilesms\MobileSmsModel */
+/* @var $model common\services\message\MobileSmsModel */
 
-$this->title = '添加 手机短信';
-$this->params['breadcrumbs'][] = ['label' => '手机短信', 'url' => ['index']];
+$this->title = '添加 短信记录';
+$this->params['breadcrumbs'][] = ['label' => '短信记录', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="createeditcont mobile-sms-model-create">

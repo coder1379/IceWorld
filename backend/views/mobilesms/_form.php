@@ -1,48 +1,57 @@
 <?php
 
+
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\services\mobilesms\MobileSmsModel */
+/* @var $model common\services\message\MobileSmsModel */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
+
 
 <div class="mobile-sms-model-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id'=>'create_update_active_form']); ?>
+
+    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'object_id')->textInput() ?>
 
- <?= $form->field($model, 'object_type')->label('消息对象类型')->dropDownList($model->objectTypePredefine,['prompt' => '请选择消息对象类型','options'=>[$model->object_type=>['Selected'=>true]]]) ?>
+    <?php echo $form->field($model, 'object_type')->label('短信对象类型')->dropDownList($model->objectTypePredefine,['options'=>[$model->object_type=>['Selected'=>true]]]); ?>
 
- <?= $form->field($model, 'user_id')->label('用户')->dropDownList($model->getUserRecordList(),['prompt' => '请选择用户','options'=>[$model->user_id=>['Selected'=>true]]]) ?>
+    <?php echo $form->field($model, 'user_id')->label('接收用户')->dropDownList($model->getUserRecordList(),['options'=>[$model->user_id=>['Selected'=>true]]]); ?>
 
-    <?= $form->field($model, 'access_ip')->textInput(['maxlength' => true]) ?>
+    <?php echo $form->field($model, 'area_num')->textInput(); ?>
 
     <?= $form->field($model, 'mobile')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'contents')->textarea(['rows' => 6]) ?>
+    <?php echo $form->field($model, 'other_mobiles')->textarea(['rows' => 3,'maxlength' => true]); ?>
 
-    <?= $form->field($model, 'params_json')->textInput(['maxlength' => true]) ?>
+    <?php echo $form->field($model, 'content')->textarea(['rows' => 3,'maxlength' => true]); ?>
 
- <?= $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['prompt' => '请选择状态','options'=>[$model->status=>['Selected'=>true]]]) ?>
+    <?php echo $form->field($model, 'params_json')->textarea(['rows' => 3,'maxlength' => true]); ?>
 
-    <?= $form->field($model, 'send_time')->textInput() ?>
+    <?php //echo $form->field($model, 'send_time')->textInput(); ?>
 
-    <?= $form->field($model, 'send_number')->textInput() ?>
+    <?php //echo $form->field($model, 'send_num')->textInput(); ?>
 
- <?= $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '请选择类型','options'=>[$model->type=>['Selected'=>true]]]) ?>
+    <?php echo $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['options'=>[$model->type=>['Selected'=>true]]]); ?>
 
- <?= $form->field($model, 'send_type')->label('发送类型')->dropDownList($model->sendTypePredefine,['prompt' => '请选择发送类型','options'=>[$model->send_type=>['Selected'=>true]]]) ?>
+    <?php echo $form->field($model, 'send_type')->label('发送类型')->dropDownList($model->sendTypePredefine,['options'=>[$model->send_type=>['Selected'=>true]]]); ?>
 
- <?= $form->field($model, 'sms_type')->label('消息类型')->dropDownList($model->smsTypePredefine,['prompt' => '请选择消息类型','options'=>[$model->sms_type=>['Selected'=>true]]]) ?>
+    <?php echo $form->field($model, 'sms_type')->label('短信渠道')->dropDownList($model->smsTypePredefine,['options'=>[$model->sms_type=>['Selected'=>true]]]); ?>
 
-    <?= $form->field($model, 'template')->textInput(['maxlength' => true]) ?>
+    <?php //echo $form->field($model, 'template')->textarea(['rows' => 3,'maxlength' => true]); ?>
 
-    <?= $form->field($model, 'feedback')->textInput(['maxlength' => true]) ?>
+    <?php //echo $form->field($model, 'feedback')->textarea(['rows' => 3,'maxlength' => true]); ?>
 
-    <?= $form->field($model, 'remark')->textInput(['maxlength' => true]) ?>
+    <?php echo $form->field($model, 'remark')->textarea(['rows' => 3,'maxlength' => true]); ?>
+
+    <?php //echo $form->field($model, 'add_time')->textInput(); ?>
+
+    <?php echo $form->field($model, 'status')->label('状态')->dropDownList($model->statusPredefine,['options'=>[$model->status=>['Selected'=>true]]]); ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? '添加' : '修改', ['class' => $model->isNewRecord ? 'btn btn-primary radius' : 'btn btn-primary radius']) ?>
@@ -66,5 +75,12 @@ use yii\widgets\ActiveForm;
             $(':submit').attr('disabled', true).addClass('disabled');
         });
     });
+
+    //禁用input回车提交
+    $(document).on("keydown","#create_update_active_form input[type='text']", function(event) {
+        return event.key != "Enter";
+    });
+
+    
 
 </script>

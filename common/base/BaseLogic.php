@@ -297,7 +297,7 @@ class BaseLogic
         if (empty($printFields)) {
             throw new \Exception('printFields cant null');
         }
-        $model = $detailQuery->one(); //获取一条数据
+        $model = $detailQuery->limit(1)->one(); //获取一条数据
         if (empty($model)) {
             return ComBase::getNoFindReturnArray();
         }

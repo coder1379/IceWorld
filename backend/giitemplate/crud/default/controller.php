@@ -196,12 +196,12 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
         }else{
 
             $deleteFlag = 0;
-            if(isset($obj->is_delete)!=true){
-                $deleteFlag = $obj->delete();
-            }else{
+            if(isset($obj->status)){ //有状态自动自动走软删除设置为-1
                 $obj->scenario = 'delete';//删除场景，控制字段安全
-                $obj->is_delete=1;
+                $obj->status = ComBase::DB_IS_DELETE_VAL;
                 $deleteFlag = $obj->update();
+            }else{
+                $deleteFlag = $obj->delete();
             }
 
             if($deleteFlag){

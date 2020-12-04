@@ -14,6 +14,7 @@ class ApiCommonContoller extends BaseContoller
 
     public function beforeAction($action)
     {
+        $this->user = ['id' => 10];
         $this->setUser();
         return true;
     }

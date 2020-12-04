@@ -1,65 +1,12 @@
 <?php
-/**
- * This is the template for generating CRUD search class of the specified model.
- */
 
-use yii\helpers\StringHelper;
-
-$modelClass = StringHelper::basename($generator->modelClass);
-$searchModelClass = StringHelper::basename($generator->searchModelClass);
-$logicModelClass = StringHelper::basename($generator->logic);
-if ($modelClass === $logicModelClass) {
-    $modelAlias = $modelClass . 'Model';
-}
-$rules = $generator->generateSearchRules();
-$labels = $generator->generateSearchLabels();
-$searchAttributes = $generator->getSearchAttributes();
-$searchConditions = $generator->generateSearchConditions();
-
-$columnNames = $generator->getColumnNames();
-$includeIsDelete = 0;
-if(!empty($columnNames)){
-    foreach ($columnNames as $c){
-        if($c == 'status'){
-            $includeIsDelete = 1;
-        }
-    }
-}
-
-$includeUserId = 0;
-if(!empty($columnNames)){
-    foreach ($columnNames as $c){
-        if($c == 'user_id'){
-            $includeUserId = 1;
-        }
-    }
-}
-
-$tempClass = $generator->modelClass;
-$tempClassDb = $tempClass::getDb();
-$dbNameString = $tempClassDb->dsn;
-$dbName1=explode(';',$dbNameString);
-$dbNameArr=explode('=',$dbName1[1]);
-$dbName=$dbNameArr[1];
-$tableNmae = $generator->getTableSchema()->fullName;
-$tableCommentObj = $tempClassDb->createCommand("select table_name,table_comment from information_schema.tables where table_schema = '".$dbName."' and table_name ='".$tableNmae."'")->queryOne();
-$tableComment = $tableCommentObj['table_comment'];
-if(empty($tableComment)){
-    $tableComment=$tableCommentObj['table_name'];
-}
-
-
-echo "<?php\n";
-?>
-
-namespace <?= StringHelper::dirname(ltrim($generator->logic, '\\')) ?>;
+namespace common\services\message;
 
 use Yii;
 use common\ComBase;
 use common\base\BaseLogic;
 
-class <?= $logicModelClass ?>
-
+class MobileSmsLogic
 {
     /**
      * 自动获取POST内容新增数据
@@ -81,15 +28,14 @@ class <?= $logicModelClass ?>
             return ComBase::getNoLoginReturnArray();
         }
 
-        $model = new <?php echo $modelClass; ?>();
+        $model = new MobileSmsApiModel();
 
         $allAttributeLabels = $model->attributeLabels();
         if (!empty($allAttributeLabels['add_time']) && empty($model->add_time)) {
             $model->add_time = time();
         }
 
-        <?php if ($includeUserId == 1) { echo "\$params['user_id'] = \$currentUserId;//***默认加入user_id参数"; } ?>
-
+        $params['user_id'] = $currentUserId;//***默认加入user_id参数
 
         return BaseLogic::baseCreate($model, $params, $scenario, $formName);
     }
@@ -120,19 +66,9 @@ class <?= $logicModelClass ?>
         }
 
 
-        $queryModel = <?php echo $modelClass; ?>::find()->andWhere(['id'=>$id]);
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$queryModel->andWhere(['user_id'=>\$currentUserId]);//***默认加入了user_id过滤";
-        }
-        ?>
-
-        <?php
-        if($includeIsDelete == 1){ //包含status 默认加入status > -1;
-            echo "\$queryModel->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤";
-        }
-        ?>
-
+        $queryModel = MobileSmsApiModel::find()->andWhere(['id'=>$id]);
+        $queryModel->andWhere(['user_id'=>$currentUserId]);//***默认加入了user_id过滤
+        $queryModel->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤
         $model = $queryModel->limit(1)->one();
 
         if (empty($model)) {
@@ -175,13 +111,8 @@ class <?= $logicModelClass ?>
 
         //设置status=-1 标记删除
         $params['status'] = ComBase::DB_IS_DELETE_VAL;
-        $queryModel = <?php echo $modelClass; ?>::find()->andWhere(['id'=>$id])->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$queryModel->andWhere(['user_id'=>\$currentUserId]);//***默认加入了user_id过滤";
-        }
-        ?>
-
+        $queryModel = MobileSmsApiModel::find()->andWhere(['id'=>$id])->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);
+        $queryModel->andWhere(['user_id'=>$currentUserId]);//***默认加入了user_id过滤
         $model = $queryModel->limit(1)->one();
 
         if (empty($model)) {
@@ -216,13 +147,8 @@ class <?= $logicModelClass ?>
         }
 
         $where = ['id' => $id];
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
-        }
-        ?>
-
-        $model = <?php echo $modelClass; ?>::findOne($where);
+        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
+        $model = MobileSmsApiModel::findOne($where);
 
         if (empty($model)) {
             return ComBase::getNoFindReturnArray();
@@ -251,22 +177,12 @@ class <?= $logicModelClass ?>
             return ComBase::getParamsErrorReturnArray();
         }
 
-        $detailModel = new <?php echo $modelClass; ?>();
+        $detailModel = new MobileSmsApiModel();
         $detailQuery = $detailModel::find();
         $where = ['id' => $id];
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
-        }
-        ?>
-
+        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
         $detailQuery->where($where);
-        <?php
-        if($includeIsDelete == 1){ //包含status 默认加入status > -1;
-            echo "\$detailQuery->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤";
-        }
-        ?>
-
+        $detailQuery->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤
         //获取输出字段
         $printFields = $detailModel->fieldsScenarios()[$fieldScenarios];
 
@@ -291,22 +207,12 @@ class <?= $logicModelClass ?>
         }
 
         //创建查询对象
-        $searchModel = new <?= $modelClass ?>();
+        $searchModel = new MobileSmsApiModel();
         $searchDataQuery = $searchModel::find();
         $where = [];//添加过滤条件，注意默认是无条件的
-        <?php
-        if($includeUserId == 1){ //包含user_id 默认加入user_id;
-            echo "\$where['user_id'] = \$currentUserId;//***默认加入了user_id过滤";
-        }
-        ?>
-
+        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
         $searchDataQuery->where($where);
-        <?php
-        if($includeIsDelete == 1){ //包含status 默认加入status > -1;
-            echo "\$searchDataQuery->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//默认添加标记删除标识";
-        }
-        ?>
-
+        $searchDataQuery->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//默认添加标记删除标识
         $searchDataQuery->orderBy('id desc');//添加默认排序规则
 
         //获取输出字段
