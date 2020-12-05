@@ -53,61 +53,6 @@ foreach ($labels as $name => $label){
  */
 class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . "\n" ?>
 {
-
-    /*
-     * @配置信息写入
-     */
-<?php foreach ($labels as $name => $label){
-    $lableArr = explode('=+=',$label);
-    if(count($lableArr)>1){
-                $jsonV=json_decode($lableArr[1],true);
-                if($jsonV["type"]=="text"){
-                    echo "    //对应字段:".$name.",备注：".$lableArr[0]."\n";
-                    echo "    public $".$jsonV["name"]."=".$jsonV["list"].";\n";
-                }
-    }
-} ?>
-
-
-    /*
-    * @关系内容写入
-    */
-<?php foreach ($labels as $name => $label){
-    $lableArr = explode('=+=',$label);
-    if(count($lableArr)>1){
-        $jsonV=json_decode($lableArr[1],true);
-        if($jsonV["type"]=="db"){
-            $idFeildArr = explode(",",$jsonV["selectFeild"]);
-            ?>
-     //对应字段：<?php echo $name; ?>,<?php echo $lableArr[0]; ?>
-
-     public function <?php echo $jsonV["functionName"]; ?>()
-     {
-        return $this->hasOne(<?php echo $jsonV["modelName"]; ?>::class, ['<?php echo $jsonV["joinTableId"]; ?>' => '<?php echo $name; ?>']);
-     }
-
-     //获取<?php echo $name; ?>,<?php echo $lableArr[0]; ?> 的LIST
-     public function <?php echo $jsonV["functionName"]; ?>List(){
-            return [];
-            //根据实际使用完善下方获取列表功能
-            /*
-            $array = <?php echo $jsonV["modelName"]; ?>::find()->select('<?php echo $jsonV["selectFeild"]; ?>')->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL])->orderBy("<?php echo $idFeildArr[0]; ?> desc")->limit(100)->asArray()->all();
-            $newArr = [];
-
-            if(empty($array)!=true){
-                foreach($array as $v){
-                $newArr[$v["<?php echo $idFeildArr[0]; ?>"]]=$v["<?php echo $idFeildArr[1]; ?>"];
-                }
-            }
-            return $newArr;
-            */
-      }
-
-<?php
-        }
-    }
-} ?>
-
     /**
      * @inheritdoc
      */
@@ -215,4 +160,61 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . 
         return new <?= $queryClassFullName ?>(get_called_class());
     }
 <?php endif; ?>
+
+    /*
+    * @配置信息写入
+    */
+<?php foreach ($labels as $name => $label){
+    $lableArr = explode('=+=',$label);
+    if(count($lableArr)>1){
+        $jsonV=json_decode($lableArr[1],true);
+        if($jsonV["type"]=="text"){
+            echo "    //对应字段:".$name.",备注：".$lableArr[0]."\n";
+            echo "    public $".$jsonV["name"]."=".$jsonV["list"].";\n";
+        }
+    }
+} ?>
+
+
+    /*
+    * @关系内容写入
+    */
+<?php foreach ($labels as $name => $label){
+    $lableArr = explode('=+=',$label);
+    if(count($lableArr)>1){
+        $jsonV=json_decode($lableArr[1],true);
+        if($jsonV["type"]=="db"){
+            $idFeildArr = explode(",",$jsonV["selectFeild"]);
+            ?>
+    //对应字段：<?php echo $name; ?>,<?php echo $lableArr[0]; ?>
+
+    public function <?php echo $jsonV["functionName"]; ?>()
+    {
+        return $this->hasOne(<?php echo $jsonV["modelName"]; ?>::class, ['<?php echo $jsonV["joinTableId"]; ?>' => '<?php echo $name; ?>']);
+    }
+
+    //获取<?php echo $name; ?>,<?php echo $lableArr[0]; ?> 的LIST
+    public function <?php echo $jsonV["functionName"]; ?>List(){
+        return [];
+        //根据实际使用完善下方获取列表功能
+        /*
+        $array = <?php echo $jsonV["modelName"]; ?>::find()->select('<?php echo $jsonV["selectFeild"]; ?>')->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL])->orderBy("<?php echo $idFeildArr[0]; ?> desc")->limit(100)->asArray()->all();
+        $newArr = [];
+
+        if(empty($array)!=true){
+            foreach($array as $v){
+                $newArr[$v["<?php echo $idFeildArr[0]; ?>"]]=$v["<?php echo $idFeildArr[1]; ?>"];
+            }
+        }
+        return $newArr;
+        */
+    }
+
+   <?php
+        }
+    }
+} ?>
+
+
+
 }

@@ -31,49 +31,6 @@ use common\services\user\UserModel;
  */
 class MobileSmsModel extends \yii\db\ActiveRecord
 {
-
-    /*
-     * @配置信息写入
-     */
-    //对应字段:object_type,备注：短信对象类型
-    public $objectTypePredefine=["0"=>"无","1"=>"用户","2"=>"订单"];
-    //对应字段:type,备注：类型
-    public $typePredefine=["1"=>"验证码","2"=>"通知","3"=>"消息"];
-    //对应字段:send_type,备注：发送类型
-    public $sendTypePredefine=["0"=>"未指定","1"=>"用户发起","2"=>"管理员发起","3"=>"任务发起"];
-    //对应字段:sms_type,备注：短信渠道
-    public $smsTypePredefine=["1"=>"阿里","2"=>"互亿","9"=>"其他"];
-    //对应字段:status,备注：状态
-    public $statusPredefine=["0"=>"不发送","1"=>"发送成功","2"=>"待发送","3"=>"发送失败"];
-
-
-    /*
-    * @关系内容写入
-    */
-     //对应字段：user_id,接收用户
-     public function getUserRecord()
-     {
-        return $this->hasOne(UserModel::class, ['id' => 'user_id']);
-     }
-
-     //获取user_id,接收用户 的LIST
-     public function getUserRecordList(){
-            return [];
-            //根据实际使用完善下方获取列表功能
-            /*
-            $array = UserModel::find()->select('id,name')->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL])->orderBy("id desc")->limit(100)->asArray()->all();
-            $newArr = [];
-
-            if(empty($array)!=true){
-                foreach($array as $v){
-                $newArr[$v["id"]]=$v["name"];
-                }
-            }
-            return $newArr;
-            */
-      }
-
-
     /**
      * @inheritdoc
      */
@@ -91,10 +48,10 @@ class MobileSmsModel extends \yii\db\ActiveRecord
         ////////////字段验证规则
         return [
             [['object_id', 'object_type', 'user_id', 'area_num', 'send_time', 'send_num', 'type', 'send_type', 'sms_type', 'add_time', 'status'], 'integer'],
-            [['mobile'], 'required'],
+            [['mobile','content'], 'required'],
             [['content'], 'string'],
             [['name'], 'string', 'max' => 100],
-            [['mobile'], 'string', 'max' => 11],
+            [['mobile'], 'match', 'pattern'=>'/[1-9]{11}/','message' => '手机号必须为11位数字'],
             [['other_mobiles', 'params_json', 'template', 'feedback'], 'string', 'max' => 255],
             [['remark'], 'string', 'max' => 250],
         ];
@@ -149,4 +106,49 @@ class MobileSmsModel extends \yii\db\ActiveRecord
     {
         return new MobileSmsQuery(get_called_class());
     }
+
+    /*
+    * @配置信息写入
+    */
+    //对应字段:object_type,备注：短信对象类型
+    public $objectTypePredefine=["0"=>"无","1"=>"用户","2"=>"订单"];
+    //对应字段:type,备注：类型
+    public $typePredefine=["1"=>"验证码","2"=>"通知","3"=>"消息"];
+    //对应字段:send_type,备注：发送类型
+    public $sendTypePredefine=["0"=>"未指定","1"=>"用户发起","2"=>"管理员发起","3"=>"任务发起"];
+    //对应字段:sms_type,备注：短信渠道
+    public $smsTypePredefine=["1"=>"阿里","2"=>"互亿","9"=>"其他"];
+    //对应字段:status,备注：状态
+    public $statusPredefine=["0"=>"不发送","1"=>"发送成功","2"=>"待发送","3"=>"发送失败"];
+
+
+    /*
+    * @关系内容写入
+    */
+    //对应字段：user_id,接收用户
+    public function getUserRecord()
+    {
+        return $this->hasOne(UserModel::class, ['id' => 'user_id']);
+    }
+
+    //获取user_id,接收用户 的LIST
+    public function getUserRecordList(){
+        return [];
+        //根据实际使用完善下方获取列表功能
+        /*
+        $array = UserModel::find()->select('id,name')->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL])->orderBy("id desc")->limit(100)->asArray()->all();
+        $newArr = [];
+
+        if(empty($array)!=true){
+            foreach($array as $v){
+                $newArr[$v["id"]]=$v["name"];
+            }
+        }
+        return $newArr;
+        */
+    }
+
+   
+
+
 }
