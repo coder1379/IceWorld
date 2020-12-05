@@ -128,7 +128,7 @@ class BaseLogic
      */
     public static function getFormatErrorsArray($errors)
     {
-        $returnData = ['firstKey' => $errors['first']['k']];
+        $returnData = null;//['firstKey' => $errors['first']['k']];//仅返回错误描述，不返回错误字段需要自行开启
         if (Yii::$app->params['returnAllErrors'] == true) {
             $returnData['allErrors'] = $errors['all'];
         }
