@@ -5,13 +5,13 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\services\message\MobileSmsModel */
+/* @var $model common\services\sms\SmsMobileModel */
 /* @var $form yii\widgets\ActiveForm */
 
 ?>
 
 
-<div class="mobile-sms-model-form">
+<div class="sms-mobile-model-form">
 
     <?php $form = ActiveForm::begin(['id'=>'create_update_active_form']); ?>
 

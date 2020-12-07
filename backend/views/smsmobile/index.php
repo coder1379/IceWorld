@@ -4,7 +4,7 @@ use yii\helpers\Url;
 use yii\grid\GridView;
 use common\base\BackendCommon;
 /* @var $this yii\web\View */
-/* @var $searchModel common\services\message\MobileSmsSearch */
+/* @var $searchModel common\services\sms\SmsMobileSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = '短信记录';

@@ -4,13 +4,13 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\services\message\MobileSmsModel */
+/* @var $model common\services\sms\SmsMobileModel */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => '短信记录', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="mobile-sms-model-view">
+<div class="sms-mobile-model-view">
 
     <!--<h1><?= Html::encode($this->title) ?></h1>-->
 
