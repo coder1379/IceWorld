@@ -3,8 +3,8 @@
 namespace backend\controllers;
 
 use Yii;
-use common\services\message\MobileSmsModel;
-use common\services\message\MobileSmsSearch;
+use common\services\sms\SmsMobileModel;
+use common\services\sms\SmsMobileSearch;
 use backend\controllers\AuthController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -12,9 +12,9 @@ use common\ComBase;
 use common\services\user\UserModel;
 
 /**
- * MobilesmsController implements the CRUD actions for MobileSmsModel model.
+ * SmsmobileController implements the CRUD actions for SmsMobileModel model.
  */
-class MobilesmsController extends AuthController
+class SmsmobileController extends AuthController
 {
     /**
      * @inheritdoc
@@ -33,12 +33,12 @@ class MobilesmsController extends AuthController
     }
 
     /**
-     * Lists all MobileSmsModel models.
+     * Lists all SmsMobileModel models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new MobileSmsSearch();
+        $searchModel = new SmsMobileSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -49,7 +49,7 @@ class MobilesmsController extends AuthController
     }
 
     /**
-     * Displays a single MobileSmsModel model.
+     * Displays a single SmsMobileModel model.
      * @param integer $id
      * @return mixed
      */
@@ -61,13 +61,13 @@ class MobilesmsController extends AuthController
     }
 
     /**
-     * Creates a new MobileSmsModel model.
+     * Creates a new SmsMobileModel model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new MobileSmsModel();
+        $model = new SmsMobileModel();
         $model->scenario = 'create';//创建场景，控制字段安全
         $model->loadDefaultValues();
         if ( $model->load(Yii::$app->request->post())==true) {
@@ -94,7 +94,7 @@ class MobilesmsController extends AuthController
     }
 
     /**
-     * Updates an existing MobileSmsModel model.
+     * Updates an existing SmsMobileModel model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -120,7 +120,7 @@ class MobilesmsController extends AuthController
     }
 
     /**
-     * Deletes an existing MobileSmsModel model.
+     * Deletes an existing SmsMobileModel model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -150,15 +150,15 @@ class MobilesmsController extends AuthController
     }
 
     /**
-     * Finds the MobileSmsModel model based on its primary key value.
+     * Finds the SmsMobileModel model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return MobileSmsModel the loaded model
+     * @return SmsMobileModel the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = MobileSmsModel::findOne($id)) !== null) {
+        if (($model = SmsMobileModel::findOne($id)) !== null) {
             return $model;
         } else {
            return null;
