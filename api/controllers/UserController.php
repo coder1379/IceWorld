@@ -25,7 +25,7 @@ class UserController extends ApiCommonContoller
     public function actionList()
     {
         $logic = new UserLogic();
-        $result = $logic->list($this->post(), 10);
+        $result = $logic->list($this->post(), $this->getUserId());
         return Json::encode($result);
     }
 
@@ -38,7 +38,7 @@ class UserController extends ApiCommonContoller
     public function actionDetail()
     {
         $logic = new UserLogic();
-        $result = $logic->detail($this->post(), 10);
+        $result = $logic->detail($this->post(), $this->getUserId());
         return Json::encode($result);
     }
 
@@ -51,7 +51,7 @@ class UserController extends ApiCommonContoller
     public function actionCreate()
     {
         $logic = new UserLogic();
-        $result = $logic->create($this->post(), 10);
+        $result = $logic->create($this->post(), $this->getUserId());
         return Json::encode($result);
     }
 
@@ -65,34 +65,9 @@ class UserController extends ApiCommonContoller
     public function actionUpdate()
     {
         $logic = new UserLogic();
-        $result = $logic->update($this->post(), 10);
+        $result = $logic->update($this->post(), $this->getUserId());
         return Json::encode($result);
     }
 
-    /**
-     * 删除用户
-     * @notes
-     * @param int $id ID 1
-     * @return json yes {"data":null}
-     */
-    public function actionDelete()
-    {
-        $logic = new UserLogic();
-        $result = $logic->delete($this->post(),10);
-        return Json::encode($result);
-    }
-
-    /**
-     * 物理删除默认屏蔽，需要自行打开用户
-     * @notes
-     * @param int $id ID 1
-     * @return json yes {"data":null}
-     */
-    public function actionPhysiedelete()
-    {
-        $logic = new UserLogic();
-        $result = $logic->physieDelete($this->post(), 10);
-        return Json::encode($result);
-    }
 
 }

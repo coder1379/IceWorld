@@ -4,7 +4,7 @@ ICE WORLD
 1.获取代码,
 2.创建db,
 3.导入db,
-4.配置api,admin域名,
+4.配置api,admin域名,static(选择)
 5.修改environments dev,befprod,prod common/main-local.php common/params-local.php对应参数, 执行init
 6.修改commmon/params.php对应参数
 7.添加systemd queue守护进程 详见：systemd 常见配置
@@ -13,7 +13,7 @@ ICE WORLD
 #yii2 每分钟进行一次系统检测发现异常钉钉推送
 * * * * * /usr/local/php74/bin/php /data/wwwroot/yii2/yii index/systemtour
 ```
-9.根据需求修改模板框架以提高开发速度
+9.根据需求修改模板框架以提高开发速度,注意user仅可覆盖admin后台相关与apimodel，userLogic与userController不能覆盖齐相关内容
 10.发布与测试
 
 ===============
@@ -237,3 +237,7 @@ go jwt ：github.com/dgrijalva/jwt-go
 python:pip install PyJWT
 
 #### office excel 改用 phpoffice/phpspreadsheet包，PHPExcel已经停止维护
+
+####浏览器唯一指纹预选方案：https://github.com/fingerprintjs/fingerprintjs
+
+####强制使用索引 select *from table force index(user_id)...

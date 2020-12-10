@@ -11,9 +11,9 @@ class UserApiModel extends \common\services\user\UserModel
     public function fieldsScenarios()
     {
         return [
-            'list' => ['id','name','mobile','qq','truename','account','email','wx_openid','wx_unionid','add_time','reg_ip','last_login_ip','token','token_out_time','last_login_time','head_portrait','birthday','sex','inviter_user_id','add_admin_id','introduce','status','type','user_id',],//列表
+            'list' => ['id','name','status','type','level','realname','avatar','introduce','sex','birthday','district','title','add_time',],//列表
 
-            'detail' => ['id','name','mobile','qq','truename','account','email','wx_openid','wx_unionid','add_time','reg_ip','last_login_ip','token','token_out_time','last_login_time','head_portrait','birthday','sex','inviter_user_id','add_admin_id','introduce','status','type','user_id',],//详情
+            'detail' => ['id','name','status','type','level','realname','avatar','introduce','sex','birthday','district','title','add_time',],//详情
         ];
     }
 
@@ -22,15 +22,14 @@ class UserApiModel extends \common\services\user\UserModel
     {
         return [
             [['name'], 'required'],
-            [['add_time', 'token_out_time', 'last_login_time', 'sex', 'inviter_user_id', 'add_admin_id', 'status', 'type', 'is_delete', 'user_id'], 'integer'],
-            [['birthday'], 'safe'],
-            [['name', 'truename', 'account', 'wx_openid', 'wx_unionid'], 'string', 'max' => 50],
-            [['login_password'], 'string', 'max' => 100],
-            [['mobile'], 'string', 'max' => 11],
-            [['qq'], 'string', 'max' => 15],
-            [['email', 'reg_ip', 'last_login_ip'], 'string', 'max' => 30],
-            [['token'], 'string', 'max' => 56],
-            [['head_portrait', 'introduce'], 'string', 'max' => 255],
+            [['status', 'type', 'level', 'sex', 'birthday', 'add_time'], 'integer'],
+            [['name', 'username', 'realname', 'district', 'title'], 'string', 'max' => 30],
+            [['mobile'], 'string', 'max' => 20],
+            [['login_password'], 'string', 'max' => 64],
+            [['email'], 'string', 'max' => 50],
+            [['avatar'], 'string', 'max' => 255],
+            [['introduce'], 'string', 'max' => 200],
+            [['token'], 'string', 'max' => 100],
         ];
     }*/
 
@@ -38,11 +37,11 @@ class UserApiModel extends \common\services\user\UserModel
     /*public function scenarios()
     {
         return [
-            'create' => ['name','login_password','mobile','qq','truename','account','email','wx_openid','wx_unionid','reg_ip','last_login_ip','token','token_out_time','last_login_time','head_portrait','birthday','sex','inviter_user_id','add_admin_id','introduce','status','type','user_id',],//创建场景
+            'create' => ['name','mobile','username','login_password','status','type','level','realname','email','avatar','introduce','sex','birthday','district','title','token',],//创建场景
 
-            'update' => ['name','login_password','mobile','qq','truename','account','email','wx_openid','wx_unionid','reg_ip','last_login_ip','token','token_out_time','last_login_time','head_portrait','birthday','sex','inviter_user_id','add_admin_id','introduce','status','type','user_id',],//修改场景
+            'update' => ['name','mobile','username','login_password','status','type','level','realname','email','avatar','introduce','sex','birthday','district','title','token',],//修改场景
 
-            'delete' => ['is_delete'],//删除场景
+            'delete' => ['status'],//删除场景 status = -1
         ];
     }*/
 
@@ -53,30 +52,22 @@ class UserApiModel extends \common\services\user\UserModel
         return [
             'id' => 'ID',
             'name' => '昵称',
-            'login_password' => '密码',
             'mobile' => '手机号',
-            'qq' => 'QQ',
-            'truename' => '真名',
-            'account' => '用户名',
-            'email' => '邮箱',
-            'wx_openid' => '微信OPENID',
-            'wx_unionid' => '微信unionid',
-            'add_time' => '注册时间',
-            'reg_ip' => '注册IP',
-            'last_login_ip' => '最后登录IP',
-            'token' => 'token',
-            'token_out_time' => 'token_过期时间',
-            'last_login_time' => '最后登录时间',
-            'head_portrait' => '头像',
-            'birthday' => '生日',
-            'sex' => '性别',
-            'inviter_user_id' => '邀请人',
-            'add_admin_id' => '添加人',
-            'introduce' => '自我介绍',
+            'username' => '用户名',
+            'login_password' => '密码',
             'status' => '状态',
-            'type' => '类型',
-            'is_delete' => '是否删除',
-            'user_id' => '用户ID',
+            'type' => '用户类型',
+            'level' => '等级',
+            'realname' => '真实姓名',
+            'email' => '邮箱',
+            'avatar' => '头像',
+            'introduce' => '自我介绍',
+            'sex' => '性别',
+            'birthday' => '生日',
+            'district' => '地区',
+            'title' => '头衔',
+            'token' => 'token',
+            'add_time' => '注册时间',
             ];
     }*/
 

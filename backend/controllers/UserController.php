@@ -9,7 +9,6 @@ use backend\controllers\AuthController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\ComBase;
-use common\services\admin\AdministratorModel;
 
 /**
  * UserController implements the CRUD actions for UserModel model.
@@ -129,22 +128,22 @@ class UserController extends AuthController
     {
         $obj=$this->findModel($id);
         if(empty($obj)==true){
-            return ComBase::getReturnJson([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);
+            return $this->getJsonString(ComBase::getParamsErrorReturnArray());
         }else{
 
             $deleteFlag = 0;
-            if(isset($obj->is_delete)!=true){
-                $deleteFlag = $obj->delete();
-            }else{
+            if(isset($obj->status)){ //有状态自动自动走软删除设置为-1
                 $obj->scenario = 'delete';//删除场景，控制字段安全
-                $obj->is_delete=1;
+                $obj->status = ComBase::DB_IS_DELETE_VAL;
                 $deleteFlag = $obj->update();
+            }else{
+                $deleteFlag = $obj->delete();
             }
 
             if($deleteFlag){
                 return $this->getJsonString([],ComBase::CODE_RUN_SUCCESS,ComBase::MESSAGE_DELETE_SUCCESS);
             }else{
-                return $this->getJsonString([],ComBase::CODE_SERVER_ERROR,ComBase::MESSAGE_SERVER_ERROR);
+                return $this->getJsonString(ComBase::getServerBusyReturnArray());
             }
         }
     }

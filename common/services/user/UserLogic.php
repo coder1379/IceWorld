@@ -24,7 +24,7 @@ class UserLogic
         }
 
         if (empty($currentUserId)) {
-            //判断uid是否为空
+            //判断user_id是否为空
             return ComBase::getNoLoginReturnArray();
         }
 
@@ -35,7 +35,7 @@ class UserLogic
             $model->add_time = time();
         }
 
-        $params['user_id'] = $currentUserId;//***默认加入user_id参数
+        
 
         return BaseLogic::baseCreate($model, $params, $scenario, $formName);
     }
@@ -56,7 +56,7 @@ class UserLogic
         }
 
         if (empty($currentUserId)) {
-            //判断uid是否为空
+            //判断user_id是否为空
             return ComBase::getNoLoginReturnArray();
         }
 
@@ -65,20 +65,21 @@ class UserLogic
             return ComBase::getParamsErrorReturnArray();
         }
 
-        $where = ['id' => $id];
-        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
-        $where['is_delete'] = 0;//有is_delete表默认加入软删除过滤
-        $model = UserApiModel::findOne($where);
+
+        $queryModel = UserApiModel::find()->andWhere(['id'=>$id]);
+        
+        $queryModel->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤
+        $model = $queryModel->limit(1)->one();
 
         if (empty($model)) {
             return ComBase::getNoFindReturnArray();
         }
 
         $allAttributeLabels = $model->attributeLabels();
-        //if (!empty($allAttributeLabels['update_time'])) {
+        if (!empty($allAttributeLabels['update_time'])) {
             //默认修改更新时间，不需要自行移除
             $model->update_time = time();
-        //}
+        }
 
         return BaseLogic::baseUpdate($model, $params, $scenario, $formName);
     }
@@ -99,7 +100,7 @@ class UserLogic
         }
 
         if (empty($currentUserId)) {
-            //判断uid是否为空
+            //判断user_id是否为空
             return ComBase::getNoLoginReturnArray();
         }
 
@@ -108,15 +109,11 @@ class UserLogic
             return ComBase::getParamsErrorReturnArray();
         }
 
-        $where = ['id' => $id];
-        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
-        //设置is_delete标记=1
-        if (empty($params['is_delete'])) {
-            $params['is_delete'] = 1;
-        }
-
-        $where['is_delete'] = 0;//有is_delete表默认加入软删除过滤
-        $model = UserApiModel::findOne($where);
+        //设置status=-1 标记删除
+        $params['status'] = ComBase::DB_IS_DELETE_VAL;
+        $queryModel = UserApiModel::find()->andWhere(['id'=>$id])->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);
+        
+        $model = $queryModel->limit(1)->one();
 
         if (empty($model)) {
             return ComBase::getNoFindReturnArray();
@@ -140,7 +137,7 @@ class UserLogic
         }
 
         if (empty($currentUserId)) {
-            //判断uid是否为空
+            //判断user_id是否为空
             return ComBase::getNoLoginReturnArray();
         }
 
@@ -150,7 +147,7 @@ class UserLogic
         }
 
         $where = ['id' => $id];
-        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
+        
         $model = UserApiModel::findOne($where);
 
         if (empty($model)) {
@@ -171,7 +168,7 @@ class UserLogic
     public function detail($params, $currentUserId, $fieldScenarios = 'detail')
     {
         if (empty($currentUserId)) {
-            //判断uid是否为空
+            //判断user_id是否为空
             return ComBase::getNoLoginReturnArray();
         }
 
@@ -180,12 +177,12 @@ class UserLogic
             return ComBase::getParamsErrorReturnArray();
         }
 
-        $where = ['id' => $id];
-        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
         $detailModel = new UserApiModel();
         $detailQuery = $detailModel::find();
+        $where = ['id' => $id];
+        
         $detailQuery->where($where);
-        $detailQuery->andWhere(['is_delete' => 0]);//有is_delete表默认加入软删除过滤
+        $detailQuery->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤
         //获取输出字段
         $printFields = $detailModel->fieldsScenarios()[$fieldScenarios];
 
@@ -205,20 +202,19 @@ class UserLogic
     public function list($params, $currentUserId, $fieldScenarios = 'list')
     {
         if (empty($currentUserId)) {
-            //判断uid是否为空
+            //判断user_id是否为空
             return ComBase::getNoLoginReturnArray();
         }
-
 
         //创建查询对象
         $searchModel = new UserApiModel();
         $searchDataQuery = $searchModel::find();
         $where = [];//添加过滤条件，注意默认是无条件的
-        $where['user_id'] = $currentUserId;//***默认加入了user_id过滤
+        
         $searchDataQuery->where($where);
+        $searchDataQuery->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//默认添加标记删除标识
         $searchDataQuery->orderBy('id desc');//添加默认排序规则
 
-        $searchDataQuery->andWhere(['is_delete' => 0]);//默认添加标记删除标识
         //获取输出字段
         $printFields = $searchModel->fieldsScenarios()[$fieldScenarios];
 

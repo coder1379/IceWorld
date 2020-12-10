@@ -192,7 +192,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
     {
         $obj=$this->findModel(<?= $actionParams ?>);
         if(empty($obj)==true){
-            return ComBase::getReturnJson([],ComBase::CODE_PARAM_ERROR,ComBase::MESSAGE_PARAM_ERROR);
+            return $this->getJsonString(ComBase::getParamsErrorReturnArray());
         }else{
 
             $deleteFlag = 0;
@@ -207,7 +207,7 @@ class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->bas
             if($deleteFlag){
                 return $this->getJsonString([],ComBase::CODE_RUN_SUCCESS,ComBase::MESSAGE_DELETE_SUCCESS);
             }else{
-                return $this->getJsonString([],ComBase::CODE_SERVER_ERROR,ComBase::MESSAGE_SERVER_ERROR);
+                return $this->getJsonString(ComBase::getServerBusyReturnArray());
             }
         }
     }
