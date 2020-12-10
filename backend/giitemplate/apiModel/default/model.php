@@ -21,19 +21,39 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . 
         }
 
         //设置敏感字段自动不加入显示列表
-        if(stripos($column->name,'password')){
+        if(stripos($column->name,'password')!==false){
             continue;
         }
 
-        if(stripos($column->name,'pwd')){
+        if(stripos($column->name,'pwd')!==false){
             continue;
         }
 
-        if(stripos($column->name,'token')){
+        if(stripos($column->name,'mobile')!==false){
             continue;
         }
 
-        if(stripos($column->name,'auth')){
+        if(stripos($column->name,'phone')!==false){
+            continue;
+        }
+
+        if(stripos($column->name,'email')!==false){
+            continue;
+        }
+
+        if(stripos($column->name,'token')!==false){
+            continue;
+        }
+
+        if(stripos($column->name,'auth')!==false){
+            continue;
+        }
+
+        if(stripos($column->name,'user_name')!==false){
+            continue;
+        }
+
+        if(stripos($column->name,'username')!==false){
             continue;
         }
 

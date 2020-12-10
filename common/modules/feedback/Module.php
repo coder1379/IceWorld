@@ -1,6 +1,6 @@
 <?php
 
-namespace api\modules\feedback;
+namespace common\modules\feedback;
 
 /**
  * feedback module definition class
@@ -10,7 +10,7 @@ class Module extends \yii\base\Module
     /**
      * {@inheritdoc}
      */
-    public $controllerNamespace = 'api\modules\feedback\controllers';
+    public $controllerNamespace = 'common\modules\feedback\controllers';
 
     /**
      * {@inheritdoc}

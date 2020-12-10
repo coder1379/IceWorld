@@ -1,14 +1,14 @@
 <?php
 
-namespace api\modules\feedback\controllers;
+namespace common\modules\feedback\controllers;
 
-use common\controllers\BaseContoller;
+use common\controllers\ApiCommonContoller;
 use yii\helpers\Json;
 
 /**
- * Message controller for the `abc` module
+ * Message controller for the `test` module
  */
-class MessageController extends BaseContoller
+class MessageController extends ApiCommonContoller
 {
 
     public $enableCsrfValidation = false; //取消CSRF验证

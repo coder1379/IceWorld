@@ -103,20 +103,18 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
-            //$query->where('0=1');
+            $query->where('0=1');
             return $dataProvider;
         }
 
         // grid filtering conditions
         <?= implode("\n        ", $searchConditions) ?>
 
-
         <?php
         if($includeDelete==1){
             echo "\$query->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤";
         }
         ?>
-
 
         <?php
         //////获取并设置备注里面的ralation 自动生成
@@ -140,15 +138,12 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
             }
             echo "\$query".$withStr.";";
         }
-
         ?>
 
         <?php
         if(!empty($idKey)) {
             ?>
-
-            $query->addOrderBy('<?php echo $idKey; ?> desc');
-
+    $query->addOrderBy('<?php echo $idKey; ?> desc');
             <?php
         }
         ?>

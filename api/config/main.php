@@ -14,7 +14,7 @@ return [
     'sourceLanguage'=>'en-US',
     'controllerNamespace' => 'api\controllers',
     'modules' => [
-        'feedback' => ['class'=>'api\modules\feedback\Module'],//反馈模块,模块化模板
+        'feedback' => ['class'=>'common\modules\feedback\Module'],//反馈模块,模块化模板
     ],
     'components' => [
         'errorHandler' => [
