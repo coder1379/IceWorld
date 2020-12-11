@@ -202,7 +202,7 @@ class UploadLogic
 
     public function getUploadPath($dirName = 'upload'){
         $filePath = '/'.$dirName.'/' . date('Ymd');
-        $md5Key = Yii::$app->params['md5Key'];
+        $md5Key = Yii::$app->params['md5_tmp_key'];
         $filePath .= '/' . md5(time() .'_'. mt_rand(1000000, 9000000).$md5Key);
         return $filePath;
     }

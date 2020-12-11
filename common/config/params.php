@@ -1,8 +1,9 @@
 <?php
 return [
     'project_name' => 'ICE',//项目名称用于各类提示信息title
-    'md5Key' => 'ice_world',//md5加密秘钥 可变更不影响使用
-    'md5PWDKey' => 'ice_world',//md5 PWD加密key 项目初始化时修改后将不能再修改避免影响登录
+    'md5_tmp_key' => 'ice_world',//md5临时加密秘钥用于图片路径等场景 可变更不影响使用
+    'md5_forever_key' => 'ice_world',//md5 永久加密key 项目初始化时修改后将不能再修改避免影响用户密码登录
+    'save_access_log' => true, //保存访问日志,根据情况缓存日志
     'adminEmail' => '',
     'supportEmail' => '',
     'user.passwordResetTokenExpire' => 3600,
