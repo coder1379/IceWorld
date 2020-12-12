@@ -13,6 +13,7 @@ use yii\helpers\Json;
 class IndexController extends ApiCommonContoller
 {
 	public $enableCsrfValidation = false;
+    public $excludeAccessLog = ['index','404'];
 
     /**
      * index 默认首页

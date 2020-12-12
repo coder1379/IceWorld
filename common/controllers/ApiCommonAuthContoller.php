@@ -17,7 +17,7 @@ class ApiCommonAuthContoller extends ApiCommonContoller
         $this->setUser();
         $actionId=$action->id;
         if(!in_array($actionId,$this->allowAccessActions,true)){
-            if(empty($this->user)){
+            if(empty($this->userId)){
                 //没有权限
                 echo Json::encode($this->getJsonArray([],ComBase::CODE_NO_LOGIN_ERROR,ComBase::MESSAGE_NO_LOGIN_ERROR));
                 exit();
