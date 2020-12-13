@@ -133,14 +133,6 @@ class BackendCommon extends BaseCommon
         }
     }
 
-    /**
-     * 获取cookie 密码
-     * @param string $str
-     * @return string
-     */
-    public function getToCookiePassword($str=""){
-        return md5(md5('7be'.$str.'93ew'));
-    }
 
     /**
      * 生成存入数据库的密码

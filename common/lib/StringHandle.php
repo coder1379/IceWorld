@@ -18,7 +18,7 @@ class StringHandle
      * @param int $length
      * @return string
      */
-    public function getRandomNumber($length = 6, $chars = '')
+    public static function getRandomNumber($length = 6, $chars = '')
     {
         $chars = trim($chars);
         if (empty($chars)) {
@@ -38,7 +38,7 @@ class StringHandle
      * @param string $searchStr 被选字符 为空默认a-zA-Z0-9
      * @return string
      */
-    public function getRandomString($length = 4, $searchStr = '')
+    public static function getRandomString($length = 4, $searchStr = '')
     {
         $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz';
         if (!empty($searchStr)) {
@@ -60,7 +60,7 @@ class StringHandle
      * @param int $length 需要添加的*的长度 0 为自动判断
      * @return mixed|string
      */
-    public function getStarsString($needpstr = "", $positionflag = 2, $length = 0)
+    public static function getStarsString($needpstr = "", $positionflag = 2, $length = 0)
     {
         $returnpsstr = "";
         if ($needpstr != "") {
@@ -96,7 +96,7 @@ class StringHandle
      * @param string $etc 超出文本
      * @return string 返回
      */
-    public function getSubString($str, $len = 10, $etc = '...')
+    public static function getSubString($str, $len = 10, $etc = '...')
     {
         $restr = '';
         $i = 0;
@@ -173,7 +173,7 @@ class StringHandle
      * @param $to 需要返回的编码
      * @return string
      */
-    public function getEncoding($data, $to)
+    public static function getEncoding($data, $to)
     {
         $encode_arr = array('UTF-8', 'ASCII', 'GBK', 'GB2312', 'BIG5', 'JIS', 'eucjp-win', 'sjis-win', 'EUC-JP');
         $encoded = mb_detect_encoding($data, $encode_arr);
@@ -186,7 +186,7 @@ class StringHandle
      * @param $xml
      * @return array
      */
-    public function xml_to_array($xml)
+    public static function xml_to_array($xml)
     {
         $arr = array();
         $reg = "/<(\w+)[^>]*>([\\x00-\\xFF]*)<\\/\\1>/";
@@ -196,7 +196,7 @@ class StringHandle
                 $subxml = $matches[2][$i];
                 $key = $matches[1][$i];
                 if (preg_match($reg, $subxml)) {
-                    $arr[$key] = $this->xml_to_array($subxml);
+                    $arr[$key] = self::xml_to_array($subxml);
                 } else {
                     $arr[$key] = $subxml;
                 }
@@ -210,7 +210,7 @@ class StringHandle
      * @param string $salt 加密盐
      * @return string
      */
-    public function createMd5($salt = '')
+    public static function createMd5($salt = '')
     {
         //生成一个不会重复的字符串
         $str = md5(uniqid(md5(microtime(true)), true) . '_' . $salt . '_' . mt_rand(100, 999));
@@ -222,16 +222,16 @@ class StringHandle
      * @param $salt 加密盐
      * @return string
      */
-    public function createToken($salt = '')
+    public static function createToken($salt = '')
     {
         //生成一个不会重复的字符串
-        $str = uniqid(md5(microtime(true)), true) .'_'.$salt. '_' . mt_rand(1000,9999);
+        $str = uniqid(md5(microtime(true)), true) . '_' . $salt . '_' . mt_rand(1000, 9999);
 
         //md5加密
-        $strMd5 = md5($str.mt_rand(10,99));
+        $strMd5 = md5($str . mt_rand(10, 99));
 
         //sha1加密拼接64位
-        $resStr = substr($strMd5,0,11).sha1($str).substr($strMd5,12,13);
+        $resStr = substr($strMd5, 0, 11) . sha1($str) . substr($strMd5, 12, 13);
         return $resStr;
     }
 
@@ -240,7 +240,7 @@ class StringHandle
      * @param   $params
      * @return  string
      */
-    public function toUrlParams($params)
+    public static function toUrlParams($params)
     {
         $string = '';
         if (!empty($params)) {
@@ -251,6 +251,77 @@ class StringHandle
             $string = implode("&", $array);
         }
         return $string;
+    }
+
+    /**
+     * 获取浏览器系统
+     * @param $agent
+     * @return string
+     */
+    public static function getWebSystem($agent)
+    {
+        $os = '';
+        if (strpos($agent, 'Android')) {
+            $os = 'Android Web';
+        } else if (strpos($agent, 'iPhone') || strpos($agent, 'iPad')) {
+            $os = 'IOS Web';
+        } else if (preg_match('/win/i', $agent) && preg_match('/nt 6.0/i', $agent)) {
+            $os = 'Windows Vista';
+        } else if (preg_match('/win/i', $agent) && preg_match('/nt 6.1/i', $agent)) {
+            $os = 'Windows 7';
+        } else if (preg_match('/win/i', $agent) && preg_match('/nt 6.2/i', $agent)) {
+            $os = 'Windows 8';
+        } else if (preg_match('/win/i', $agent) && preg_match('/nt 10.0/i', $agent)) {
+            $os = 'Windows 10';#添加win10判断
+        } else if (preg_match('/win/i', $agent) && preg_match('/nt 5.1/i', $agent)) {
+            $os = 'Windows XP';
+        } else if (preg_match('/win/i', $agent) && preg_match('/nt 5/i', $agent)) {
+            $os = 'Windows 2000';
+        } else if (preg_match('/win/i', $agent) && preg_match('/nt/i', $agent)) {
+            $os = 'Windows NT';
+        } else if (preg_match('/linux/i', $agent)) {
+            $os = 'Linux';
+        } else if (preg_match('/unix/i', $agent)) {
+            $os = 'Unix';
+        } else if (preg_match('/sun/i', $agent) && preg_match('/os/i', $agent)) {
+            $os = 'SunOS';
+        } else {
+            $os = '未知系统';
+        }
+        return $os;
+    }
+
+    /**
+     * 获取浏览器品牌
+     * @return mixed
+     */
+    public static function getBrowser($sys)
+    {
+        $browser = '';
+        if (stripos($sys, "Chrome") > 0) {
+            $browser = "Chrome浏览器";
+        } else if (stripos($sys, "WeChat") > 0) {
+            $browser = "微信浏览器";
+        }  else if (stripos($sys, "Safari") > 0) {
+            $browser = "Safari浏览器";
+        } else if (stripos($sys, "QQ") > 0) {
+            $browser = "QQ浏览器";
+        } else if (stripos($sys, "Android") > 0) {
+            $browser = "安卓浏览器";
+        } else if (stripos($sys, "Firefox") > 0) {
+            $browser = "火狐浏览器";
+        } else if (stripos($sys, "Maxthon") > 0) {
+            $browser = "遨游浏览器";
+        } else if (stripos($sys, "MSIE") > 0) {
+            $browser = 'IE浏览器';
+        }  else if (stripos($sys, "Edge") > 0) {
+            $browser = 'Edge浏览器';
+        } else if (stripos($sys, "OPR") > 0) {
+            $browser = "Opera浏览器";
+        }else {
+            $browser = "未知浏览器";
+        }
+        return $browser;
     }
 
 

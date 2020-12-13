@@ -40,8 +40,8 @@ class UploadOSS
         if(!empty($block)){
             $block=$block.'/';
         }
-        $stringHand = new StringHandle();
-        return $block.date('Ymd') . '/' .$stringHand->createMd5().mt_rand(100,999). $ext;
+
+        return $block.date('Ymd') . '/' .StringHandle::createMd5().mt_rand(100,999). $ext;
     }
 
 
