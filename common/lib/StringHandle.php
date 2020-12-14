@@ -286,7 +286,7 @@ class StringHandle
         } else if (preg_match('/sun/i', $agent) && preg_match('/os/i', $agent)) {
             $os = 'SunOS';
         } else {
-            $os = '未知系统';
+            $os = '未识别系统';
         }
         return $os;
     }
@@ -319,7 +319,7 @@ class StringHandle
         } else if (stripos($sys, "OPR") > 0) {
             $browser = "Opera浏览器";
         }else {
-            $browser = "未知浏览器";
+            $browser = "未识别浏览器";
         }
         return $browser;
     }
