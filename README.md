@@ -241,3 +241,5 @@ python:pip install PyJWT
 ####浏览器唯一指纹预选方案：https://github.com/fingerprintjs/fingerprintjs
 
 ####强制使用索引 select *from table force index(user_id)...
+
+####抛出异常并写入参数  $allArgs = func_get_args(); throw new \Exception('msg:'.json_encode($allArgs));

@@ -2,6 +2,7 @@
 
 namespace common\controllers;
 
+use common\ComBase;
 use common\lib\StringHandle;
 use Yii;
 use common\base\UserCommon;
@@ -14,9 +15,10 @@ class ApiCommonContoller extends BaseContoller
 {
     public $enableCsrfValidation = false;
     public $excludeAccessLog = [];
-    public $user = null;
+    public $user = null;//user非空表示已经进行数据库查询
     public $userId = 0;//控制器userid
-    public $userType = 0;//控制器usertype
+    public $userType = 0;//控制器usertype 主要判断是否为正式用户游客等
+    public $shortToken = null; //jwt.后的短token值 用于进行数据库比较
 
     public function beforeAction($action)
     {
@@ -101,11 +103,16 @@ class ApiCommonContoller extends BaseContoller
                 $nowTime = time();
                 $jwtTime =  intval($jwtUser->o_t??0);
                 if(empty($jwtTime) || $nowTime<$jwtTime){
+                    $tokenArr = explode('.');
                     $this->userId  = intval($jwtUser->u_i??0);
                     $this->userType = intval($jwtUser->u_t??0);
+                    $this->shortToken = end($tokenArr);
+                }else{
+                    return ComBase::CODE_LOGIN_EXPIRE;
                 }
             }
         }
+        return ComBase::CODE_RUN_SUCCESS;
     }
 
     /**

@@ -2,6 +2,7 @@
 return [
     'project_name' => 'ICE',//项目名称用于各类提示信息title
     'md5_tmp_key' => 'ice_world',//md5临时加密秘钥用于图片路径,jwtToken生成等场景 可变更不影响使用
+    'jwt_md5_key' => 'ice_world',//jwtToken生成等场景,可变更但会导致目前的登录失效
     'md5_forever_key' => 'ice_world',//md5 永久加密key 项目初始化时修改后将不能再修改避免影响用户密码登录
     'adminAutoLoginKey'=>'ien5l3Kjrb',//后台加密串 初始化时修改 修改后将导致后台自动登录需要重新登录一次
     'save_access_log' => true, //保存访问日志,根据情况缓存日志

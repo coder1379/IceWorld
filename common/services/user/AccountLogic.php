@@ -63,6 +63,26 @@ class AccountLogic
     }
 
     /**
+     * 写入用户密码类登录绑定表
+     * @param $userId
+     * @param $type
+     * @param $key
+     * @return bool
+     * @throws \yii\db\Exception
+     */
+    private function insertUserLoginBindWithPwd($userId, $type, $key)
+    {
+        if (empty($userId) || empty($type) || empty($key)) {
+            $allArgs = func_get_args();
+            throw new \Exception('insertUserLoginBindWithPwd 写入用户登录绑定表参数不能为空:' . json_encode($allArgs));
+        }
+
+        $insertSql = 'INSERT INTO {{%user_login_bind}} (`user_id`, `type`, `bind_key`) VALUES (:user_id,:type,:bind_key);';
+        Yii::$app->db->createCommand($insertSql, [':user_id' => $userId, ':type' => $type, ':bind_key' => $key])->execute();
+        return Yii::$app->db->getLastInsertID();
+    }
+
+    /**
      * 更新登录设备信息token等,$deviceArr必须通过getDeviceInfo获取保障内容不能为空
      * @param $userId
      * @param $token
@@ -73,37 +93,111 @@ class AccountLogic
     private function updateUserLoginDevice($userId, $token, $deviceArr)
     {
         if (empty($userId) || empty($token) || empty($deviceArr['code']) || $deviceArr['code'] != ComBase::CODE_RUN_SUCCESS) {
-            throw new \Exception('updateUserLoginDevice 更新用户登录设备参数错误');
+            $allArgs = func_get_args();
+            throw new \Exception('updateUserLoginDevice 更新用户登录设备参数错误:' . json_encode($allArgs));
         }
-        $deviceCode = $deviceArr['device_code'] ?? '';//设备号
+        $deviceId = 0;
+        $deviceCode = $deviceArr['data']['device_code'] ?? '';//设备号
         $userDeviceData = $this->getUserLoginDeviceByDeviceCode($userId, $deviceCode);
         if (!empty($userDeviceData)) {
+            $deviceId = intval($userDeviceData['id']);
             $updateSql = 'update {{%user_login_device}} set token=:token where id=:id';
-            Yii::$app->db->createCommand($updateSql, [':id' => $userDeviceData['id']])->execute();
+            Yii::$app->db->createCommand($updateSql, [':token'=>$token,':id' => $deviceId])->execute();
         } else {
-            $deviceType = $deviceArr['device_type'];//设备类型
-            $deviceSystem = $deviceArr['system'];//设备系统
-            $deviceModel = $deviceArr['model'];//设备型号
-            $deviceDesc = $deviceArr['device_desc'];//设备描述
+            $deviceType = $deviceArr['data']['device_type'];//设备类型
+            $deviceSystem = $deviceArr['data']['system'];//设备系统
+            $deviceModel = $deviceArr['data']['model'];//设备型号
+            $deviceDesc = $deviceArr['data']['device_desc'];//设备描述
             try {
                 $insertSql = 'INSERT INTO {{%user_login_device}} (`user_id`, `device_code`, `type`, `system`, `model`, `token`, `add_time`, `device_desc`) VALUES (:user_id,:device_code,:type,:system,:model,:token,:add_time,:device_desc);';
-                Yii::$app->db->createCommand($insertSql, [':user_id' => $userId,':device_code'=>$deviceCode,':type'=>$deviceType,':system'=>$deviceSystem,':model'=>$deviceModel,':token'=>$token,':add_time'=>time(),':device_desc'=>$deviceDesc])->execute();
+                Yii::$app->db->createCommand($insertSql, [':user_id' => $userId, ':device_code' => $deviceCode, ':type' => $deviceType, ':system' => $deviceSystem, ':model' => $deviceModel, ':token' => $token, ':add_time' => time(), ':device_desc' => $deviceDesc])->execute();
+                $deviceId = intval(Yii::$app->db->getLastInsertID());
             } catch (\Exception $ex) {
                 Yii::error('写入登录设备信息错误:' . $ex->getMessage());
             }
         }
 
-        return true;
+        return $deviceId;
     }
 
+    /**
+     * 获取用户设备信息by user_id 设备号
+     * @param $userId
+     * @param $deviceCode
+     * @param int $type
+     * @return array|false
+     * @throws \yii\db\Exception
+     */
     private function getUserLoginDeviceByDeviceCode($userId, $deviceCode, $type = 0)
     {
         if (empty($userId) || empty($deviceCode)) {
-            throw new \Exception('getUserLoginDeviceByDeviceCode 获取用户设备信息参数不能为空');
+            $allArgs = func_get_args();
+            throw new \Exception('getUserLoginDeviceByDeviceCode 获取用户设备信息参数不能为空:' . json_encode($allArgs));
         }
 
         $sql = 'select id,user_id,type,device_code from {{%user_login_device}} where user_id=:user_id and device_code=:device_code limit 1';
         return Yii::$app->db->createCommand($sql, [':user_id' => $userId, ':device_code' => $deviceCode])->queryOne();
+    }
+
+    /**
+     * 设备token续签
+     * @param $data
+     * @return array
+     */
+    public function deviceTokenRenewal($userId,$data)
+    {
+        $token = '';
+
+        if (empty($userId)) {
+            return ComBase::getNoLoginReturnArray();
+        }
+
+        $shortToken = null;
+        $oldToken = Yii::$app->request->post('token', '');
+        if(!empty($oldToken) && strlen($oldToken)<500){
+            $jwtUser = UserCommon::decodeUserLoginToken($oldToken);
+            if(!empty($jwtUser)){
+                $nowTime = time()-3600;
+                $jwtTime =  intval($jwtUser->o_t??0);
+                if(empty($jwtTime) || $nowTime>$jwtTime){
+                    return ComBase::getReturnArray(['token' => $oldToken]);//如果过期时间为0或者离过期超过1小时则直接返回当前token,防止无意义刷新
+                }
+                $tempTokenArr = explode('.',$oldToken);
+                $shortToken = end($tempTokenArr);
+            }
+        }
+
+        if(empty($shortToken)){
+            return ComBase::getNoLoginReturnArray();
+        }
+
+        $deviceArr = $this->getDeviceInfo($data);
+        if ($deviceArr['code'] !== ComBase::CODE_RUN_SUCCESS) {
+            return ComBase::getNoLoginReturnArray();
+        }
+
+        $deviceData = UserCommon::getUserDeviceByUserIdToken($userId, $shortToken);
+        if(empty($deviceData)){
+            return ComBase::getNoLoginReturnArray();
+        }
+
+        //todo 处理app跳转web续签问题
+
+        /*if (!empty($bindData)) {
+            $userData = UserCommon::getUserByid($bindData['user_id']);//通过登录绑定的user_id获取用户密码
+            if (!empty($userData) && !empty($userData['login_password']) && $userData['login_password'] === UserCommon::getUserLoginMd5Password($password)) {
+                $userId = $userData['id'];
+                $tokenArr = UserCommon::getUserLoginToken($userId, $userData['type']);
+                //更新用户设备信息
+                $deviceId = $this->updateUserLoginDevice($userId, $tokenArr['token'], $deviceArr);
+
+                $this->insertUserLoginLog($userId, $bindData['id'], $deviceId, UserCommon::USER_LOGIN_TYPE_USERNAME, $deviceArr);//写入登录日志
+
+                return ComBase::getReturnArray(['token' => $tokenArr['jwt_token']]);
+            }
+        }*/
+
+        return ComBase::getParamsErrorReturnArray('账号或密码错误');
     }
 
     /**
@@ -140,19 +234,64 @@ class AccountLogic
         if (!empty($bindData)) {
             $userData = UserCommon::getUserByid($bindData['user_id']);//通过登录绑定的user_id获取用户密码
             if (!empty($userData) && !empty($userData['login_password']) && $userData['login_password'] === UserCommon::getUserLoginMd5Password($password)) {
-                $token = UserCommon::getUserLoginToken($userData['id'], $userData['type']);
-                $tokenArr = explode('.', $token);
+                $userId = $userData['id'];
+                $tokenArr = UserCommon::getUserLoginToken($userId, $userData['type']);
                 //更新用户设备信息
-                $this->updateUserLoginDevice($userData['id'], end($tokenArr), $deviceArr);
+                $deviceId = $this->updateUserLoginDevice($userId, $tokenArr['token'], $deviceArr);
 
+                $this->insertUserLoginLog($userId, $bindData['id'], $deviceId, UserCommon::USER_LOGIN_TYPE_USERNAME, $deviceArr);//写入登录日志
 
-                return ComBase::getReturnArray(['token' => $token]);
+                return ComBase::getReturnArray(['token' => $tokenArr['jwt_token']]);
             }
         }
 
         return ComBase::getParamsErrorReturnArray('账号或密码错误');
     }
 
+    /**
+     * 写入用户登录日志,$deviceArr必须通过getDeviceInfo获取保障内容不能为空
+     * @param int $userId
+     * @param int $bindId
+     * @param int $deviceId
+     * @param int $loginType
+     * @param $deviceArr
+     * @return bool
+     */
+    private function insertUserLoginLog($userId = 0, $bindId = 0, $deviceId = 0, $loginType = 0, $deviceArr)
+    {
+        $deviceCode = $deviceArr['data']['device_code'] ?? '';//设备号
+        $deviceType = $deviceArr['data']['device_type'] ?? 0;//设备类型
+        $deviceSystem = $deviceArr['data']['system'] ?? '';//设备系统
+        $deviceModel = $deviceArr['data']['model'] ?? '';//设备型号
+        $deviceDesc = $deviceArr['data']['device_desc'] ?? '';//设备描述
+        try {
+            $insertSql = 'INSERT INTO {{%user_login_log}} (`user_id`,`bind_id`,`device_id`,`type`,`login_type`, `device_code`, `system`, `model`,`district`,`device_desc`,`ip`,`add_time`) VALUES (:user_id,:bind_id,:device_id,:type,:login_type,:device_code,:system,:model,:district,:device_desc,:ip,:add_time);';
+            $bindParams = [
+                ':user_id' => $userId,
+                ':bind_id' => $bindId,
+                ':device_id' => $deviceId,
+                ':type' => $deviceType,
+                ':login_type' => $loginType,
+                ':device_code' => $deviceCode,
+                ':system' => $deviceSystem,
+                ':model' => $deviceModel,
+                ':district' => '',
+                ':device_desc' => $deviceDesc,
+                ':ip' => Yii::$app->request->getRemoteIP(),
+                ':add_time' => time(),
+            ];
+            Yii::$app->db->createCommand($insertSql, $bindParams)->execute();
+        } catch (\Exception $ex) {
+            $allArgs = func_get_args();
+            Yii::error('写入登录日志错误:' . $ex->getMessage() . '_' . json_encode($allArgs));
+        }
+
+        return true;
+    }
+
+    private function getUserDefaultName(){
+        return '用户_' . StringHandle::getRandomString(6, 'ACDEFGHIJKLMNOPQRSTUVWXYZ2356789acdefghijkmnpqrstuvwxyz');
+    }
 
     /**
      * 通过用户名密码注册
@@ -204,7 +343,7 @@ class AccountLogic
         $newTime = time();
 
         $userData = [
-            'name' => '用户_' . StringHandle::getRandomString(6, 'ACDEFGHIJKLMNOPQRSTUVWXYZ2356789acdefghijkmnpqrstuvwxyz'),
+            'name' =>$this->getUserDefaultName(),
             'username' => $userName,
             'login_password' => UserCommon::getUserLoginMd5Password($password1),
             'status' => UserCommon::USER_STATUS_YES,
@@ -212,40 +351,32 @@ class AccountLogic
             'add_time' => $newTime,
         ];
 
-        $userLoginBindData = [
-            'type' => UserCommon::USER_LOGIN_TYPE_USERNAME,
-            'bind_key' => $userName,
-        ];
-
         $token = '';
-
+        $userId = 0;
+        $bindId = 0;
+        $deviceId = 0;
         $db = Yii::$app->db;
         $transaction = $db->beginTransaction();
         try {
             $db->createCommand()->insert('{{%user}}', $userData)->execute(); //创建用户主表
             $userId = $db->getLastInsertID();//获取用户主表id
-            $tokenLongStr = UserCommon::getUserLoginToken($userId, UserCommon::USER_TYPE_REGISTER);//获取用户登录token
-            $tempTokenArr = explode('.', $tokenLongStr);
-            $token = $tempTokenArr[1] . '.' . $tempTokenArr[2];
-            $userLoginBindData['user_id'] = $userId;
-            $saveDbToken = end($tempTokenArr);
-
-            $db->createCommand()->insert('{{%user_login_bind}}', $userLoginBindData)->execute();//创建用户登录绑定表
-
-            $this->updateUserLoginDevice($userId, $saveDbToken, $deviceArr);//更新用户登录设备信息
-
+            $tokenArr = UserCommon::getUserLoginToken($userId, UserCommon::USER_TYPE_REGISTER);//获取用户登录token
+            $bindId = $this->insertUserLoginBindWithPwd($userId, UserCommon::USER_LOGIN_TYPE_USERNAME, $userName); //写入用户登录绑定密码类
+            $deviceId = $this->updateUserLoginDevice($userId, $tokenArr['token'], $deviceArr);//更新用户登录设备信息
             $transaction->commit();
         } catch (\Exception $e) {
             $transaction->rollBack();
-            Yii::error('用户注册事务回滚:'.$e->getMessage());
+            Yii::error('registerByUsername 用户注册事务回滚:' . $e->getMessage());
             return ComBase::getServerBusyReturnArray();
         } catch (\Throwable $e) {
             $transaction->rollBack();
-            Yii::error('用户注册事务回滚:'.$e->getMessage());
+            Yii::error('registerByUsername 用户注册事务回滚:' . $e->getMessage());
             return ComBase::getServerBusyReturnArray();
         }
 
-        return ComBase::getReturnArray(['token' => $token]);
+        $this->insertUserLoginLog($userId, $bindId, $deviceId, UserCommon::USER_LOGIN_TYPE_USERNAME, $deviceArr);//注册默认登录并写入登录日志
+
+        return ComBase::getReturnArray(['token' => $tokenArr['jwt_token']]);
     }
 
 

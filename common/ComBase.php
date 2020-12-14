@@ -29,6 +29,10 @@ class ComBase
     const CODE_NO_LOGIN_ERROR = 401;
     const MESSAGE_NO_LOGIN_ERROR = '尚未登录';
 
+    //登录过期需要续签
+    const CODE_LOGIN_EXPIRE = 402;
+    const MESSAGE_LOGIN_EXPIRE = '登录过期';
+
     //没有权限
     const CODE_NO_AUTH_ERROR = 403;
     const MESSAGE_NO_AUTH_ERROR = '没有权限';
