@@ -15,6 +15,7 @@ class UserCommon
 {
     const USER_TYPE_REGISTER = 1;//用户类型注册用户
 
+    const USER_STATUS_DEL = -1;//用户状态删除
     const USER_STATUS_YES = 1;//用户状态正常
 
     const USER_LOGIN_TYPE_USERNAME = 1;//用户登录类型为用户名密码
