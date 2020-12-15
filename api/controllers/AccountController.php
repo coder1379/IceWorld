@@ -64,7 +64,7 @@ class AccountController extends ApiCommonContoller
      */
     public function actionRenewal(){
         $logic = new AccountLogic();
-        $result = $logic->deviceTokenRenewal($this->getUserId(),$this->post());
+        $result = $logic->deviceTokenRenewal($this->post());
         return Json::encode($result);
     }
 

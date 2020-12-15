@@ -103,7 +103,7 @@ class ApiCommonContoller extends BaseContoller
                 $nowTime = time();
                 $jwtTime =  intval($jwtUser->o_t??0);
                 if(empty($jwtTime) || $nowTime<$jwtTime){
-                    $tokenArr = explode('.');
+                    $tokenArr = explode('.',$token);
                     $this->userId  = intval($jwtUser->u_i??0);
                     $this->userType = intval($jwtUser->u_t??0);
                     $this->shortToken = end($tokenArr);

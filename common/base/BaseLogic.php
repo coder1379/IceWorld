@@ -344,7 +344,7 @@ class BaseLogic
             'totalCount' => $count,
         ]);
         $pagination->setPage($paginationParams['page']);//设置获取数据页码
-        $pagination->setPageSize($paginationParams['pageSize']);//设置每页行数
+        $pagination->setPageSize($paginationParams['page_size']);//设置每页行数
         $searchDataQuery->offset($pagination->offset)->limit($pagination->limit);
 
         //获取数据列表
@@ -400,7 +400,7 @@ class BaseLogic
                 $pageSize = $pageSizeParam;
             }
         }
-        $pagination['pageSize'] = $pageSize;
+        $pagination['page_size'] = $pageSize;
         if (!empty($params[$pageParamName])) {
             $pageParam = intval($params[$pageParamName]);
             if ($pageParam > 0) {
