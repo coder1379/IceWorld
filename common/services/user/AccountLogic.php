@@ -215,16 +215,27 @@ class AccountLogic
                     }else{
 
                         if ($deviceType === UserCommon::USER_DEVICE_TYPE_WEB) {
-                            //浏览器类型可以直接续签新浏览器主要用于app内打开网页场景
-                           $deviceId = $this->insertUserLoginDevice($userId, $deviceArr, $tokenArr['token']);
-                           if(empty($deviceId)){
-                               return ComBase::getNoLoginReturnArray(); //添加设备失败,主要发生在app与浏览器非正常数据导致触发了唯一约束，直接要求重新登录
-                           }
+                            $deviceDataWeb = $this->getUserLoginDeviceByDeviceCode($userId, $deviceCode);//获取设备信息
+                            if(!empty($deviceDataWeb)){
+                                $webDeviceType = intval($deviceDataWeb['type']??0);
+                                if($webDeviceType===UserCommon::USER_DEVICE_TYPE_WEB){
+                                   $updateFlg = $this->updateUserLoginDevice($deviceDataWeb['id'], $tokenArr['token']);//浏览器设备号相同视为同一个浏览器直接更新旧token
+                                    if(empty($updateFlg)){
+                                        return ComBase::getNoLoginReturnArray(); //更新旧浏览器token失败返回重新登录
+                                    }
+                                }
+
+                            }else{
+                                //浏览器类型可以直接续签新浏览器主要用于app内打开网页场景
+                                $deviceId = $this->insertUserLoginDevice($userId, $deviceArr, $tokenArr['token']);
+                                if(empty($deviceId)){
+                                    return ComBase::getNoLoginReturnArray(); //添加设备失败,主要发生在app与浏览器非正常数据导致触发了唯一约束，直接要求重新登
+                                }
+                            }
                         } else {
                             return ComBase::getNoLoginReturnArray(); //非浏览器 设备号不相同不能续签
                         }
                     }
-
 
                     return ComBase::getReturnArray(['token' => $tokenArr['jwt_token']]);
                 }
