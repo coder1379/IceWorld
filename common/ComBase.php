@@ -194,6 +194,22 @@ class ComBase
     }
 
     /**
+     * 获取获取一维数组防止异常数据例如前端一维ids数据库保存被串改为2维度
+     * @param $array
+     */
+    public static function getOneArrayByString($array){
+        $retArr = [];
+        if(!empty($array)){
+            foreach ($array as $a) {
+                if(is_string($a)){
+                    $retArr[] = $a;
+                }
+            }
+        }
+        return $retArr;
+    }
+
+    /**
      * 参数错误指定格式返回快捷调用
      * @param null $msg 自定义错误描述为null使用默认
      * @param array $data 自定义数据 为null使用默认空
