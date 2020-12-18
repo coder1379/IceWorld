@@ -20,11 +20,25 @@ class AccountLogic
      * @param $password
      * @return array|bool
      */
-    private function checkPasswordFormat($password)
+    private function checkPasswordFormatReturnError($password)
     {
         //检查密码
         if (!preg_match('/^[a-zA-Z0-9~!@#$%&*_?]{6,30}$/', $password)) {
             return ComBase::getParamsFormatErrorReturnArray('密码格式错误,密码需由字母(区分大小写)数字和~!@#$%&*_?组合，长度为6-30');
+        }
+
+        return false;
+    }
+
+    /**
+     * 检查手机号格式并返回错误信息
+     * @param $mobile
+     * @return array|bool
+     */
+    private function checkMobileFormatReturnError($mobile){
+        //检查手机号格式
+        if (!preg_match('/^1[0-9]{10}$/', $mobile)) {
+            return ComBase::getParamsFormatErrorReturnArray('手机号格式错误');
         }
 
         return false;
@@ -282,8 +296,8 @@ class AccountLogic
         }
 
         //检查密码
-        $pwdRes = $this->checkPasswordFormat($password);
-        if (!empty($pwdRes)) {
+        $pwdRes = $this->checkPasswordFormatReturnError($password);
+        if ($pwdRes!==false) {
             return $pwdRes;
         }
 
@@ -390,14 +404,90 @@ class AccountLogic
         }
 
         //检查密码
-        $pwdRes = $this->checkPasswordFormat($password1);
-        if (!empty($pwdRes)) {
+        $pwdRes = $this->checkPasswordFormatReturnError($password1);
+        if ($pwdRes!==false) {
             return $pwdRes;
         }
 
         if ($password1 !== $password2) {
             return ComBase::getParamsFormatErrorReturnArray('两次密码不匹配');
         }
+
+        $bindUser = UserCommon::getUserLoginBindWithPwdTypes($userName);
+        if (!empty($bindUser)) {
+            return ComBase::getParamsFormatErrorReturnArray('用户名已经存在');
+        }
+
+        //创建user并设置绑定
+        //user表数据
+        $newTime = time();
+
+        $userData = [
+            'name' => $this->getUserDefaultName(),
+            'username' => $userName,
+            'login_password' => UserCommon::getUserLoginMd5Password($password1),
+            'status' => UserCommon::USER_STATUS_YES,
+            'type' => UserCommon::USER_TYPE_REGISTER,
+            'add_time' => $newTime,
+            'app_id' => $appId,
+        ];
+
+        $token = '';
+        $userId = 0;
+        $bindId = 0;
+        $deviceId = 0;
+        $db = Yii::$app->db;
+        $transaction = $db->beginTransaction();
+        try {
+            $db->createCommand()->insert('{{%user}}', $userData)->execute(); //创建用户主表
+            $userId = $db->getLastInsertID();//获取用户主表id
+            $tokenArr = UserCommon::getUserLoginToken($userId, UserCommon::USER_TYPE_REGISTER, $appId);//获取用户登录token
+            $bindId = $this->insertUserLoginBindWithPwd($userId, UserCommon::USER_LOGIN_TYPE_USERNAME, $userName, $appId); //写入用户登录绑定密码类
+            $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);//更新用户登录设备信息
+            $transaction->commit();
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            Yii::error('registerByUsername 用户注册事务回滚:' . $e->getMessage());
+            return ComBase::getServerBusyReturnArray();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            Yii::error('registerByUsername 用户注册事务回滚:' . $e->getMessage());
+            return ComBase::getServerBusyReturnArray();
+        }
+
+        $this->insertUserLoginLog($userId, $bindId, $deviceId, UserCommon::USER_LOGIN_TYPE_USERNAME, $deviceArr, $appId);//注册默认登录并写入登录日志
+
+        return ComBase::getReturnArray(['token' => $tokenArr['jwt_token']]);
+    }
+
+    /**
+     * 通过手机号注册
+     * @param array $data
+     * @return array
+     */
+    public function registerByMobile($data)
+    {
+        if (empty($data) || empty($data['mobile']) || empty($data['code'])) {
+            return ComBase::getParamsErrorReturnArray('手机号或验证码参数错误');
+        }
+
+        $mobile = trim(ComBase::getStrVal('mobile', $data));
+        $code = trim(ComBase::getIntVal('code', $data));
+
+        $appId = 0;//应用ID 0为默认 根据业务自行控制是否需要获取 搜索**app_id** 更换需要app_id逻辑的地方
+
+        $deviceArr = $this->getDeviceInfo($data);//获取并判断设备信息,后续保存用户设备信息使用
+        if ($deviceArr['code'] !== ComBase::CODE_RUN_SUCCESS) {
+            return $deviceArr;
+        }
+
+        //检查手机号
+        $checkRes = $this->checkMobileFormatReturnError($mobile);
+        if($checkRes!==false){
+            return $checkRes;
+        }
+
+
 
         $bindUser = UserCommon::getUserLoginBindWithPwdTypes($userName);
         if (!empty($bindUser)) {
