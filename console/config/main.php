@@ -10,6 +10,9 @@ return [
     'id' => 'app-console',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'console\controllers',
+    'bootstrap'=> [
+        'queue',//控制台加入任务预加载否则无法使用
+    ],
     'components' => [
     ],
     'params' => $params,

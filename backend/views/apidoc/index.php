@@ -83,9 +83,14 @@
                                             class="label label-secondary radius"><?php echo $number; ?></span>.<?php echo $m['tags']['description']; ?>
                                 </h4>
                                 <span style="margin-right: 20px;">URL地址:</span><?php echo $apiRootUrl . $cname . '/' . $key; ?>
-                                <a style="margin-left: 20px;" target="_blank"
+                                <a style="margin-left: 10px;" target="_blank"
                                    href="/apitest/index.html?c=<?php echo $cname . '&a=' . $key; ?>"
                                    class="label label-warning radius">点击测试</a>
+
+                                <a style="margin-left: 10px;"
+                                   href="javascript:void(0);"
+                                   onclick="copyToClipboard('<?php echo $cname.'/'.$key ?>')" class="label label-success radius">点击复制C/A</a>
+
                                 <h4><?php if (!empty($m['tags']['notes'])) {
                                         echo $m['tags']['notes'];
                                     } ?></h4>
