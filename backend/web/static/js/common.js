@@ -182,7 +182,7 @@ function copyToClipboard (text) {
 
     try {
         var successful = document.execCommand('copy');
-        var msg = successful ? '成功复制到剪贴板' : '该浏览器不支持点击复制到剪贴板';
+        var msg = successful ? '成功复制到剪贴板内容:'+text : '该浏览器不支持点击复制到剪贴板';
         alert(msg);
     } catch (err) {
         alert('该浏览器不支持点击复制到剪贴板请手动复制：'+text);

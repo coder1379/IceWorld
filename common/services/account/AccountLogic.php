@@ -1,7 +1,7 @@
 <?php
 
 
-namespace common\services\user;
+namespace common\services\account;
 
 use common\lib\StringHandle;
 use Yii;
@@ -10,7 +10,7 @@ use common\base\UserCommon;
 
 /**
  * 账号逻辑封装用户登录注册等
- * @package common\services\user
+ * @package common\services\account
  */
 class AccountLogic
 {
@@ -487,6 +487,7 @@ class AccountLogic
             return $checkRes;
         }
 
+        #Yii::$app->cache->set()
 
 
         $bindUser = UserCommon::getUserLoginBindWithPwdTypes($userName);

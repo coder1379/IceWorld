@@ -3,7 +3,7 @@
 namespace api\controllers;
 
 use Yii;
-use common\services\user\AccountLogic;
+use common\services\account\AccountLogic;
 use common\controllers\ApiCommonContoller;
 use yii\helpers\Json;
 

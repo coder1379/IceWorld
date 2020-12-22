@@ -3,7 +3,6 @@ return [
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
 	'timeZone' => 'Asia/Shanghai',
     'bootstrap'=> [
-        'queue',
         'log',
     ],
     'components' => [
@@ -32,10 +31,13 @@ return [
             //'redis' => 'redis',//redis对象id
             //reids end````
 
-            'channel' => 'yii_queue_default', // Queue channel key
+            'channel' => 'ice_world_yii_queue', // 前缀名多项目共用redis需配置不同前缀
             'ttr' => 5, // Max time for anything job handling
             'attempts' => 3, // Max number of attempts
             'as log'=> \yii\queue\LogBehavior::class,//日志
+        ],
+        'cache' => [
+            'class' => 'yii\caching\FileCache',
         ],
     ],
 ];

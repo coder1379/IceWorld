@@ -7,7 +7,7 @@ ICE WORLD
 2.创建db,
 3.导入db,
 4.配置api,admin域名,static(选择)
-5.修改environments dev,befprod,prod common/main-local.php common/params-local.php对应参数, 执行init
+5.修改environments dev,befprod,prod 下 common/main-local.php common/params-local.php对应参数, 执行init
 6.修改commmon/params.php对应参数
 7.添加systemd queue守护进程 详见：systemd 常见配置
 8.添加crontab 钉钉错误提醒机器人 crontab代码如下,注意配置钉钉机器人token，并设置消息关键字 异常日志
@@ -246,3 +246,5 @@ python:pip install PyJWT
 ####强制使用索引 select *from table force index(user_id)...
 
 ####抛出异常并写入参数  $allArgs = func_get_args(); throw new \Exception('msg:'.json_encode($allArgs));
+
+##@需要完善@ 搜索查找需要完善的地方

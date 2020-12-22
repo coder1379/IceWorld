@@ -45,7 +45,7 @@ class ApidocController extends AuthController
 
         $controllers = FileHelper::findFiles($path, $options);
         $apiReflection = new ApiReflection();
-
+        asort($controllers);
         foreach ($controllers as $c) {
             $carr = explode("/", $c);
             $carr = explode("\\", end($carr));
