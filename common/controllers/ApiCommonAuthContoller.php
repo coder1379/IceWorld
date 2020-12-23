@@ -2,7 +2,7 @@
 
 namespace common\controllers;
 
-use common\base\UserCommon;
+use common\services\account\AccountCommon;
 use common\ComBase;
 use Yii;
 use yii\helpers\Json;
@@ -41,7 +41,7 @@ class ApiCommonAuthContoller extends ApiCommonContoller
         //二次校验是否在需要进行短token数据库查询验证的actions数组内，存在则进行token数据库校验
         if (!empty($this->verifyShortTokenActions) && in_array($actionId, $this->verifyShortTokenActions)) {
             $appId = 0;//此处app_id使用默认0 根据业务调整是否需要验证app_id，例如是否运行跨app使用相同jwt等
-            $deviceData = UserCommon::getUserDeviceByUserIdToken($this->userId, $this->shortToken, $appId);
+            $deviceData = AccountCommon::getAccountDeviceByUserIdToken($this->userId, $this->shortToken, $appId);
             if (empty($deviceData)) {
                 //通过token未查询到对应设备，没有权限
                 echo Json::encode($this->getJsonArray([], ComBase::CODE_NO_LOGIN_ERROR, ComBase::MESSAGE_NO_LOGIN_ERROR));

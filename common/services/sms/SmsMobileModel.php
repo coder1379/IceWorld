@@ -136,7 +136,7 @@ class SmsMobileModel extends \yii\db\ActiveRecord
         return [];
         //根据实际使用完善下方获取列表功能
         /*
-        $array = UserModel::find()->select('id,name')->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL])->orderBy("id desc")->limit(100)->asArray()->all();
+        $array = UserModel::find()->select('id,name')->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE])->orderBy("id desc")->limit(100)->asArray()->all();
         $newArr = [];
 
         if(empty($array)!=true){

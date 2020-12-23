@@ -81,7 +81,7 @@ class UserSearch extends UserModel
             ->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'token', $this->token]);
 
-        $query->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤
+        $query->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤
         
             $query->addOrderBy('id desc');
             

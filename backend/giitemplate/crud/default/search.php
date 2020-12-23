@@ -112,7 +112,7 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
 
         <?php
         if($includeDelete==1){
-            echo "\$query->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤";
+            echo "\$query->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤";
         }
         ?>
 
