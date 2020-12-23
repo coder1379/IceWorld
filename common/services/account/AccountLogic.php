@@ -6,7 +6,7 @@ namespace common\services\account;
 use common\lib\StringHandle;
 use Yii;
 use common\ComBase;
-use common\base\UserCommon;
+use common\services\user\UserCommon;
 
 /**
  * 账号逻辑封装用户登录注册等
@@ -190,7 +190,7 @@ class AccountLogic
         $appId = 0;//应用ID 0为默认 根据业务自行控制是否需要获取 搜索**app_id** 更换需要app_id逻辑的地方 根据业务可以选择由前端传入或者从jwt中获取a_i
 
         if (!empty($oldToken) && strlen($oldToken) < 500) {
-            $jwtUser = UserCommon::decodeUserLoginToken($oldToken);
+            $jwtUser = AccountCommon::decodeUserLoginToken($oldToken);
             if (!empty($jwtUser)) {
                 $nowTime = time();
                 $userId = $jwtUser->u_i ?? 0;
@@ -224,12 +224,12 @@ class AccountLogic
                     }
 
                     try {
-                        $deviceData = UserCommon::getUserDeviceByUserIdToken($userId, $shortToken, $appId);//获取设备信息
+                        $deviceData = AccountCommon::getAccountDeviceByUserIdToken($userId, $shortToken, $appId);//获取设备信息
                         $userData = UserCommon::getUserByid($userId);//获取用户信息判断是否续签，防止问题用户无限续签
                         if (!empty($deviceData) && !empty($userData)) {
                             $userStatus = intval($userData['status']);
                             if ($userStatus > UserCommon::USER_STATUS_DEL) {//如果是已经删除的用户则无法续签，这里自行根据业务修改用户状态判断值
-                                $tokenArr = UserCommon::getUserLoginToken($userId, $userData['type'], $appId);
+                                $tokenArr = AccountCommon::getUserLoginToken($userId, $userData['type'], $appId);
                                 $deviceType = $deviceArr['data']['device_type'];//设备类型
                                 $deviceCode = $deviceArr['data']['device_code'] ?? '';//设备号
                                 $dbDeviceType = intval($deviceData['type']);
@@ -306,12 +306,12 @@ class AccountLogic
             return $deviceArr;
         }
 
-        $bindData = UserCommon::getUserLoginBindWithPwdTypes($userName, $appId);
+        $bindData = AccountCommon::getUserLoginBindWithPwdTypes($userName, $appId);
         if (!empty($bindData)) {
             $userData = UserCommon::getUserByid($bindData['user_id']);//通过登录绑定的user_id获取用户密码
-            if (!empty($userData) && !empty($userData['login_password']) && $userData['login_password'] === UserCommon::getUserLoginMd5Password($password)) {
+            if (!empty($userData) && !empty($userData['login_password']) && $userData['login_password'] === AccountCommon::getUserLoginMd5Password($password)) {
                 $userId = $userData['id'];
-                $tokenArr = UserCommon::getUserLoginToken($userId, $userData['type']);
+                $tokenArr = AccountCommon::getUserLoginToken($userId, $userData['type']);
                 //更新用户设备信息
                 $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);
 
@@ -413,7 +413,7 @@ class AccountLogic
             return ComBase::getParamsFormatErrorReturnArray('两次密码不匹配');
         }
 
-        $bindUser = UserCommon::getUserLoginBindWithPwdTypes($userName);
+        $bindUser = AccountCommon::getUserLoginBindWithPwdTypes($userName);
         if (!empty($bindUser)) {
             return ComBase::getParamsFormatErrorReturnArray('用户名已经存在');
         }
@@ -425,7 +425,7 @@ class AccountLogic
         $userData = [
             'name' => $this->getUserDefaultName(),
             'username' => $userName,
-            'login_password' => UserCommon::getUserLoginMd5Password($password1),
+            'login_password' => AccountCommon::getUserLoginMd5Password($password1),
             'status' => UserCommon::USER_STATUS_YES,
             'type' => UserCommon::USER_TYPE_REGISTER,
             'add_time' => $newTime,
@@ -441,7 +441,7 @@ class AccountLogic
         try {
             $db->createCommand()->insert('{{%user}}', $userData)->execute(); //创建用户主表
             $userId = $db->getLastInsertID();//获取用户主表id
-            $tokenArr = UserCommon::getUserLoginToken($userId, UserCommon::USER_TYPE_REGISTER, $appId);//获取用户登录token
+            $tokenArr = AccountCommon::getUserLoginToken($userId, UserCommon::USER_TYPE_REGISTER, $appId);//获取用户登录token
             $bindId = $this->insertUserLoginBindWithPwd($userId, UserCommon::USER_LOGIN_TYPE_USERNAME, $userName, $appId); //写入用户登录绑定密码类
             $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);//更新用户登录设备信息
             $transaction->commit();
@@ -490,7 +490,7 @@ class AccountLogic
         #Yii::$app->cache->set()
 
 
-        $bindUser = UserCommon::getUserLoginBindWithPwdTypes($userName);
+        $bindUser = AccountCommon::getUserLoginBindWithPwdTypes($userName);
         if (!empty($bindUser)) {
             return ComBase::getParamsFormatErrorReturnArray('用户名已经存在');
         }
@@ -502,7 +502,7 @@ class AccountLogic
         $userData = [
             'name' => $this->getUserDefaultName(),
             'username' => $userName,
-            'login_password' => UserCommon::getUserLoginMd5Password($password1),
+            'login_password' => AccountCommon::getUserLoginMd5Password($password1),
             'status' => UserCommon::USER_STATUS_YES,
             'type' => UserCommon::USER_TYPE_REGISTER,
             'add_time' => $newTime,
@@ -518,7 +518,7 @@ class AccountLogic
         try {
             $db->createCommand()->insert('{{%user}}', $userData)->execute(); //创建用户主表
             $userId = $db->getLastInsertID();//获取用户主表id
-            $tokenArr = UserCommon::getUserLoginToken($userId, UserCommon::USER_TYPE_REGISTER, $appId);//获取用户登录token
+            $tokenArr = AccountCommon::getUserLoginToken($userId, UserCommon::USER_TYPE_REGISTER, $appId);//获取用户登录token
             $bindId = $this->insertUserLoginBindWithPwd($userId, UserCommon::USER_LOGIN_TYPE_USERNAME, $userName, $appId); //写入用户登录绑定密码类
             $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);//更新用户登录设备信息
             $transaction->commit();

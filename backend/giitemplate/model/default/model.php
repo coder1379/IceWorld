@@ -198,7 +198,7 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . 
         return [];
         //根据实际使用完善下方获取列表功能
         /*
-        $array = <?php echo $jsonV["modelName"]; ?>::find()->select('<?php echo $jsonV["selectFeild"]; ?>')->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL])->orderBy("<?php echo $idFeildArr[0]; ?> desc")->limit(100)->asArray()->all();
+        $array = <?php echo $jsonV["modelName"]; ?>::find()->select('<?php echo $jsonV["selectFeild"]; ?>')->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE])->orderBy("<?php echo $idFeildArr[0]; ?> desc")->limit(100)->asArray()->all();
         $newArr = [];
 
         if(empty($array)!=true){

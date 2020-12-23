@@ -135,7 +135,7 @@ class SmsmobileController extends AuthController
             $deleteFlag = 0;
             if(isset($obj->status)){ //有状态自动自动走软删除设置为-1
                 $obj->scenario = 'delete';//删除场景，控制字段安全
-                $obj->status = ComBase::DB_IS_DELETE_VAL;
+                $obj->status = ComBase::STATUS_COMMON_DELETE;
                 $deleteFlag = $obj->update();
             }else{
                 $deleteFlag = $obj->delete();

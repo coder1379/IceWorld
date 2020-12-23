@@ -129,7 +129,7 @@ class <?= $logicModelClass ?>
 
         <?php
         if($includeIsDelete == 1){ //包含status 默认加入status > -1;
-            echo "\$queryModel->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤";
+            echo "\$queryModel->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤";
         }
         ?>
 
@@ -174,8 +174,8 @@ class <?= $logicModelClass ?>
         }
 
         //设置status=-1 标记删除
-        $params['status'] = ComBase::DB_IS_DELETE_VAL;
-        $queryModel = <?php echo $modelClass; ?>::find()->andWhere(['id'=>$id])->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);
+        $params['status'] = ComBase::STATUS_COMMON_DELETE;
+        $queryModel = <?php echo $modelClass; ?>::find()->andWhere(['id'=>$id])->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);
         <?php
         if($includeUserId == 1){ //包含user_id 默认加入user_id;
             echo "\$queryModel->andWhere(['user_id'=>\$currentUserId]);//***默认加入了user_id过滤";
@@ -263,7 +263,7 @@ class <?= $logicModelClass ?>
         $detailQuery->where($where);
         <?php
         if($includeIsDelete == 1){ //包含status 默认加入status > -1;
-            echo "\$detailQuery->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤";
+            echo "\$detailQuery->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤";
         }
         ?>
 
@@ -303,7 +303,7 @@ class <?= $logicModelClass ?>
         $searchDataQuery->where($where);
         <?php
         if($includeIsDelete == 1){ //包含status 默认加入status > -1;
-            echo "\$searchDataQuery->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//默认添加标记删除标识";
+            echo "\$searchDataQuery->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//默认添加标记删除标识";
         }
         ?>
 

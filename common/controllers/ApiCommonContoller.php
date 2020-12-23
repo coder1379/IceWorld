@@ -4,8 +4,8 @@ namespace common\controllers;
 
 use common\ComBase;
 use common\lib\StringHandle;
+use common\services\account\AccountCommon;
 use Yii;
-use common\base\UserCommon;
 
 
 /**
@@ -98,7 +98,7 @@ class ApiCommonContoller extends BaseContoller
         $token = $this->post('token', '');
         if (!empty($token) && strlen($token) < 500) {
             //只填充user_id和user_type,user通过实际需要的时候查询数据库获得
-            $jwtUser = UserCommon::decodeUserLoginToken($token);
+            $jwtUser = AccountCommon::decodeUserLoginToken($token);
             if(!empty($jwtUser)){
                 $nowTime = time();
                 $jwtTime =  intval($jwtUser->o_t??0);

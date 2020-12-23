@@ -68,7 +68,7 @@ class UserLogic
 
         $queryModel = UserApiModel::find()->andWhere(['id'=>$id]);
         
-        $queryModel->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤
+        $queryModel->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤
         $model = $queryModel->limit(1)->one();
 
         if (empty($model)) {
@@ -110,8 +110,8 @@ class UserLogic
         }
 
         //设置status=-1 标记删除
-        $params['status'] = ComBase::DB_IS_DELETE_VAL;
-        $queryModel = UserApiModel::find()->andWhere(['id'=>$id])->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);
+        $params['status'] = ComBase::STATUS_COMMON_DELETE;
+        $queryModel = UserApiModel::find()->andWhere(['id'=>$id])->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);
         
         $model = $queryModel->limit(1)->one();
 
@@ -182,7 +182,7 @@ class UserLogic
         $where = ['id' => $id];
         
         $detailQuery->where($where);
-        $detailQuery->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤
+        $detailQuery->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤
         //获取输出字段
         $printFields = $detailModel->fieldsScenarios()[$fieldScenarios];
 
@@ -212,7 +212,7 @@ class UserLogic
         $where = [];//添加过滤条件，注意默认是无条件的
         
         $searchDataQuery->where($where);
-        $searchDataQuery->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//默认添加标记删除标识
+        $searchDataQuery->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//默认添加标记删除标识
         $searchDataQuery->orderBy('id desc');//添加默认排序规则
 
         //获取输出字段

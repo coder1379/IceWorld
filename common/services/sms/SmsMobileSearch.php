@@ -84,7 +84,7 @@ class SmsMobileSearch extends SmsMobileModel
             ->andFilterWhere(['like', 'remark', $this->remark]);
 
 
-        $query->andWhere(['>','status',ComBase::DB_IS_DELETE_VAL]);//自动加入删除过滤
+        $query->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤
 
         $query->with('userRecord');
         

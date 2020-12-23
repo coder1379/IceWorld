@@ -14,8 +14,8 @@ class ComBase
     const MESSAGE_UPDATE_SUCCESS = '修改成功';
     const MESSAGE_DELETE_SUCCESS = '删除成功';
 
-    const DB_IS_DELETE_VAL = -1; //数据库为删除的数据标记
-
+    const STATUS_COMMON_DELETE = -1;//状态通用的删除值,不同自行定义
+    const STATUS_COMMON_YES = 1;//状态通用的YES状态值,不同自行定义
 
     //成功
     const CODE_RUN_SUCCESS = 200; //执行成功code = 200,大于200的返回值都视为发生错误,小于200的数值也为成功可做特殊使用
