@@ -54,6 +54,21 @@ class AccountController extends ApiCommonContoller
     }
 
     /**
+     * 发送手机短信验证码
+     * @notes
+     * @param string $mobile 手机号 1
+     * @param string $area_code 区号(默认空) 0
+     * @param int $scene 场景(1=注册,2=登录,3=忘记密码) 1
+     * @return json yes {"code":200}
+     */
+    public function actionSendmobilecode()
+    {
+        $logic = new AccountLogic();
+        $result = $logic->sendMobileCode($this->post());
+        return Json::encode($result);
+    }
+
+    /**
      * 账号密码登录
      * @notes
      * @param string $username 用户名 1

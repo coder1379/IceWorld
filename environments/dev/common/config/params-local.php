@@ -1,6 +1,6 @@
 <?php
 return [
-    'sendsms' =>false,//覆盖params里面的短信发送，测试地址短信不发送
+    'send_sms' =>false,//覆盖params里面的短信发送，测试地址短信不发送
     'oss' => [ //测试环境覆盖生产oss参数
         'accessKeyId' => '11111',
         'accessKeySecret' => '11111',

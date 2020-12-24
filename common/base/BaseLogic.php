@@ -39,10 +39,11 @@ class BaseLogic
      * @return array
      * @throws \Exception
      */
-    public static function getLogicInclude($model, $include = [])
+    public static function getLogicInclude($model, $include = null)
     {
+        $returnList = [];
         if (!empty($include)) {
-            $returnList = [];
+
             foreach ($include as $obj) {
                 $recordName = $obj['name'];
                 $fields = $obj['fields']; //在获取非model数据时fields可以不传
@@ -100,11 +101,31 @@ class BaseLogic
     }
 
     /**
-     * 获取模型的错误数组模式，并将第一个错误格式化到返回错误中
+     * 获取第一个错误并返回return格式
      * @param $errors
      * @return array
      */
-    public static function getModelErrorsToArray($errors)
+    public static function getModelFirstErrorArray($errors)
+    {
+        $firstErrorStr = ComBase::MESSAGE_PARAM_FORMAT_ERROR.':'.ComBase::CODE_PARAM_FORMAT_ERROR;
+
+        if(!empty($errors)){
+            $tempArr = current($errors);
+            $tempStr = current($tempArr);
+            if(!empty($tempStr)){
+                $firstErrorStr = $tempStr;
+            }
+        }
+        //可自行扩展是否返回错误字段信息
+        return ComBase::getReturnArray([], ComBase::CODE_PARAM_FORMAT_ERROR, $firstErrorStr);
+    }
+
+    /**
+     * 获取model的所有错误内容并返回数组
+     * @param $errors
+     * @return array
+     */
+    public static function getModelAllErrorArray($errors)
     {
         $returnErrors = ['all' => [], 'first' => ['k' => 0, 'v' => '']];
         if (!empty($errors)) {
@@ -118,21 +139,7 @@ class BaseLogic
                 }
             }
         }
-        return $returnErrors;
-    }
-
-    /**
-     *  将 getModelErrorsToArray 格式化后的数据再次格式化为直接能返回前端的数据,根据params设置的returnAllErrors 控制是否输出全部错误
-     * @param $errors
-     * @return array
-     */
-    public static function getFormatErrorsArray($errors)
-    {
-        $returnData = null;//['firstKey' => $errors['first']['k']];//仅返回错误描述，不返回错误字段需要自行开启
-        if (Yii::$app->params['returnAllErrors'] == true) {
-            $returnData['allErrors'] = $errors['all'];
-        }
-        return ComBase::getReturnArray($returnData, ComBase::CODE_PARAM_FORMAT_ERROR, $errors['first']['v']);
+        return ComBase::getReturnArray($returnErrors,ComBase::CODE_PARAM_FORMAT_ERROR,ComBase::MESSAGE_PARAM_FORMAT_ERROR);
     }
 
     /**
@@ -167,7 +174,7 @@ class BaseLogic
                 }
             } else {
                 //获取并返回错误内容数组
-                return self::getFormatErrorsArray(self::getModelErrorsToArray($model->getErrors()));
+                return self::getModelFirstErrorArray($model->getErrors());
             }
         }
 
@@ -206,7 +213,7 @@ class BaseLogic
                 }
             } else {
                 //获取并返回错误内容数组
-                return self::getFormatErrorsArray(self::getModelErrorsToArray($model->getErrors()));
+                return self::getModelFirstErrorArray($model->getErrors());
             }
         }
 
@@ -245,7 +252,7 @@ class BaseLogic
                 }
             } else {
                 //获取并返回错误内容数组
-                return self::getFormatErrorsArray(self::getModelErrorsToArray($model->getErrors()));
+                return self::getModelFirstErrorArray($model->getErrors());
             }
         }
 

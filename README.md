@@ -16,7 +16,7 @@ ICE WORLD
 * * * * * /usr/local/php74/bin/php /data/wwwroot/yii2/yii index/systemtour
 ```
 9.根据需求修改模板框架以提高开发速度,注意user仅可覆盖admin后台相关与apimodel，userLogic与userController不能覆盖齐相关内容
-10.发布与测试
+10.发布与测试,根据是否有redis选择 CaptchaLogic 缓存方式
 
 ===============
 
@@ -248,3 +248,5 @@ python:pip install PyJWT
 ####抛出异常并写入参数  $allArgs = func_get_args(); throw new \Exception('msg:'.json_encode($allArgs));
 
 ##@需要完善@ 搜索查找需要完善的地方
+
+## mongodb 可选包： "yiisoft/yii2-mongodb": "^2.1"(yii2支持mongo但不支持objectID转换string,优先使用), "mongodb/mongodb": "1.6.0"(配合MongoLib原生使用,主要能对objectid作为string时使用), 可两个同时使用

@@ -4,6 +4,11 @@
 namespace common\services\account;
 
 use common\lib\StringHandle;
+use common\queues\SendMobileSmsJobs;
+use common\services\captcha\CaptchaLogic;
+use common\services\sms\SmsCommon;
+use common\services\sms\SmsMobileApiModel;
+use common\services\sms\SmsMobileLogic;
 use Yii;
 use common\ComBase;
 use common\services\user\UserCommon;
@@ -35,7 +40,8 @@ class AccountLogic
      * @param $mobile
      * @return array|bool
      */
-    private function checkMobileFormatReturnError($mobile){
+    private function checkMobileFormatReturnError($mobile)
+    {
         //检查手机号格式
         if (!preg_match('/^1[0-9]{10}$/', $mobile)) {
             return ComBase::getParamsFormatErrorReturnArray('手机号格式错误');
@@ -46,12 +52,12 @@ class AccountLogic
 
     /**
      * 获取设备信息 如有错误并返回错误信息
-     * @param $data
+     * @param $params
      * @return array
      */
-    private function getDeviceInfo($data)
+    private function getDeviceInfo($params)
     {
-        $deviceType = ComBase::getIntVal('device_type', $data); //设备类型
+        $deviceType = ComBase::getIntVal('device_type', $params); //设备类型
         if (!in_array($deviceType, UserCommon::USER_DEVICE_ARR, true)) {
             return ComBase::getParamsErrorReturnArray('设备类型参数错误');
         }
@@ -62,13 +68,13 @@ class AccountLogic
 
         if ($deviceType === UserCommon::USER_DEVICE_TYPE_WEB) {
             $deviceDesc = Yii::$app->request->getUserAgent();
-            $deviceCode = trim(ComBase::getStrVal('device_code', $data));
+            $deviceCode = trim(ComBase::getStrVal('device_code', $params));
             $userDeviceSystem = StringHandle::getWebSystem($deviceDesc);
             $userDeviceModel = StringHandle::getBrowser($deviceDesc);
         } else {
-            $deviceCode = trim(ComBase::getStrVal('device_code', $data));
-            $userDeviceSystem = trim(ComBase::getStrVal('system', $data));
-            $userDeviceModel = trim(ComBase::getStrVal('model', $data));
+            $deviceCode = trim(ComBase::getStrVal('device_code', $params));
+            $userDeviceSystem = trim(ComBase::getStrVal('system', $params));
+            $userDeviceModel = trim(ComBase::getStrVal('model', $params));
         }
         if (empty($deviceCode) || empty($userDeviceSystem) || empty($userDeviceModel)) {
             return ComBase::getParamsErrorReturnArray('device相关参数错误');
@@ -178,10 +184,10 @@ class AccountLogic
 
     /**
      * 设备token续签
-     * @param $data
+     * @param $params
      * @return array
      */
-    public function deviceTokenRenewal($data)
+    public function deviceTokenRenewal($params)
     {
         $userId = 0; //续签的用户id不会串过来所以重新获取
         $shortToken = null;
@@ -205,8 +211,8 @@ class AccountLogic
                 }
 
                 $lastExTime = $jwtTime - $nowTime;
-                if(!empty($jwtTime)){//$jwtTime = 0为永久有效，但在续签的业务中如果调用了续签还是生成新的jwt-token防止用户状态不刷新
-                    if ($lastExTime > 3600 ) {
+                if (!empty($jwtTime)) {//$jwtTime = 0为永久有效，但在续签的业务中如果调用了续签还是生成新的jwt-token防止用户状态不刷新
+                    if ($lastExTime > 3600) {
                         return ComBase::getReturnArray(['token' => $oldToken]);//如果过期时间为0或者离过期超过1小时则直接返回当前token,防止无意义刷新
                     } else if ($exMaxTime > 2592000) { //****如果过期时间已经超过30天则不能再进行续签，直接过期重新登录 具体时间自行调整****
                         return ComBase::getNoLoginReturnArray();
@@ -216,8 +222,8 @@ class AccountLogic
 
                 $tempTokenArr = explode('.', $oldToken);
                 $shortToken = end($tempTokenArr);
-                if(!empty($shortToken)){
-                    $deviceArr = $this->getDeviceInfo($data);
+                if (!empty($shortToken)) {
+                    $deviceArr = $this->getDeviceInfo($params);
 
                     if ($deviceArr['code'] !== ComBase::CODE_RUN_SUCCESS) {
                         return ComBase::getNoLoginReturnArray($deviceArr['msg']);
@@ -236,7 +242,7 @@ class AccountLogic
 
                                 if (!empty($deviceCode) && $deviceType === $dbDeviceType && $deviceCode === $deviceData['device_code']) {
                                     //设备code相同直接更新,刷新需要判断devicetype是否相同,防止刷新了app的token
-                                   $updateFlg = $this->updateUserLoginDevice($deviceData['id'], $tokenArr['token']);
+                                    $updateFlg = $this->updateUserLoginDevice($deviceData['id'], $tokenArr['token']);
                                     if (!empty($updateFlg)) {
                                         return ComBase::getReturnArray(['token' => $tokenArr['jwt_token']]);//返回新的jwt-token
                                     }
@@ -276,14 +282,14 @@ class AccountLogic
 
     /**
      * 账号密码登录
-     * @param $data
+     * @param $params
      * @return array
      */
-    public function loginByAccountPwd($data)
+    public function loginByAccountPwd($params)
     {
         $token = '';
-        $userName = trim(ComBase::getStrVal('username', $data));
-        $password = trim(ComBase::getStrVal('password', $data));
+        $userName = trim(ComBase::getStrVal('username', $params));
+        $password = trim(ComBase::getStrVal('password', $params));
         if (empty($userName) || empty($password)) {
             return ComBase::getParamsErrorReturnArray('账号或密码不能为空');
         }
@@ -297,11 +303,11 @@ class AccountLogic
 
         //检查密码
         $pwdRes = $this->checkPasswordFormatReturnError($password);
-        if ($pwdRes!==false) {
+        if ($pwdRes !== false) {
             return $pwdRes;
         }
 
-        $deviceArr = $this->getDeviceInfo($data);
+        $deviceArr = $this->getDeviceInfo($params);
         if ($deviceArr['code'] !== ComBase::CODE_RUN_SUCCESS) {
             return $deviceArr;
         }
@@ -374,22 +380,22 @@ class AccountLogic
 
     /**
      * 通过用户名密码注册
-     * @param array $data
+     * @param array $params
      * @return array
      */
-    public function registerByUsername($data)
+    public function registerByUsername($params)
     {
-        if (empty($data) || empty($data['username'])) {
+        if (empty($params) || empty($params['username'])) {
             return ComBase::getParamsErrorReturnArray('用户名,密码参数错误');
         }
 
-        $userName = trim(ComBase::getStrVal('username', $data));
-        $password1 = trim(ComBase::getStrVal('password1', $data));
-        $password2 = trim(ComBase::getStrVal('password2', $data));
+        $userName = trim(ComBase::getStrVal('username', $params));
+        $password1 = trim(ComBase::getStrVal('password1', $params));
+        $password2 = trim(ComBase::getStrVal('password2', $params));
 
         $appId = 0;//应用ID 0为默认 根据业务自行控制是否需要获取 搜索**app_id** 更换需要app_id逻辑的地方
 
-        $deviceArr = $this->getDeviceInfo($data);//获取并判断设备信息,后续保存用户设备信息使用
+        $deviceArr = $this->getDeviceInfo($params);//获取并判断设备信息,后续保存用户设备信息使用
         if ($deviceArr['code'] !== ComBase::CODE_RUN_SUCCESS) {
             return $deviceArr;
         }
@@ -405,7 +411,7 @@ class AccountLogic
 
         //检查密码
         $pwdRes = $this->checkPasswordFormatReturnError($password1);
-        if ($pwdRes!==false) {
+        if ($pwdRes !== false) {
             return $pwdRes;
         }
 
@@ -461,32 +467,89 @@ class AccountLogic
     }
 
     /**
-     * 通过手机号注册
-     * @param array $data
+     * 发送手机验证码
+     * @param $params
      * @return array
      */
-    public function registerByMobile($data)
+    public function sendMobileCode($params)
     {
-        if (empty($data) || empty($data['mobile']) || empty($data['code'])) {
+        $mobile = ComBase::getStrVal('mobile', $params);
+        $areaCode = ComBase::getStrVal('area_code', $params);
+        $areaCode = str_replace('+', '', $areaCode);
+        $areaCode = intval($areaCode);
+        $scene = ComBase::getIntVal('scene', $params);
+
+        if (empty($mobile) || !in_array($scene, SmsCommon::SMS_CODE_SCENE_LIST, true)) {
+            return ComBase::getParamsErrorReturnArray();
+        }
+
+        //检查手机号
+        $checkRes = $this->checkMobileFormatReturnError($mobile);
+        if ($checkRes !== false) {
+            return $checkRes;
+        }
+
+        $nowTime = time();
+        $key = $scene . '_' . $mobile; //此处将发送手机的验证与场景区分防止不同场景触发60秒限制，也可改为同意限制手机号
+
+        $capLogin = new CaptchaLogic();
+        $nextTime = $capLogin->getKeyLimitTime($key);
+        if ($nextTime === 0) {
+            $bool = $capLogin->setKeyLimitTime($mobile, $nowTime, $capLogin->sendCodeSplitTime);
+            if (empty($bool)) {
+                return ComBase::getServerBusyReturnArray();
+            }
+        } else {
+            return ComBase::getReturnArray([], ComBase::CODE_REQUEST_INVALID, '距离下次发送验证码还有' . $nextTime . '秒');
+        }
+
+        //发送验证码并创建异步发送任务
+        $smsMobileLogic = new SmsMobileLogic();
+        $name = '验证码';//todo + ces
+
+        $saveParams = [
+            'name' => '验证码',
+            'mobile' => $mobile,
+            'area_num' => $areaCode,
+            'content' => '验证码：12346',
+            'add_time' => $nowTime,
+            'status' => 2
+        ];
+        Yii::$app->db->createCommand()->insert('{{%sms_mobile}}', $saveParams)->execute();
+        $lastId = Yii::$app->db->getLastInsertID();
+        Yii::$app->queue->push(new SendMobileSmsJobs(['id' => $lastId]));
+
+        return ComBase::getReturnArray();
+    }
+
+    /**
+     * 通过手机号注册
+     * @param array $params
+     * @return array
+     */
+    public function registerByMobile($params)
+    {
+        if (empty($params) || empty($params['mobile']) || empty($params['code'])) {
             return ComBase::getParamsErrorReturnArray('手机号或验证码参数错误');
         }
 
-        $mobile = trim(ComBase::getStrVal('mobile', $data));
-        $code = trim(ComBase::getIntVal('code', $data));
+        $mobile = trim(ComBase::getStrVal('mobile', $params));
+        $code = trim(ComBase::getIntVal('code', $params));
 
         $appId = 0;//应用ID 0为默认 根据业务自行控制是否需要获取 搜索**app_id** 更换需要app_id逻辑的地方
 
-        $deviceArr = $this->getDeviceInfo($data);//获取并判断设备信息,后续保存用户设备信息使用
+        $deviceArr = $this->getDeviceInfo($params);//获取并判断设备信息,后续保存用户设备信息使用
         if ($deviceArr['code'] !== ComBase::CODE_RUN_SUCCESS) {
             return $deviceArr;
         }
 
         //检查手机号
         $checkRes = $this->checkMobileFormatReturnError($mobile);
-        if($checkRes!==false){
+        if ($checkRes !== false) {
             return $checkRes;
         }
 
+        //todo
         #Yii::$app->cache->set()
 
 
