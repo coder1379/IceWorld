@@ -225,4 +225,5 @@ class SmsMobileLogic
 
         return BaseLogic::baseList($searchDataQuery, $printFields, $paginationParams, $include);
     }
+
 }
