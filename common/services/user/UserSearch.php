@@ -2,6 +2,7 @@
 
 namespace common\services\user;
 
+use common\lib\output\OutputExcel;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -46,9 +47,16 @@ class UserSearch extends UserModel
 
         // add conditions that should always apply here
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
+        //判断是否为导出
+        $dpArr = ['query' => $query,];
+        $exportFileFlag = $params['export_file_flag']??0;
+        $exportFileFlag = intval($exportFileFlag);
+        if($exportFileFlag === 1){
+            $query->limit(10000);
+            $dpArr['pagination'] = false;
+        }
+
+        $dataProvider = new ActiveDataProvider($dpArr);
 
         $this->load($params);
 
@@ -84,6 +92,15 @@ class UserSearch extends UserModel
         $query->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤
         
             $query->addOrderBy('id desc');
+
+            //导出实际执行,自行打开扩展
+            /*if($exportFileFlag===1){
+                $outputObj = new OutputExcel();
+                $header = ['标题1','标题2'];//导出标题
+                $query->select(['id']);//控制导出字段
+                $ext = $query->asArray()->all();//导出数据
+                $outputObj->run('导出'.date('YmdHis',time()),$header,$ext);
+            }*/
             
         return $dataProvider;
     }
