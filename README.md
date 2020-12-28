@@ -250,3 +250,5 @@ python:pip install PyJWT
 ##@需要完善@ 搜索查找需要完善的地方
 
 ## mongodb 可选包： "yiisoft/yii2-mongodb": "^2.1"(yii2支持mongo但不支持objectID转换string,优先使用), "mongodb/mongodb": "1.6.0"(配合MongoLib原生使用,主要能对objectid作为string时使用), 可两个同时使用
+
+###excel 导出 在search中
