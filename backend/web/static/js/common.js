@@ -199,3 +199,23 @@ function reUpLoadImg(removeImgId){
     $("#uploadimgpre_"+removeImgId).html("");
     $("#filename-"+removeImgId).val("");
 }
+
+/**
+ * 搜索按钮
+ * @param hidename 隐藏控制字段名称
+ * @param formObj 提交的from对象
+ */
+function indexSearchSubmitButton(hidename,formObj) {
+    $("#"+hidename).val(0);
+    $("#"+formObj)[0].submit();
+}
+
+/**
+ * 导出按钮
+ * @param hidename 隐藏控制字段名称
+ * @param formObj 提交的from对象
+ */
+function exportFileSubmitButton(hidename,formObj) {
+    $("#"+hidename).val(1);
+    $("#"+formObj)[0].submit();
+}

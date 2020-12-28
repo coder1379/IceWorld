@@ -8,7 +8,7 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="text-c search-form-group" style="display:none;">
+<div class="text-c search-form-group" style="display: none;">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -49,8 +49,12 @@ use yii\widgets\ActiveForm;
 
 <?php echo $form->field($model, 'add_time') ?>
 
+    <input type="hidden" id="export_file_flag" name="export_file_flag" value="0">
+
     <div class="form-group">
-        <button type="submit" class="btn btn-success radius" ><i class="Hui-iconfont">&#xe665;</i> 查询</button>
+        <button type="button" onclick="indexSearchSubmitButton('export_file_flag','w0')" class="btn btn-success radius" ><i class="Hui-iconfont">&#xe665;</i> 查询</button>
+
+        <button style="display: none;" type="button" onclick="exportFileSubmitButton('export_file_flag','w0')" class="btn btn-warning radius export_file_submit_btn" ><i class="Hui-iconfont">&#xe644;</i> 导出</button>
     </div>
 
     <?php ActiveForm::end();?>
