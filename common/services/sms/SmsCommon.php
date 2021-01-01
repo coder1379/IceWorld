@@ -67,7 +67,7 @@ class SmsCommon
      * @return int
      */
     public static function getMobileAreaCode($areaCode){
-        //根据需求开启
+        //根据需求开启,默认只支持大陆手机号areacode都返回0
         /*if(!empty($areaCode)){
             $areaCode = str_replace('+', '', $areaCode);
             $areaCode = intval($areaCode);

@@ -13,20 +13,12 @@ use yii\helpers\Json;
 class ApiCommonAuthContoller extends ApiCommonContoller
 {
     public $allowAccessActions = null;//设置不校验用户允许访问的actions
-    public $verifyShortTokenActions = null;//需要进行短token校验的action,注意大小写要保持一致，是区分大小写的
+    public $verifyShortTokenActions = null;//需要进行短token校验的action(强安全性要求时使用例如修改密码,发表评论等),注意大小写要保持一致，是区分大小写的
 
     //public $loginAccessActions = [];//设置登录就能访问的页面
     public function beforeAction($action)
     {
-
         $verifyCode = $this->setUser();
-        if (Yii::$app->params['open_jwt_expire_verify']) {
-            if ($verifyCode == ComBase::CODE_LOGIN_EXPIRE) {
-                //jwt过期，返回要求前端续签
-                echo Json::encode($this->getJsonArray([], ComBase::CODE_LOGIN_EXPIRE, ComBase::MESSAGE_LOGIN_EXPIRE));
-                exit();
-            }
-        }
         $actionId = $action->id;
 
         //先校验是否在允许例外的actions数组内
@@ -36,6 +28,7 @@ class ApiCommonAuthContoller extends ApiCommonContoller
                 echo Json::encode($this->getJsonArray([], ComBase::CODE_NO_LOGIN_ERROR, ComBase::MESSAGE_NO_LOGIN_ERROR));
                 exit();
             }
+
         }
 
         //二次校验是否在需要进行短token数据库查询验证的actions数组内，存在则进行token数据库校验
