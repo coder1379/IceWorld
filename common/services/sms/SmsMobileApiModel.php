@@ -11,9 +11,9 @@ class SmsMobileApiModel extends \common\services\sms\SmsMobileModel
     public function fieldsScenarios()
     {
         return [
-            'list' => ['id','name','object_id','object_type','user_id','area_num','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','add_time','status',],//列表
+            'list' => ['id','name','object_id','object_type','user_id','area_code','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','add_time','status',],//列表
 
-            'detail' => ['id','name','object_id','object_type','user_id','area_num','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','add_time','status',],//详情
+            'detail' => ['id','name','object_id','object_type','user_id','area_code','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','add_time','status',],//详情
         ];
     }
 
@@ -21,7 +21,7 @@ class SmsMobileApiModel extends \common\services\sms\SmsMobileModel
     /*public function rules()
     {
         return [
-            [['object_id', 'object_type', 'user_id', 'area_num', 'send_time', 'send_num', 'type', 'send_type', 'sms_type', 'add_time', 'status'], 'integer'],
+            [['object_id', 'object_type', 'user_id', 'area_code', 'send_time', 'send_num', 'type', 'send_type', 'sms_type', 'add_time', 'status'], 'integer'],
             [['mobile'], 'required'],
             [['content'], 'string'],
             [['name'], 'string', 'max' => 100],
@@ -35,9 +35,9 @@ class SmsMobileApiModel extends \common\services\sms\SmsMobileModel
     /*public function scenarios()
     {
         return [
-            'create' => ['name','object_id','object_type','user_id','area_num','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','status',],//创建场景
+            'create' => ['name','object_id','object_type','user_id','area_code','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','status',],//创建场景
 
-            'update' => ['name','object_id','object_type','user_id','area_num','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','status',],//修改场景
+            'update' => ['name','object_id','object_type','user_id','area_code','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','status',],//修改场景
 
             'delete' => ['status'],//删除场景 status = -1
         ];
@@ -53,7 +53,7 @@ class SmsMobileApiModel extends \common\services\sms\SmsMobileModel
             'object_id' => '短信对象ID',
             'object_type' => '短信对象类型',
             'user_id' => '接收用户',
-            'area_num' => '地区号',
+            'area_code' => '地区号',
             'mobile' => '手机号',
             'other_mobiles' => '其他接收手机号',
             'content' => '发送内容',

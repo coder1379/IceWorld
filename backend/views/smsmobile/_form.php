@@ -23,7 +23,7 @@ use yii\widgets\ActiveForm;
 
     <?php echo $form->field($model, 'user_id')->label('接收用户')->dropDownList($model->getUserRecordList(),['options'=>[$model->user_id=>['Selected'=>true]]]); ?>
 
-    <?php echo $form->field($model, 'area_num')->textInput(); ?>
+    <?php echo $form->field($model, 'area_code')->textInput(); ?>
 
     <?= $form->field($model, 'mobile')->textInput(['maxlength' => true]) ?>
 

@@ -13,7 +13,7 @@ use common\services\user\UserModel;
  * @property integer $object_id
  * @property integer $object_type
  * @property integer $user_id
- * @property integer $area_num
+ * @property integer $area_code
  * @property string $mobile
  * @property string $other_mobiles
  * @property string $content
@@ -47,12 +47,13 @@ class SmsMobileModel extends \yii\db\ActiveRecord
     
         ////////////字段验证规则
         return [
-            [['object_id', 'object_type', 'user_id', 'area_num', 'send_time', 'send_num', 'type', 'send_type', 'sms_type', 'add_time', 'status'], 'integer'],
+            [['object_id', 'object_type', 'user_id', 'area_code', 'send_time', 'send_num', 'type', 'send_type', 'sms_type', 'add_time', 'status'], 'integer'],
             [['mobile'], 'required'],
             [['content'], 'string'],
             [['name'], 'string', 'max' => 100],
             [['mobile'], 'match', 'pattern'=>'/[1-9]{11}/','message' => '手机号必须为11位数字'],
-            [['other_mobiles', 'params_json', 'template', 'feedback'], 'string', 'max' => 255],
+            [['other_mobiles', 'template', 'feedback'], 'string', 'max' => 255],
+            [['params_json'], 'string', 'max' => 1000],
             [['remark'], 'string', 'max' => 250],
         ];
     }
@@ -61,9 +62,9 @@ class SmsMobileModel extends \yii\db\ActiveRecord
     {
         ///////模型使用场景
                 return [
-        'create' => ['name','object_id','object_type','user_id','area_num','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','add_time','status',],//创建场景
+        'create' => ['name','object_id','object_type','user_id','area_code','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','add_time','status',],//创建场景
 
-        'update' => ['name','object_id','object_type','user_id','area_num','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','add_time','status',],//修改场景
+        'update' => ['name','object_id','object_type','user_id','area_code','mobile','other_mobiles','content','params_json','send_time','send_num','type','send_type','sms_type','template','feedback','remark','add_time','status',],//修改场景
 
         'delete' => ['status'],//删除场景
         ];
@@ -80,7 +81,7 @@ class SmsMobileModel extends \yii\db\ActiveRecord
             'object_id' => '短信对象ID',
             'object_type' => '短信对象类型',
             'user_id' => '接收用户',
-            'area_num' => '地区号',
+            'area_code' => '地区号',
             'mobile' => '手机号',
             'other_mobiles' => '其他接收手机号',
             'content' => '发送内容',
@@ -117,7 +118,7 @@ class SmsMobileModel extends \yii\db\ActiveRecord
     //对应字段:send_type,备注：发送类型
     public $sendTypePredefine=["0"=>"未指定","1"=>"用户发起","2"=>"管理员发起","3"=>"任务发起"];
     //对应字段:sms_type,备注：短信渠道
-    public $smsTypePredefine=["1"=>"阿里","2"=>"互亿","9"=>"其他"];
+    public $smsTypePredefine=["1"=>"阿里","2"=>"腾讯","6"=>"互,亿","9"=>"其他"];
     //对应字段:status,备注：状态
     public $statusPredefine=["0"=>"不发送","1"=>"发送成功","2"=>"待发送","3"=>"发送失败"];
 

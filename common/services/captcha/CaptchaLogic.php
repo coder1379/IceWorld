@@ -12,10 +12,11 @@ use Yii;
  */
 class CaptchaLogic
 {
-    private $codeMobilePre = 'code_mobile_';//验证码手机号前缀
-    private $limitPre = 'limit_send_code_';//限速手机号发送验证码前缀
+    private $codeCachePre = 'code_cache_';//验证码前缀
+    private $limitPre = 'limit_send_code_';//限速发送验证码前缀
     private $maxLimitTime = 3600; //最大限速时间防止逻辑错误
     public $sendCodeSplitTime = 60;//发送验证码间隔时间60秒
+    public $captchaCacheTime = 900;//验证码有效期15分钟
 
     public function checkSmsCodeStatus($mobile, $scene)
     {
@@ -63,10 +64,31 @@ class CaptchaLogic
         return $retTime;
     }
 
-    public function getMobileCode($mobile)
+    /**
+     * 获取发送缓存验证码
+     * @param $searchKey
+     * @return mixed
+     */
+    public function getSendCodeCache($searchKey)
     {
-        $key = $this->codeMobilePre . $mobile;
+        $key = $this->codeCachePre . $searchKey;
         return $this->getCaptcha($key);
+    }
+
+    /**
+     * 设置发送缓存验证码
+     * @param $setKey
+     * @param $value
+     * @param $expireTime
+     * @return bool
+     */
+    public function setSendCodeCache($setKey, $value, $expireTime = null)
+    {
+        if (empty($expireTime)) {
+            $expireTime = $this->captchaCacheTime;
+        }
+        $key = $this->codeCachePre . $setKey;
+        return $this->setCaptcha($key, $value, $expireTime);
     }
 
 
@@ -78,7 +100,7 @@ class CaptchaLogic
      * @param object $db 存储区 null为默认
      * @return bool
      */
-    public function setCaptcha($key, $value, $expireTime, $db = null)
+    private function setCaptcha($key, $value, $expireTime, $db = null)
     {
         $key = 'captcha_' . $key;
         return BaseCache::setExVal($key, $value, $expireTime, $db);
@@ -90,7 +112,7 @@ class CaptchaLogic
      * @param object $db 存储区 null为默认
      * @return mixed
      */
-    public function getCaptcha($key, $db = null)
+    private function getCaptcha($key, $db = null)
     {
         $key = 'captcha_' . $key;
         return BaseCache::getVal($key, $db);

@@ -20,12 +20,12 @@ class SendMobileSmsJobs extends BaseObject implements \yii\queue\JobInterface
     {
 
         $exTime = time();
-        $maxSendTime = $exTime - 640800; //控制超过7天未发送的短信将不在发送方式过期短信重复发
+        $maxSendTime = $exTime - 640800; //控制超过7天未发送的短信将不在发送,防止过期短信重复发
         if(empty($this->id)){
             Yii::error('SendMobileSmsJobs id 出现为空');
             return true;
         }
-        $selectArr = ['id', 'name', 'object_id', 'object_type', 'user_id', 'area_num', 'mobile', 'other_mobiles', 'content', 'params_json', 'send_num', 'type', 'send_type', 'sms_type', 'template', 'add_time', 'status'];
+        $selectArr = ['id', 'name', 'object_id', 'object_type', 'user_id', 'area_code', 'mobile', 'other_mobiles', 'content', 'params_json', 'send_num', 'type', 'send_type', 'sms_type', 'template', 'add_time', 'status'];
         $smsData = SmsMobileModel::find()->select($selectArr)->where(['id' => $this->id, 'status' => 2])->one();
         if(!empty($smsData)){
             $addTime = $smsData->add_time;
