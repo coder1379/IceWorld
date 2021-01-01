@@ -1,6 +1,6 @@
 ICE WORLD 
 项目基础模板
-常用后台(crud,富文本,图,关联,下拉,多选),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app),account(jwt+token+续签+多app-未获取参数搜**app_id**自行添加)
+常用后台(crud,富文本,图,关联,下拉,多选),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app),account(jwt+token+续签+多app)
 ===============================
 ##新项目复制流程
 1.获取代码,
@@ -252,3 +252,17 @@ python:pip install PyJWT
 ## mongodb 可选包： "yiisoft/yii2-mongodb": "^2.1"(yii2支持mongo但不支持objectID转换string,优先使用), "mongodb/mongodb": "1.6.0"(配合MongoLib原生使用,主要能对objectid作为string时使用), 可两个同时使用
 
 ###excel 导出 在search中
+
+###短信相关内容在 SmsCommom 中指定对应参数 
+###开启国际海外手机号支持流程 需修改 getMobileAreaCode 获取area_code规则，AccountCommon::getMobileFormatReturnError 完善海外手机号验证
+###海外手机号模式 通过area_code判断是否为0或者86限制后续保存或缓存key是否携带区号和-
+```
+$areaCode = SmsCommon::getMobileAreaCode(ComBase::getStrVal('area_code', $params));
+$checkRes = AccountCommon::getMobileFormatReturnError($mobile,$areaCode);
+$saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
+```
+
+
+###提示文本的逗号统一采用中文模式下的逗号
+
+###开启多app账号模式：AppCommon打开获取_app_id控制并完善鉴权

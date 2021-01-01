@@ -5,6 +5,7 @@ namespace common\services\account;
 
 use common\lib\StringHandle;
 use common\queues\SendMobileSmsJobs;
+use common\services\application\AppCommon;
 use common\services\captcha\CaptchaLogic;
 use common\services\sms\SmsCommon;
 use common\services\sms\SmsMobileApiModel;
@@ -29,22 +30,7 @@ class AccountLogic
     {
         //检查密码
         if (!preg_match('/^[a-zA-Z0-9~!@#$%&*_?]{6,30}$/', $password)) {
-            return ComBase::getParamsFormatErrorReturnArray('密码格式错误,密码需由字母(区分大小写)数字和~!@#$%&*_?组合，长度为6-30');
-        }
-
-        return false;
-    }
-
-    /**
-     * 检查手机号格式并返回错误信息
-     * @param $mobile
-     * @return array|bool
-     */
-    private function checkMobileFormatReturnError($mobile)
-    {
-        //检查手机号格式
-        if (!preg_match('/^1[0-9]{10}$/', $mobile)) {
-            return ComBase::getParamsFormatErrorReturnArray('手机号格式错误');
+            return ComBase::getParamsFormatErrorReturnArray('密码格式错误，密码需由字母(区分大小写)数字和~!@#$%&*_?组合，长度为6-30');
         }
 
         return false;
@@ -58,7 +44,7 @@ class AccountLogic
     private function getDeviceInfo($params)
     {
         $deviceType = ComBase::getIntVal('device_type', $params); //设备类型
-        if (!in_array($deviceType, UserCommon::USER_DEVICE_ARR, true)) {
+        if (!in_array($deviceType, AccountCommon::DEVICE_ARR, true)) {
             return ComBase::getParamsErrorReturnArray('设备类型参数错误');
         }
         $deviceCode = '';
@@ -66,7 +52,7 @@ class AccountLogic
         $userDeviceModel = '';
         $deviceDesc = '';
 
-        if ($deviceType === UserCommon::USER_DEVICE_TYPE_WEB) {
+        if ($deviceType === AccountCommon::DEVICE_TYPE_WEB) {
             $deviceDesc = Yii::$app->request->getUserAgent();
             $deviceCode = trim(ComBase::getStrVal('device_code', $params));
             $userDeviceSystem = StringHandle::getWebSystem($deviceDesc);
@@ -83,7 +69,7 @@ class AccountLogic
     }
 
     /**
-     * 写入用户密码类登录绑定表
+     * 写入用户密码类登录绑定表:手机号验证码登录也归属于这个表
      * @param $userId
      * @param $type
      * @param $key
@@ -193,7 +179,7 @@ class AccountLogic
         $shortToken = null;
         $oldToken = Yii::$app->request->post('token', '');
 
-        $appId = 0;//应用ID 0为默认 根据业务自行控制是否需要获取 搜索**app_id** 更换需要app_id逻辑的地方 根据业务可以选择由前端传入或者从jwt中获取a_i
+        $appId = AppCommon::getAppId($params);
 
         if (!empty($oldToken) && strlen($oldToken) < 500) {
             $jwtUser = AccountCommon::decodeUserLoginToken($oldToken);
@@ -234,7 +220,7 @@ class AccountLogic
                         $userData = UserCommon::getUserByid($userId);//获取用户信息判断是否续签，防止问题用户无限续签
                         if (!empty($deviceData) && !empty($userData)) {
                             $userStatus = intval($userData['status']);
-                            if ($userStatus > UserCommon::USER_STATUS_DEL) {//如果是已经删除的用户则无法续签，这里自行根据业务修改用户状态判断值
+                            if ($userStatus > UserCommon::STATUS_DEL) {//如果是已经删除的用户则无法续签，这里自行根据业务修改用户状态判断值
                                 $tokenArr = AccountCommon::getUserLoginToken($userId, $userData['type'], $appId);
                                 $deviceType = $deviceArr['data']['device_type'];//设备类型
                                 $deviceCode = $deviceArr['data']['device_code'] ?? '';//设备号
@@ -248,11 +234,11 @@ class AccountLogic
                                     }
                                 } else {
 
-                                    if ($deviceType === UserCommon::USER_DEVICE_TYPE_WEB) {
+                                    if ($deviceType === AccountCommon::DEVICE_TYPE_WEB) {
                                         $deviceDataWeb = $this->getUserLoginDeviceByDeviceCode($userId, $deviceCode, $appId);//获取设备信息
                                         if (!empty($deviceDataWeb)) {
                                             $webDeviceType = intval($deviceDataWeb['type'] ?? 0);
-                                            if ($webDeviceType === UserCommon::USER_DEVICE_TYPE_WEB) {
+                                            if ($webDeviceType === AccountCommon::DEVICE_TYPE_WEB) {
                                                 $updateFlg = $this->updateUserLoginDevice($deviceDataWeb['id'], $tokenArr['token']);//浏览器设备号相同视为同一个浏览器直接更新旧token
                                                 if (!empty($updateFlg)) {
                                                     return ComBase::getReturnArray(['token' => $tokenArr['jwt_token']]);//返回新的jwt-token
@@ -294,7 +280,7 @@ class AccountLogic
             return ComBase::getParamsErrorReturnArray('账号或密码不能为空');
         }
 
-        $appId = 0;//应用ID 0为默认 根据业务自行控制是否需要获取 搜索**app_id** 更换需要app_id逻辑的地方
+        $appId = AppCommon::getAppId($params);
 
         //检查用户名
         if (!preg_match('/^[a-zA-Z0-9@._]{6,50}$/', $userName)) {
@@ -317,11 +303,11 @@ class AccountLogic
             $userData = UserCommon::getUserByid($bindData['user_id']);//通过登录绑定的user_id获取用户密码
             if (!empty($userData) && !empty($userData['login_password']) && $userData['login_password'] === AccountCommon::getUserLoginMd5Password($password)) {
                 $userId = $userData['id'];
-                $tokenArr = AccountCommon::getUserLoginToken($userId, $userData['type']);
+                $tokenArr = AccountCommon::getUserLoginToken($userId, $userData['type'],$appId);
                 //更新用户设备信息
                 $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);
 
-                $this->insertUserLoginLog($userId, $bindData['id'], $deviceId, UserCommon::USER_LOGIN_TYPE_USERNAME, $deviceArr, $appId);//写入登录日志
+                $this->insertUserLoginLog($userId, $bindData['id'], $deviceId, AccountCommon::LOGIN_TYPE_USERNAME, $deviceArr, $appId);//写入登录日志
 
                 return ComBase::getReturnArray(['token' => $tokenArr['jwt_token']]);
             }
@@ -375,7 +361,7 @@ class AccountLogic
 
     private function getUserDefaultName()
     {
-        return '用户_' . StringHandle::getRandomString(6, 'ACDEFGHIJKLMNOPQRSTUVWXYZ2356789acdefghijkmnpqrstuvwxyz');
+        return '用户_' . StringHandle::getRandomString(6, 'ACDEFGHIJKLMNOPQRSTUVWXYZ2356789');
     }
 
     /**
@@ -386,14 +372,14 @@ class AccountLogic
     public function registerByUsername($params)
     {
         if (empty($params) || empty($params['username'])) {
-            return ComBase::getParamsErrorReturnArray('用户名,密码参数错误');
+            return ComBase::getParamsErrorReturnArray('用户名，密码参数错误');
         }
 
         $userName = trim(ComBase::getStrVal('username', $params));
         $password1 = trim(ComBase::getStrVal('password1', $params));
         $password2 = trim(ComBase::getStrVal('password2', $params));
 
-        $appId = 0;//应用ID 0为默认 根据业务自行控制是否需要获取 搜索**app_id** 更换需要app_id逻辑的地方
+        $appId = AppCommon::getAppId($params);
 
         $deviceArr = $this->getDeviceInfo($params);//获取并判断设备信息,后续保存用户设备信息使用
         if ($deviceArr['code'] !== ComBase::CODE_RUN_SUCCESS) {
@@ -419,7 +405,7 @@ class AccountLogic
             return ComBase::getParamsFormatErrorReturnArray('两次密码不匹配');
         }
 
-        $bindUser = AccountCommon::getUserLoginBindWithPwdTypes($userName);
+        $bindUser = AccountCommon::getUserLoginBindWithPwdTypes($userName,$appId);
         if (!empty($bindUser)) {
             return ComBase::getParamsFormatErrorReturnArray('用户名已经存在');
         }
@@ -432,8 +418,8 @@ class AccountLogic
             'name' => $this->getUserDefaultName(),
             'username' => $userName,
             'login_password' => AccountCommon::getUserLoginMd5Password($password1),
-            'status' => UserCommon::USER_STATUS_YES,
-            'type' => UserCommon::USER_TYPE_REGISTER,
+            'status' => UserCommon::STATUS_YES,
+            'type' => UserCommon::TYPE_REGISTER,
             'add_time' => $newTime,
             'app_id' => $appId,
         ];
@@ -447,8 +433,8 @@ class AccountLogic
         try {
             $db->createCommand()->insert('{{%user}}', $userData)->execute(); //创建用户主表
             $userId = $db->getLastInsertID();//获取用户主表id
-            $tokenArr = AccountCommon::getUserLoginToken($userId, UserCommon::USER_TYPE_REGISTER, $appId);//获取用户登录token
-            $bindId = $this->insertUserLoginBindWithPwd($userId, UserCommon::USER_LOGIN_TYPE_USERNAME, $userName, $appId); //写入用户登录绑定密码类
+            $tokenArr = AccountCommon::getUserLoginToken($userId, UserCommon::TYPE_REGISTER, $appId);//获取用户登录token
+            $bindId = $this->insertUserLoginBindWithPwd($userId, AccountCommon::LOGIN_TYPE_USERNAME, $userName, $appId); //写入用户登录绑定密码类
             $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);//更新用户登录设备信息
             $transaction->commit();
         } catch (\Exception $e) {
@@ -461,9 +447,22 @@ class AccountLogic
             return ComBase::getServerBusyReturnArray();
         }
 
-        $this->insertUserLoginLog($userId, $bindId, $deviceId, UserCommon::USER_LOGIN_TYPE_USERNAME, $deviceArr, $appId);//注册默认登录并写入登录日志
+        $this->insertUserLoginLog($userId, $bindId, $deviceId, AccountCommon::LOGIN_TYPE_USERNAME, $deviceArr, $appId);//注册默认登录并写入登录日志
 
         return ComBase::getReturnArray(['token' => $tokenArr['jwt_token']]);
+    }
+
+
+    /**
+     * 统一获取验证码缓存key便于维护是否进行场景验证
+     * @param $appId
+     * @param $scene
+     * @param $mobile
+     * @return string
+     */
+    private function getCapchaCacheKey($appId,$scene,$mobile){
+        //此处将发送手机的验证与场景区分防止不同场景触发60秒限制，也可改为统一限制手机号
+        return $appId.'_'.$scene . '_' . $mobile;
     }
 
     /**
@@ -474,47 +473,63 @@ class AccountLogic
     public function sendMobileCode($params)
     {
         $mobile = ComBase::getStrVal('mobile', $params);
-        $areaCode = ComBase::getStrVal('area_code', $params);
-        $areaCode = str_replace('+', '', $areaCode);
-        $areaCode = intval($areaCode);
+        $areaCode = SmsCommon::getMobileAreaCode(ComBase::getStrVal('area_code', $params));
         $scene = ComBase::getIntVal('scene', $params);
 
-        if (empty($mobile) || !in_array($scene, SmsCommon::SMS_CODE_SCENE_LIST, true)) {
+        if (empty($mobile) || !in_array($scene, SmsCommon::CODE_SCENE_LIST, true)) {
             return ComBase::getParamsErrorReturnArray();
         }
 
         //检查手机号
-        $checkRes = $this->checkMobileFormatReturnError($mobile);
+        $checkRes = AccountCommon::getMobileFormatReturnError($mobile,$areaCode);
         if ($checkRes !== false) {
             return $checkRes;
         }
 
+        $appId = AppCommon::getAppId($params);
+
+        $saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
+
         $nowTime = time();
-        $key = $scene . '_' . $mobile; //此处将发送手机的验证与场景区分防止不同场景触发60秒限制，也可改为同意限制手机号
+        $key = $this->getCapchaCacheKey($appId,$scene,$saveMobile);
 
         $capLogin = new CaptchaLogic();
         $nextTime = $capLogin->getKeyLimitTime($key);
         if ($nextTime === 0) {
-            $bool = $capLogin->setKeyLimitTime($mobile, $nowTime, $capLogin->sendCodeSplitTime);
+            $bool = $capLogin->setKeyLimitTime($key, $nowTime, $capLogin->sendCodeSplitTime);
             if (empty($bool)) {
-                return ComBase::getServerBusyReturnArray();
+                return ComBase::getServerBusyReturnArray('验证码发送失败，请重试');
             }
         } else {
             return ComBase::getReturnArray([], ComBase::CODE_REQUEST_INVALID, '距离下次发送验证码还有' . $nextTime . '秒');
         }
 
-        //发送验证码并创建异步发送任务
-        $smsMobileLogic = new SmsMobileLogic();
-        $name = '验证码';//todo + ces
+        //创建异步发送验证码任务
+        $sendCode = StringHandle::getRandomNumber(6); //生产6位数字字符
+        $name = SmsCommon::SCENE_STR_LIST[$scene]??'场景未配置';
+        $paramsJson = [
+            'code' => $sendCode,
+        ];
 
         $saveParams = [
-            'name' => '验证码',
-            'mobile' => $mobile,
-            'area_num' => $areaCode,
-            'content' => '验证码：12346',
+            'name' => '验证码:'.$name,
+            'mobile' => $mobile,//发送验证码直接使用区号所有不保存待-的拼接数据
+            'area_code' => $areaCode,
+            'content' => SmsCommon::MOBILE_CAPTCHA_SENT_STR,
+            'params_json' => json_encode($paramsJson),
+            'type' =>SmsCommon::TYPE_CAPTCHA,
+            'send_type' => SmsCommon::SEND_TYPE_USER,
+            'sms_type' =>SmsCommon::MOBILE_TYPE_AUTO,
+            'template' => SmsCommon::MOBILE_CAPTCHA_SENT_TEMPLATE,
             'add_time' => $nowTime,
-            'status' => 2
+            'status' => SmsCommon::STATUS_WAIT_SEND,
         ];
+
+        $bool = $capLogin->setSendCodeCache($key, $sendCode);
+        if (empty($bool)) {
+            return ComBase::getServerBusyReturnArray('验证码发送失败，请重试');
+        }
+
         Yii::$app->db->createCommand()->insert('{{%sms_mobile}}', $saveParams)->execute();
         $lastId = Yii::$app->db->getLastInsertID();
         Yii::$app->queue->push(new SendMobileSmsJobs(['id' => $lastId]));
@@ -534,71 +549,80 @@ class AccountLogic
         }
 
         $mobile = trim(ComBase::getStrVal('mobile', $params));
-        $code = trim(ComBase::getIntVal('code', $params));
+        $areaCode = SmsCommon::getMobileAreaCode(ComBase::getStrVal('area_code', $params));
+        $code = ComBase::getStrVal('code', $params);
 
-        $appId = 0;//应用ID 0为默认 根据业务自行控制是否需要获取 搜索**app_id** 更换需要app_id逻辑的地方
+        $appId = AppCommon::getAppId($params);
 
         $deviceArr = $this->getDeviceInfo($params);//获取并判断设备信息,后续保存用户设备信息使用
         if ($deviceArr['code'] !== ComBase::CODE_RUN_SUCCESS) {
             return $deviceArr;
         }
 
-        //检查手机号
-        $checkRes = $this->checkMobileFormatReturnError($mobile);
+        //检查手机号格式
+        $checkRes = AccountCommon::getMobileFormatReturnError($mobile,$areaCode);
         if ($checkRes !== false) {
             return $checkRes;
         }
 
-        //todo
-        #Yii::$app->cache->set()
+        $saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
 
+        $key = $this->getCapchaCacheKey($appId,SmsCommon::CODE_SCENE_REGISTER,$saveMobile);
+        $capLog = new CaptchaLogic();
+        $saveCode = strval($capLog->getSendCodeCache($key));
 
-        $bindUser = AccountCommon::getUserLoginBindWithPwdTypes($userName);
-        if (!empty($bindUser)) {
-            return ComBase::getParamsFormatErrorReturnArray('用户名已经存在');
+        if(!empty($saveCode) && !empty($code) && $saveCode===$code){
+            //验证码相同
+
+            $bindUser = AccountCommon::getUserLoginBindWithPwdTypes($saveMobile,$appId);
+            if (!empty($bindUser)) {
+                return ComBase::getParamsFormatErrorReturnArray('手机号已经注册');
+            }
+
+            //创建user并设置绑定
+            //user表数据
+            $newTime = time();
+
+            $userData = [
+                'app_id' => $appId,
+                'name' => $this->getUserDefaultName(),
+                'area_code' => $areaCode,
+                'mobile' => $saveMobile,
+                'status' => UserCommon::STATUS_YES,
+                'type' => UserCommon::TYPE_REGISTER,
+                'add_time' => $newTime,
+            ];
+
+            $token = '';
+            $userId = 0;
+            $bindId = 0;
+            $deviceId = 0;
+            $db = Yii::$app->db;
+            $transaction = $db->beginTransaction();
+            try {
+                $db->createCommand()->insert('{{%user}}', $userData)->execute(); //创建用户主表
+                $userId = $db->getLastInsertID();//获取用户主表id
+                $tokenArr = AccountCommon::getUserLoginToken($userId, UserCommon::TYPE_REGISTER, $appId);//获取用户登录token
+                $bindId = $this->insertUserLoginBindWithPwd($userId, AccountCommon::LOGIN_TYPE_MOBILE, $saveMobile, $appId); //写入用户登录绑定密码类
+                $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);//更新用户登录设备信息
+                $transaction->commit();
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::error('registerByMobile 用户手机号注册事务回滚:' . $e->getMessage());
+                return ComBase::getServerBusyReturnArray();
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+                Yii::error('registerByMobile 用户手机号注册事务回滚:' . $e->getMessage());
+                return ComBase::getServerBusyReturnArray();
+            }
+
+            $this->insertUserLoginLog($userId, $bindId, $deviceId, AccountCommon::LOGIN_TYPE_MOBILE, $deviceArr, $appId);//注册默认登录并写入登录日志
+            $capLog->deleteCaptcha($key);
+            return ComBase::getReturnArray(['token' => $tokenArr['jwt_token']]);
         }
 
-        //创建user并设置绑定
-        //user表数据
-        $newTime = time();
+        return ComBase::getParamsFormatErrorReturnArray('验证码错误');
 
-        $userData = [
-            'name' => $this->getUserDefaultName(),
-            'username' => $userName,
-            'login_password' => AccountCommon::getUserLoginMd5Password($password1),
-            'status' => UserCommon::USER_STATUS_YES,
-            'type' => UserCommon::USER_TYPE_REGISTER,
-            'add_time' => $newTime,
-            'app_id' => $appId,
-        ];
-
-        $token = '';
-        $userId = 0;
-        $bindId = 0;
-        $deviceId = 0;
-        $db = Yii::$app->db;
-        $transaction = $db->beginTransaction();
-        try {
-            $db->createCommand()->insert('{{%user}}', $userData)->execute(); //创建用户主表
-            $userId = $db->getLastInsertID();//获取用户主表id
-            $tokenArr = AccountCommon::getUserLoginToken($userId, UserCommon::USER_TYPE_REGISTER, $appId);//获取用户登录token
-            $bindId = $this->insertUserLoginBindWithPwd($userId, UserCommon::USER_LOGIN_TYPE_USERNAME, $userName, $appId); //写入用户登录绑定密码类
-            $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);//更新用户登录设备信息
-            $transaction->commit();
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            Yii::error('registerByUsername 用户注册事务回滚:' . $e->getMessage());
-            return ComBase::getServerBusyReturnArray();
-        } catch (\Throwable $e) {
-            $transaction->rollBack();
-            Yii::error('registerByUsername 用户注册事务回滚:' . $e->getMessage());
-            return ComBase::getServerBusyReturnArray();
-        }
-
-        $this->insertUserLoginLog($userId, $bindId, $deviceId, UserCommon::USER_LOGIN_TYPE_USERNAME, $deviceArr, $appId);//注册默认登录并写入登录日志
-
-        return ComBase::getReturnArray(['token' => $tokenArr['jwt_token']]);
     }
-
 
 }

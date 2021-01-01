@@ -19,7 +19,7 @@ class SmsMobileSearch extends SmsMobileModel
     public function rules()
     {
         return [
-            [['id', 'object_id', 'object_type', 'user_id', 'area_num', 'send_time', 'send_num', 'type', 'send_type', 'sms_type', 'add_time', 'status'], 'integer'],
+            [['id', 'object_id', 'object_type', 'user_id', 'area_code', 'send_time', 'send_num', 'type', 'send_type', 'sms_type', 'add_time', 'status'], 'integer'],
             [['name', 'mobile', 'other_mobiles', 'content', 'params_json', 'template', 'feedback', 'remark'], 'safe'],
         ];
     }
@@ -64,7 +64,7 @@ class SmsMobileSearch extends SmsMobileModel
             'object_id' => $this->object_id,
             'object_type' => $this->object_type,
             'user_id' => $this->user_id,
-            'area_num' => $this->area_num,
+            'area_code' => $this->area_code,
             'send_time' => $this->send_time,
             'send_num' => $this->send_num,
             'type' => $this->type,

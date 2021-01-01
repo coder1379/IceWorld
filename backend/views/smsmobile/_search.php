@@ -25,7 +25,7 @@ use yii\widgets\ActiveForm;
 
  <?php //echo $form->field($model, 'user_id')->label('接收用户')->dropDownList($model->getUserRecordList(),['prompt' => '全部']) ?>
 
-<?php echo $form->field($model, 'area_num') ?>
+<?php echo $form->field($model, 'area_code') ?>
 
 <?php echo $form->field($model, 'mobile') ?>
 

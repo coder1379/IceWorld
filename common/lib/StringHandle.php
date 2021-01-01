@@ -254,7 +254,7 @@ class StringHandle
     }
 
     /**
-     * 获取浏览器系统
+     * 获取浏览器系统 不能返回空将影响使用地方的判断
      * @param $agent
      * @return string
      */
@@ -292,7 +292,7 @@ class StringHandle
     }
 
     /**
-     * 获取浏览器品牌
+     * 获取浏览器品牌 不能返回空将影响使用地方的判断
      * @return mixed
      */
     public static function getBrowser($sys)

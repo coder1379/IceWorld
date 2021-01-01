@@ -51,11 +51,11 @@ class ComBase
 
     //服务端错误码
     const CODE_SERVER_ERROR = 500;
-    const MESSAGE_SERVER_ERROR = '服务端处理失败,请重试';
+    const MESSAGE_SERVER_ERROR = '服务端处理失败，请重试';
 
     //服务器繁忙
     const CODE_SERVER_BUSY = 503;
-    const MESSAGE_SERVER_BUSY = '服务端繁忙,请稍后再试';
+    const MESSAGE_SERVER_BUSY = '服务端繁忙，请稍后再试';
 
     /**
      * 返回数据格式数组
