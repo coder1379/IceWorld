@@ -65,6 +65,16 @@ class CaptchaLogic
     }
 
     /**
+     * 删除时间限制key 直接调用deleteCaptcha注意key前缀问题
+     * @param $key
+     * @return mixed
+     */
+    public function deleteKeyLimitTime($key){
+        $key = $this->limitPre . $key;
+        return $this->deleteCaptcha($key);
+    }
+
+    /**
      * 获取发送缓存验证码
      * @param $searchKey
      * @return mixed
@@ -91,6 +101,15 @@ class CaptchaLogic
         return $this->setCaptcha($key, $value, $expireTime);
     }
 
+    /**
+     * 删除缓存的验证码
+     * @param $searchKey
+     * @return mixed
+     */
+    public function deleteSendCodeCache($searchKey){
+        $key = $this->codeCachePre . $searchKey;
+        return $this->deleteCaptcha($key);
+    }
 
     /**
      * 设置缓存值
@@ -124,7 +143,7 @@ class CaptchaLogic
      * @param object $db 存储区 null为默认
      * @return mixed
      */
-    public function deleteCaptcha($key, $db = null)
+    private function deleteCaptcha($key, $db = null)
     {
         $key = 'captcha_' . $key;
         return BaseCache::deleteVal($key, $db);

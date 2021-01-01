@@ -8,6 +8,7 @@ use common\services\systemconfig\SystemConfigModel;
 use common\services\systemconfig\SystemConfigQuery;
 use Firebase\JWT\JWT;
 use Yii;
+use yii\caching\FileCache;
 use yii\helpers\Json;
 use function GuzzleHttp\Promise\all;
 
@@ -18,6 +19,16 @@ use function GuzzleHttp\Promise\all;
 class TestController extends ApiCommonContoller
 {
 	public $enableCsrfValidation = false;
+
+    /**
+     * 清理过期文件缓存
+     */
+	public function actionClearouttimecache(){
+
+        $cache = new FileCache();
+        $cache->gc(true);
+
+    }
 
     /**
      * queue测试

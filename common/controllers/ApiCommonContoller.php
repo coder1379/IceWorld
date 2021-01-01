@@ -17,7 +17,8 @@ class ApiCommonContoller extends BaseContoller
     public $excludeAccessLog = [];
     public $user = null;//user非空表示已经进行数据库查询
     public $userId = 0;//控制器userid
-    public $userType = 0;//控制器usertype 主要判断是否为正式用户游客等
+    //todo userid和游客userid分两个字段
+    public $userType = 0;//控制器usertype 主要判断是否为正式用户游客等 默认为0表示游客用户在游客表中查询
     public $shortToken = null; //jwt.后的短token值 用于进行数据库比较
 
     public function beforeAction($action)
@@ -68,16 +69,18 @@ class ApiCommonContoller extends BaseContoller
                     if(!empty($_FILES)){
                         $allParams = array_merge($allParams, $_FILES);
                     }
+                    $allParams = json_encode($allParams);
                     $saveData = [
-                        'user_id' => $this->userId,
-                        'user_type' => $this->userType,
-                        'route' => $route,
-                        'ip' => Yii::$app->request->getRemoteIP(),
-                        'add_time' => time(),
-                        'run_time' => $useTime,
-                        'all_params' => $allParams,
+                        ':user_id' => $this->userId,
+                        ':user_type' => $this->userType,
+                        ':route' => $route,
+                        ':ip' => Yii::$app->request->getRemoteIP(),
+                        ':add_time' => time(),
+                        ':run_time' => $useTime,
+                        ':all_params' => $allParams,
                     ];
-                    Yii::$app->db->createCommand()->insert('{{%access_log}}', $saveData)->execute();
+                    $insertSql = 'insert into {{%access_log}} (user_id,user_type,route,ip,add_time,run_time,all_params) value (:user_id,:user_type,:route,:ip,:add_time,:run_time,CAST(:all_params AS JSON));';
+                    Yii::$app->db->createCommand($insertSql,$saveData)->execute();
                 }
             }
         } catch (\Exception $exc) {
@@ -102,11 +105,19 @@ class ApiCommonContoller extends BaseContoller
             if(!empty($jwtUser)){
                 $nowTime = time();
                 $jwtTime =  intval($jwtUser->o_t??0);
+
+                //检查过期时间如果过期则返回标记
                 if(empty($jwtTime) || $nowTime<$jwtTime){
                     $tokenArr = explode('.',$token);
                     $this->userId  = intval($jwtUser->u_i??0);
                     $this->userType = intval($jwtUser->u_t??0);
                     $this->shortToken = end($tokenArr);
+
+                    //检查用户类型 游客用户类型为-1 是按照未登录没有权限处理
+                    if($this->userType<=0){
+                        return ComBase::CODE_NO_AUTH_ERROR;
+                    }
+
                 }else{
                     return ComBase::CODE_LOGIN_EXPIRE;
                 }

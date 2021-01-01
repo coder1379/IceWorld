@@ -266,3 +266,11 @@ $saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
 ###提示文本的逗号统一采用中文模式下的逗号
 
 ###开启多app账号模式：AppCommon打开获取_app_id控制并完善鉴权
+
+###使用 cache文件保存时注意 一定时间后使用： $cache = new FileCache(); $cache->gc(true); //回收过期缓存文件
+
+###成功登录前验证扩展：AccountCommon::getBeforeLoginErrorCheck
+
+### user 字段 status 表示用户目前状态 -1删除或注销，1正常，2冻结，只有1表示正常，其余值都表示无法正常使用
+
+###游客表仅用作与访问表进行转化统计不做其他使用
