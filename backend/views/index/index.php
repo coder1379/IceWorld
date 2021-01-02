@@ -29,7 +29,7 @@ $staticFilePath=empty(Yii::$app->params["staticFilePath"])!=true?Yii::$app->para
     <script type="text/javascript" src="<?= $staticFilePath ?>/static/h-ui/js/H-ui.min.js"></script>
     <script type="text/javascript" src="<?= $staticFilePath ?>/static/h-ui.admin/js/H-ui.admin.js"></script>
     <script type="text/javascript" src="<?= $staticFilePath ?>/static/js/common.js"></script>
-    <title><?php echo Yii::$app->params['adminSiteShowName']; ?></title>
+    <title><?php echo Yii::$app->params['admin_site_show_name']; ?></title>
     <meta name="keywords" content="">
     <meta name="description" content="">
     <style>
@@ -42,7 +42,7 @@ $staticFilePath=empty(Yii::$app->params["staticFilePath"])!=true?Yii::$app->para
 <header class="navbar-wrapper">
     <div class="navbar navbar-fixed-top">
         <div class="container-fluid cl">
-            <a class="logo navbar-logo f-l mr-10 hidden-xs" href="<?php echo Yii::$app->urlManager->createUrl('index/index'); ?>"><?php echo Yii::$app->params['adminSiteShowName']; ?></a> <a class="logo navbar-logo-m f-l mr-10 visible-xs" href="<?php echo Yii::$app->urlManager->createUrl('index/index'); ?>">后台管理系统</a> <a aria-hidden="false" class="nav-toggle Hui-iconfont visible-xs" href="javascript:;">&#xe667;</a>
+            <a class="logo navbar-logo f-l mr-10 hidden-xs" href="<?php echo Yii::$app->urlManager->createUrl('index/index'); ?>"><?php echo Yii::$app->params['admin_site_show_name']; ?></a> <a class="logo navbar-logo-m f-l mr-10 visible-xs" href="<?php echo Yii::$app->urlManager->createUrl('index/index'); ?>">后台管理系统</a> <a aria-hidden="false" class="nav-toggle Hui-iconfont visible-xs" href="javascript:;">&#xe667;</a>
             <nav id="Hui-userbar" class="nav navbar-nav navbar-userbar hidden-xs">
                 <ul class="cl">
                     <li>

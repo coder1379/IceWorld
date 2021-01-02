@@ -36,7 +36,7 @@
         </form>
     </div>
 </div>
-<div class="footer" style="font-size:20px;"><?php echo Yii::$app->params['adminSiteShowName']; ?></div>
+<div class="footer" style="font-size:20px;"><?php echo Yii::$app->params['admin_site_show_name']; ?></div>
 <script>
     var errorshow='<?php if(empty($error)!=true){ echo $error; } ?>';
     $(document).ready(function(){
