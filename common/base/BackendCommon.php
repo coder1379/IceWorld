@@ -85,7 +85,7 @@ class BackendCommon extends BaseCommon
         $adminLoginTime = trim($cookies->getValue('adminlogintime'));
         $adminLoginKey = trim($cookies->getValue('adminloginkey'));
         if(empty($adminLoginName)!=true && empty($adminLoginTime)!=true && empty($adminLoginKey)!=true){
-            $md5LoginString=$this->getLoginMd5Aes($adminLoginTime,$adminLoginName,Yii::$app->params["adminAutoLoginKey"]);
+            $md5LoginString=$this->getLoginMd5Aes($adminLoginTime,$adminLoginName,Yii::$app->params["admin_auto_login_key"]);
             if($md5LoginString===$adminLoginKey){
                 return $this->setAdminCookieLoginSession($adminLoginName,1);
             }else{
@@ -154,7 +154,7 @@ class BackendCommon extends BaseCommon
             $cookies = Yii::$app->response->getCookies();
             $this->setCookie($cookies,'adminloginname',$adminRecord['login_username'],$timetemp);
             $this->setCookie($cookies,'adminlogintime',$loginTime,$timetemp);
-            $this->setCookie($cookies,'adminloginkey',$this->getLoginMd5Aes($loginTime,$adminRecord['login_username'],Yii::$app->params["adminAutoLoginKey"]),$timetemp);
+            $this->setCookie($cookies,'adminloginkey',$this->getLoginMd5Aes($loginTime,$adminRecord['login_username'],Yii::$app->params["admin_auto_login_key"]),$timetemp);
             return true;
         }
         return false;

@@ -49,10 +49,10 @@ class UploadOSS
     {
         #return 'https://' . Yii::$app->params['oss']['bucket'] . '.' . Yii::$app->params['oss']['endPoint'] . '/' . $ossName;
         $url = '';
-        if(empty(Yii::$app->params['oss_base_link'])){
+        if(empty(Yii::$app->params['oss']['oss_base_link'])){
             $url = 'https://' . Yii::$app->params['oss']['bucket'] . '.' . Yii::$app->params['oss']['endPoint'] . '/' . $ossName;
         }else{
-            $url = Yii::$app->params['oss_base_link'] . $ossName;
+            $url = Yii::$app->params['oss']['oss_base_link'] . $ossName;
         }
         return $url;
     }

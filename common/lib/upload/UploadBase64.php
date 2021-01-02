@@ -63,10 +63,10 @@ class UploadBase64
     public function getOssUrl($path)
     {
         $url = '';
-        if(empty(Yii::$app->params['oss_base_link'])){
+        if(empty(Yii::$app->params['oss']['oss_base_link'])){
             $url = 'https://' . Yii::$app->params['oss']['bucket'] . '.' . Yii::$app->params['oss']['endPoint'] . '/' . $path;
         }else{
-            $url = Yii::$app->params['oss_base_link'] . $path;
+            $url = Yii::$app->params['oss']['oss_base_link'] . $path;
         }
         return $url;
     }

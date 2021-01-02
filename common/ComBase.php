@@ -37,6 +37,10 @@ class ComBase
     const CODE_NO_AUTH_ERROR = 403;
     const MESSAGE_NO_AUTH_ERROR = '没有权限';
 
+    //获取游客token后重试,当开启了游客模式后游客jwt校验失败或权限验证允许游客访问action校验失败后返回便于前端获取游客token后重试
+    const CODE_GET_VISITOR_TOKEN_RETRY = 422;
+    const MESSAGE_GET_VISITOR_TOKEN_RETRY = '请重试';
+
     //参数错误码
     const CODE_PARAM_ERROR = 431;
     const MESSAGE_PARAM_ERROR = '参数错误';
@@ -64,13 +68,17 @@ class ComBase
      * @param string $msg 消息
      * @return array 格式数组
      */
-    public static function getReturnArray($data = null, $code = 200, $msg = 'success')
+    public static function getReturnArray($data = null, $code = null, $msg = null)
     {
         if (empty($data)) {
             $data = new \StdClass();//将空数组赋值空对象便于前端兼容处理.
         }
-        if (empty($code)) {
-            $code = self::CODE_RUN_SUCCESS;
+        if ($code === null) {
+            $code = ComBase::CODE_RUN_SUCCESS;
+        }
+
+        if ($msg === null) {
+            $msg = ComBase::MESSAGE_RUN_SUCCESS;
         }
         return ['code' => $code, 'msg' => $msg, 'data' => $data];
     }

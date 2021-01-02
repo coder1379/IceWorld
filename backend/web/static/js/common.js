@@ -6,6 +6,8 @@ var systemalert="程序错误，请重试！";
 var layerOpenWindowWidth = '80%';
 var layerOpenWindowHeight = '90%';
 
+var ajaxReturnSuccessCode = 200 ;//接口返回成功的标识
+
 var ueditorTools = [
     [
         'fullscreen', //全屏
@@ -129,7 +131,7 @@ function backend_delete_data(obj,id,clickName,dltlink){
             success:function(ajaxData){
                var data = $.parseJSON(ajaxData);
                 $(this).attr('clickDelete',0);
-                if(200==data.code){
+                if(ajaxReturnSuccessCode==data.code){
                     layer.msg(data.msg,{icon:1,time:2000});
                     $(obj).parents("tr").remove();
                 }else{

@@ -52,7 +52,7 @@ class AccountCommon
         $jwtData = null;
         try {
             $jwtToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9' . '.' . $token;
-            $jwtData = JWT::decode($jwtToken, Yii::$app->params['jwt_md5_key'], array('HS256'));
+            $jwtData = JWT::decode($jwtToken, Yii::$app->params['jwt']['jwt_md5_key'], array('HS256'));
         } catch (\Exception $exception) {
             Yii::error('Jwt json 解码错误,有人使用非正常jwt');
         }
@@ -72,7 +72,7 @@ class AccountCommon
         if (empty($userId) || $userType == null) {
             throw new \Exception('user_id或type不能为空');
         }
-        $outTime = Yii::$app->params['user_token_out_time'] ?? 0;
+        $outTime = Yii::$app->params['jwt']['jwt_out_time'] ?? 0;
         if (!empty($outTime)) {
             $outTime = time() + $outTime;
         }
@@ -86,7 +86,7 @@ class AccountCommon
             'a_i' => $appId, //写入应用id到jwt,根据业务判断使用
         ];
 
-        $jwtKey = Yii::$app->params['jwt_md5_key'];
+        $jwtKey = Yii::$app->params['jwt']['jwt_md5_key'];
         if(empty($jwtKey)){
             throw new \Exception('jwt_key不能为空');
         }
