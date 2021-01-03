@@ -2,7 +2,7 @@
 
 namespace api\controllers;
 
-use common\controllers\ApiCommonAuthContoller;
+use common\controllers\AuthApiCommonContoller;
 use Yii;
 use common\services\user\UserLogic;
 use common\controllers\ApiCommonContoller;
@@ -12,7 +12,7 @@ use yii\helpers\Json;
  * 用户
  * UserController implements the CRUD actions for UserApiModel model.
  */
-class UserController extends ApiCommonAuthContoller
+class UserController extends AuthApiCommonContoller
 {
     public $enableCsrfValidation = false;
 

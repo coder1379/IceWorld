@@ -10,7 +10,7 @@ echo $form->field($generator, 'modelClass')->textInput(['value'=>empty($generato
 echo $form->field($generator, 'logic')->textInput(['value'=>empty($generator->logic)?'common\services\xxx\XxxLogic':$generator->logic]);
 echo $form->field($generator, 'controllerClass')->textInput(['value'=>empty($generator->controllerClass)?'api\controllers\XxxController':$generator->controllerClass]);
 //echo $form->field($generator, 'viewPath')->textInput(['value'=>empty($generator->viewPath)?'@api\views\xxx':$generator->viewPath]);
-echo $form->field($generator, 'baseControllerClass')->textInput(['value'=>empty($generator->baseControllerClass)?'common\controllers\ApiCommonAuthContoller':$generator->baseControllerClass]);
+echo $form->field($generator, 'baseControllerClass')->textInput(['value'=>empty($generator->baseControllerClass)?'common\controllers\AuthApiCommonContoller':$generator->baseControllerClass]);
 /*echo $form->field($generator, 'indexWidgetType')->dropDownList([
     'grid' => 'GridView',
     'list' => 'ListView',
