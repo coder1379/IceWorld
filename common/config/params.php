@@ -12,7 +12,7 @@ return [
         'jwt_out_time' => 7200,//用户token过期时间，单位秒 2592000是30天,0为永不过期(可通过修改jwt_md5_key强制过期),当值较小时加入自动续签功能
         'jwt_refresh_min_time'=>3600,//jwt刷新小于值，防止无意义刷新 单位秒 默认小于1小时不刷新
         'jwt_refresh_max_time'=>2592000,//jwt允许刷新最大值，防止jwt过期超长时间任然可以刷新 单位秒,默认超过30天无法刷新必须重新登陆
-        'jwt_device_visitor_verification' => true,//jwt设备访客验证,默认开启,除特例接口外均需要进行游客token有效性验证,user_token验证例外也将进行游客有效性验证,建议开启并记录访问便于分析,跟随业务后续可以选择配合前端一起关闭,开启需要前端进行配合调用续签
+        'jwt_device_visitor_verification' => true,//jwt设备访客验证模式,默认开启,除特例接口外均需要进行游客token有效性验证,user_token验证例外也将进行游客有效性验证,建议开启并记录访问便于分析,跟随业务后续可以选择配合前端一起关闭,开启需要前端进行配合调用续签
     ],
     'save_access_log' => true, //保存访问日志,根据情况缓存日志 可自行扩展模式 **
     'uploadMode' => 'local',//图片上传地址 local 上传本地 oss 上传阿里云oss服务器(需配置下发oss参数) **

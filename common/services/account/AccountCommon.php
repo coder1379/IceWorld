@@ -87,7 +87,7 @@ class AccountCommon
         ];
 
         $jwtKey = Yii::$app->params['jwt']['jwt_md5_key'];
-        if(empty($jwtKey)){
+        if (empty($jwtKey)) {
             throw new \Exception('jwt_key不能为空');
         }
 
@@ -214,6 +214,26 @@ class AccountCommon
         } else {
             return ComBase::getNoAuthReturnArray('用户状态异常');
         }
+    }
+
+    /**
+     * 统一返回给前端的token格式
+     * @param $userType
+     * @param $token
+     * @param $userData
+     * @param $same 是否为相同的token，主要用于判定无意义刷新返回前端处理
+     * @return array
+     */
+    public static function getReturnTokenDataFormat($userType, $token, $userData = null, $same = 0)
+    {
+        $id = 0;
+        $userType = intval($userType);
+        if(!empty($userData) && $userType!==UserCommon::TYPE_DEVICE_VISITOR){
+            //非游客可以返回userid,部分场景可能判断当前用户是否为自己使用,游客userid设置为0避免前端判定混乱
+            $id = intval($userData['id'] ?? 0);
+        }
+        
+        return ['id'=>$id,'user_type' => $userType, 'token' => $token, 'same' => $same];
     }
 
 }

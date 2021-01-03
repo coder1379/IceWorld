@@ -202,7 +202,7 @@ class AccountLogic
                     $lastExTime = $jwtTime - $nowTime;
                     if (!empty($jwtTime)) {//$jwtTime = 0为永久有效，但在续签的业务中如果调用了续签还是生成新的jwt-token防止用户状态不刷新
                         if ($lastExTime > Yii::$app->params['jwt']['jwt_refresh_min_time']) {
-                            return ComBase::getReturnArray(['user_type' => $jwtUserType, 'token' => $oldToken]);//防止无意义刷新
+                            return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($jwtUserType, $oldToken, ['id' => $userId], 1));//防止无意义刷新,将yuan
                         } else if ($exMaxTime > Yii::$app->params['jwt']['jwt_refresh_max_time']) { //防止超长时间过期刷新
                             if ($jwtUserType !== UserCommon::TYPE_DEVICE_VISITOR) { //非游客续签直接根据配置返回
                                 return $this->getRenewalFailReturnArray($params);
@@ -240,7 +240,7 @@ class AccountLogic
                                         //设备code相同直接更新,刷新需要判断devicetype是否相同,防止刷新了app的token
                                         $updateFlg = $this->updateUserLoginDevice($deviceData['id'], $tokenArr['token']);
                                         if (!empty($updateFlg)) {
-                                            return ComBase::getReturnArray(['user_type' => $userType, 'token' => $tokenArr['jwt_token']]);//返回新的jwt-token
+                                            return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($userType, $tokenArr['jwt_token'], $userData));//返回新的jwt_token及其他格式化数据
                                         }
                                     } else {
 
@@ -251,7 +251,7 @@ class AccountLogic
                                                 if ($webDeviceType === AccountCommon::DEVICE_TYPE_WEB) {
                                                     $updateFlg = $this->updateUserLoginDevice($deviceDataWeb['id'], $tokenArr['token']);//浏览器设备号相同视为同一个浏览器直接更新旧token
                                                     if (!empty($updateFlg)) {
-                                                        return ComBase::getReturnArray(['user_type' => $userType, 'token' => $tokenArr['jwt_token']]);//返回新的jwt-token
+                                                        return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($userType, $tokenArr['jwt_token'], $userData));//返回新的jwt_token及其他格式化数据
                                                     }
                                                 }
 
@@ -259,7 +259,7 @@ class AccountLogic
                                                 //浏览器类型可以直接续签新浏览器主要用于app内打开网页场景
                                                 $deviceId = $this->insertUserLoginDevice($userId, $deviceArr, $tokenArr['token'], $appId);
                                                 if (!empty($deviceId)) {
-                                                    return ComBase::getReturnArray(['user_type' => $userType, 'token' => $tokenArr['jwt_token']]);//返回新的jwt-token
+                                                    return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($userType, $tokenArr['jwt_token'], $userData));//返回新的jwt_token及其他格式化数据
                                                 }
                                             }
                                         }
@@ -281,7 +281,8 @@ class AccountLogic
     /**
      * 获取续签失败的返回值，只要判断是否开启游客模式
      */
-    private function getRenewalFailReturnArray($params){
+    private function getRenewalFailReturnArray($params)
+    {
         if (Yii::$app->params['jwt']['jwt_device_visitor_verification'] === true) { //开启了游客模式不返回重新登录而是直接返回一个有效的新游客token，在用这个游客token去访问具体业务的时候返回是否需要重新登录
             return $this->getVisitorToken($params);
         }
@@ -362,7 +363,7 @@ class AccountLogic
 
                 $this->insertUserLoginLog($userId, $bindData['id'], $deviceId, AccountCommon::LOGIN_TYPE_USERNAME, $deviceArr, $appId);//写入登录日志
 
-                return ComBase::getReturnArray(['user_type' => intval($userData['type']), 'token' => $tokenArr['jwt_token']]);
+                return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($userData['type'], $tokenArr['jwt_token'], $userData));
             }
         }
 
@@ -502,7 +503,8 @@ class AccountLogic
 
         $this->insertUserLoginLog($userId, $bindId, $deviceId, AccountCommon::LOGIN_TYPE_USERNAME, $deviceArr, $appId);//注册默认登录并写入登录日志
 
-        return ComBase::getReturnArray(['user_type' => UserCommon::TYPE_REGISTER, 'token' => $tokenArr['jwt_token']]);
+        $userData['id'] = $userId;
+        return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_REGISTER, $tokenArr['jwt_token'], $userData));//注册成功即表示登录了，同时返回数据
     }
 
 
@@ -684,7 +686,8 @@ class AccountLogic
 
             $this->insertUserLoginLog($userId, $bindId, $deviceId, AccountCommon::LOGIN_TYPE_MOBILE, $deviceArr, $appId);//注册默认登录并写入登录日志
             $capLog->deleteSendCodeCache($key);
-            return ComBase::getReturnArray(['user_type' => UserCommon::TYPE_REGISTER, 'token' => $tokenArr['jwt_token']]);
+            $userData['id'] = $userId;
+            return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_REGISTER, $tokenArr['jwt_token'], $userData));//注册成功即表示登录了，同时返回数据
         }
 
         return ComBase::getParamsFormatErrorReturnArray('验证码错误');
@@ -770,6 +773,13 @@ class AccountLogic
         if (empty($deviceCode)) {
             return ComBase::getParamsErrorReturnArray();
         }
+
+        if (Yii::$app->params['jwt']['jwt_device_visitor_verification'] === false) {
+            //如果关闭了游客模式为了兼容前端的功能还是会返回token值，但仅为当前时间戳
+            return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_DEVICE_VISITOR, time(), ['id' => 0]));//统一获取token返回值
+        }
+
+
         $deviceType = $deviceArr['data']['device_type'] ?? 0;//设备类型
         $deviceSystem = $deviceArr['data']['system'] ?? '';//设备系统
         $deviceModel = $deviceArr['data']['model'] ?? '';//设备型号
@@ -800,8 +810,7 @@ class AccountLogic
         }
 
         $tokenArr = AccountCommon::getUserLoginToken($deviceUserId, UserCommon::TYPE_DEVICE_VISITOR, $appId);
-
-        return ComBase::getReturnArray(['user_type' => UserCommon::TYPE_DEVICE_VISITOR, 'token' => $tokenArr['jwt_token']]);
+        return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_DEVICE_VISITOR, $tokenArr['jwt_token'], ['id' => $deviceUserId]));//统一获取token返回值
     }
 
 }
