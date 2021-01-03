@@ -14,14 +14,29 @@ use Firebase\JWT\JWT;
 class AccountCommon
 {
 
+    /**
+     * 注意：登录类型1，2，3，10，20，30，40为绑定的登录类型，主要用于user_login_bind表和user_login_bind_third表
+     * 不能与11，21，31，41等搞混，避免相同类型例如微信app和web登录是两个账号
+     * 1，2，3因为不涉及区分所以目前采用相同
+     * 1，2，311,12,21,31等用于user_login_log表记录更详细的登录方式
+     */
+
     const LOGIN_TYPE_USERNAME = 1;//用户登录类型为用户名密码
     const LOGIN_TYPE_MOBILE = 2;//用户登录类型为手机号
     const LOGIN_TYPE_EMAIL = 3;//用户登录类型为邮箱
+
+    const LOGIN_TYPE_WECHAT = 10;//用户登录绑定类型为微信,login_bind_third保存使用
     const LOGIN_TYPE_WECHAT_APP = 11;//用户登录类型为微信app
     const LOGIN_TYPE_WECHAT_WEB = 12;//用户登录类型为微信网页
+
+    const LOGIN_TYPE_QQ = 20;//用户登录绑定类型为QQ,login_bind_third保存使用
     const LOGIN_TYPE_QQ_APP = 21;//用户登录类型为qqapp
     const LOGIN_TYPE_QQ_WEB = 22;//用户登录类型为qq网页
+
+    const LOGIN_TYPE_WB = 30;//用户登录绑定类型为微博,login_bind_third保存使用
     const LOGIN_TYPE_WB_APP = 31;//用户登录类型为微博app
+
+    const LOGIN_TYPE_APPLE = 40;//用户登录绑定类型为apple,login_bind_third保存使用
     const LOGIN_TYPE_APPLE_APP = 41;//用户登录类型为苹果app
 
 
@@ -54,7 +69,9 @@ class AccountCommon
             $jwtToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9' . '.' . $token;
             $jwtData = JWT::decode($jwtToken, Yii::$app->params['jwt']['jwt_md5_key'], array('HS256'));
         } catch (\Exception $exception) {
-            Yii::error('Jwt json 解码错误,有人使用非正常jwt');
+            if(strlen($token)>10){
+                Yii::error('Jwt json 解码错误,有人使用非正常jwt');
+            }
         }
         return $jwtData;
     }
@@ -232,7 +249,7 @@ class AccountCommon
             //非游客可以返回userid,部分场景可能判断当前用户是否为自己使用,游客userid设置为0避免前端判定混乱
             $id = intval($userData['id'] ?? 0);
         }
-        
+
         return ['id'=>$id,'user_type' => $userType, 'token' => $token, 'same' => $same];
     }
 

@@ -37,6 +37,10 @@ class ComBase
     const CODE_NO_AUTH_ERROR = 403;
     const MESSAGE_NO_AUTH_ERROR = '没有权限';
 
+    //服务未找到
+    const CODE_SERVER_NO_FIND_ERROR = 404;
+    const MESSAGE_SERVER_NO_FIND_ERROR = '服务未找到，请稍后重试';
+
     //获取游客token后重试,当开启了游客模式后游客jwt校验失败或权限验证允许游客访问action校验失败后返回便于前端获取游客token后重试
     const CODE_GET_VISITOR_TOKEN_RETRY = 422;
     const MESSAGE_GET_VISITOR_TOKEN_RETRY = '请重试';
@@ -55,11 +59,11 @@ class ComBase
 
     //服务端错误码
     const CODE_SERVER_ERROR = 500;
-    const MESSAGE_SERVER_ERROR = '服务端处理失败，请重试';
+    const MESSAGE_SERVER_ERROR = '服务处理失败，请重试';
 
     //服务器繁忙
     const CODE_SERVER_BUSY = 503;
-    const MESSAGE_SERVER_BUSY = '服务端繁忙，请稍后再试';
+    const MESSAGE_SERVER_BUSY = '服务繁忙，请稍后再试';
 
     /**
      * 返回数据格式数组

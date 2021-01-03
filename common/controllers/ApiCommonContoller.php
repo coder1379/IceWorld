@@ -18,12 +18,14 @@ class ApiCommonContoller extends BaseContoller
     public $enableCsrfValidation = false;
     public $excludeAccessLog = null; //访问日志不记录
 
-    public $excludeVisitorVer = ['visitortoken']; //排除游客验证,由于是基础类大部分可以游客访问所以采用排除,游客校验会受到全局配置影响,首先排除获取游客token自身
+    public $excludeVisitorVer = null; //排除游客验证,由于是基础类大部分可以游客访问所以采用排除,游客校验会受到全局配置影响,首先排除获取游客token自身
 
     public $userId = 0;//控制器userid
     public $visitorUserId = 0;//控制器游客id
 
-    public $userType = 0;//控制器usertype 主要判断是否为正式用户游客等 默认为0表示游客用户在游客表中查询
+    //控制器usertype 主要判断是否为正式用户游客等 默认为-1表示游客,如果没有成功解析jwt均按照游客身份判断
+    public $userType = -1;
+
     public $shortToken = null; //jwt.后的短token值 用于进行数据库比较
 
     public function beforeAction($action)
@@ -111,6 +113,7 @@ class ApiCommonContoller extends BaseContoller
     public function setUser()
     {
         $token = $this->post('token', '');
+        $token = strval($token);
         if (!empty($token) && strlen($token) < 500) {
             //获取user_id和user_type
             $jwtUser = AccountCommon::decodeUserLoginToken($token);
@@ -160,7 +163,7 @@ class ApiCommonContoller extends BaseContoller
     {
         if ($this->userType === UserCommon::TYPE_DEVICE_VISITOR && Yii::$app->params['jwt']['jwt_device_visitor_verification'] === true && $verifyCode !== ComBase::CODE_RUN_SUCCESS) {//是游客用户 & 开启jwt游客验证 & 验证不通过
 
-            if (in_array($actionId, $this->excludeVisitorVer, true)) {
+            if (!empty($this->excludeVisitorVer) && in_array($actionId, $this->excludeVisitorVer, true)) {
                 //如果为游客验证排除数据则不进行验证
                 return true;
             }

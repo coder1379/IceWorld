@@ -3,7 +3,6 @@
 namespace api\controllers;
 
 use common\controllers\AuthApiCommonContoller;
-use Yii;
 use common\services\user\UserLogic;
 use common\controllers\ApiCommonContoller;
 use yii\helpers\Json;

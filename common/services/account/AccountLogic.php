@@ -178,7 +178,7 @@ class AccountLogic
         $userId = 0; //续签的用户id不会串过来所以重新获取
         $shortToken = null;
         $oldToken = Yii::$app->request->post('token', '');
-
+        $oldToken = strval($oldToken);
         $appId = AppCommon::getAppId($params);
 
         $deviceArr = $this->getDeviceInfo($params); //优先验证参数防止后续直接返回游客token无法生成对应数据

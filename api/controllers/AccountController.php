@@ -2,7 +2,6 @@
 
 namespace api\controllers;
 
-use Yii;
 use common\services\account\AccountLogic;
 use common\controllers\ApiCommonContoller;
 use yii\helpers\Json;
@@ -14,6 +13,7 @@ use yii\helpers\Json;
 class AccountController extends ApiCommonContoller
 {
     public $enableCsrfValidation = false;
+    public $excludeVisitorVer = ['visitortoken'];//排除游客验证action,//这里排除了获取游客token
 
     /**
      * 通过用户名注册

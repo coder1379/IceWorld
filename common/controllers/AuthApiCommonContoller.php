@@ -78,7 +78,10 @@ class AuthApiCommonContoller extends ApiCommonContoller
             }
 
         } else {
-            //游客判断模式 主要判断是否开启游客模式，是否在允许游客访问中，不在直接返回重新登录
+            /**
+             * 游客判断模式 主要判断是否开启游客模式，是否在允许游客访问中
+             * 不在直接返回重新登录,未开启游客模式的这类情况已在前面处理不会走到这步
+             */
             if(Yii::$app->params['jwt']['jwt_device_visitor_verification'] === true && !empty($this->allowVisitorAccessActions) && in_array($actionId,$this->allowVisitorAccessActions,true)){
                 if(ComBase::CODE_RUN_SUCCESS === $verifyCode){
                     return true;

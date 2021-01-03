@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace h5mobile\assets;
+namespace api\assets;
 
 use yii\web\AssetBundle;
 
