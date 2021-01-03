@@ -16,7 +16,7 @@ use yii\helpers\Json;
 class ApiCommonContoller extends BaseContoller
 {
     public $enableCsrfValidation = false;
-    public $excludeAccessLog = []; //访问日志不记录
+    public $excludeAccessLog = null; //访问日志不记录
 
     public $excludeVisitorVer = ['visitortoken']; //排除游客验证,由于是基础类大部分可以游客访问所以采用排除,游客校验会受到全局配置影响,首先排除获取游客token自身
 

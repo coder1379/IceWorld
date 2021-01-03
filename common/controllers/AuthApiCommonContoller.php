@@ -12,11 +12,11 @@ use yii\helpers\Json;
 /**
  * 接口需用户登录及权限控制器基类
  */
-class ApiCommonAuthContoller extends ApiCommonContoller
+class AuthApiCommonContoller extends ApiCommonContoller
 {
     public $allowAccessActions = null;//设置不做任何校验用户即可访问的actions
 
-    public $allowVisitorAccessActions = null; //允许游客访问的actions,由于权限验证类大部分不允许游客访问所以采用允许例外而不是排除,仅当用户类型为游客时判断,若要排除游客验证直接使用 allowAccessActions不做任何验证,游客校验会受到全局配置影响
+    public $allowVisitorAccessActions = null; //允许游客访问的actions,由于权限验证类大部分不允许游客访问所以采用允许例外而不是排除,仅当用户类型为游客时判断,若要排除游客验证直接使用 allowAccessActions不做任何验证,游客校验会受到全局配置影响,注意如果关闭了游客模式，允许游客访问的内容将自动降级为不做任何访问限制
 
     public $verifyShortTokenActions = [];//需要进行短token校验的action(强安全性要求时使用例如修改密码,发表评论等),注意大小写要保持一致，是区分大小写的,建议均使用小写进行action命名
 
@@ -40,6 +40,12 @@ class ApiCommonAuthContoller extends ApiCommonContoller
             return true;
         }
 
+        //然后校验是否关闭了游客模式并且有允许游客访问的内容，有则降级为允许直接访问并结束后面流程
+        if(Yii::$app->params['jwt']['jwt_device_visitor_verification']===false && !empty($this->allowVisitorAccessActions) && in_array($actionId,$this->allowVisitorAccessActions,true)){
+            return true;
+        }
+
+        //之后才开始jwt正确性的校验
         if ($this->userType != UserCommon::TYPE_DEVICE_VISITOR) { //userType != -1即为正式用户
             if (ComBase::CODE_RUN_SUCCESS === $verifyCode) { //jwt验证状态为成功为正式用户jwt解密权限验证成功
 
@@ -47,6 +53,7 @@ class ApiCommonAuthContoller extends ApiCommonContoller
                  * 此处可以统一扩展更多用户的权限验证
                  * 例如判断用户是否有资格进行发言，数据写入等权限,并直接返回相应错误即可无需考虑游客相关问题
                  * 由于此处统一查询性能可能受到一定影响 少量独立验证建议在业务层自行实现
+                 * 可在controller中重写beforeAction控制独立业务，但需要注意必须优先执行父类beforeAction
                  */
 
                 //查询数据库token进行二次校验,开启严格模式或者在需要token验证的数组内执行 具体根据情况配置

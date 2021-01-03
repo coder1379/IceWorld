@@ -34,7 +34,7 @@ class ApitestController extends AuthController
                 $parentMethods = $parendRef->getMethods(\ReflectionMethod::IS_PUBLIC);
                 $ownMethods = array_diff($methods, $parentMethods);
 
-                if($parendRef->getShortName() == 'ApiCommonAuthContoller'){
+                if($parendRef->getShortName() == 'AuthApiCommonContoller'){
                     $token = 1;
                 }
                 if (!empty($ownMethods)) {

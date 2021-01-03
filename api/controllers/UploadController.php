@@ -4,7 +4,7 @@ namespace api\controllers;
 
 use Yii;
 use common\ComBase;
-use common\controllers\ApiCommonAuthContoller;
+use common\controllers\AuthApiCommonContoller;
 use common\lib\upload\UploadBase64;
 use common\services\upload\UploadLogic;
 use yii\helpers\Json;
@@ -13,7 +13,7 @@ use yii\helpers\Json;
  * 上传
  * @package api\controllers
  */
-class UploadController extends ApiCommonAuthContoller
+class UploadController extends AuthApiCommonContoller
 {
 
     /**
