@@ -131,11 +131,13 @@
                         }
                         renewalData = callApi('account/renewal',getDeviceInfo());
                         if(renewalData.code==yesCode){
-                            token = renewalData.token
-                            saveReturn = saveToken(token); //保存token到本地
-                            if(saveReturn!=true){
-                                alert("没有保存内容到本地权限，重新获取权限");
-                                return false;
+                            if(renewalData.same!=1){//防止无意义刷新返回值相同不对本地内容进行处理
+                                token = renewalData.token
+                                saveReturn = saveToken(token); //保存token到本地
+                                if(saveReturn!=true){
+                                    alert("没有保存内容到本地权限，重新获取权限");
+                                    return false;
+                                }
                             }
                             callProcess(url,paramsData,reTry+1);//递归重试
                         }else if(data.code==401){
