@@ -19,7 +19,7 @@ class AppCommon
      */
     public static function getAppId($postParams = null){
         #$appId = ComBase::getIntVal('_app_id', $params);//采用_开头防止冲突
-        $appId = 0;//使用0默认app
+        $appId = 1;//使用1默认系统app,对于app表第一个ID=1
         return $appId;
     }
 

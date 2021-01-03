@@ -51,7 +51,11 @@
                 <br/><br/>
                 返回类型：<br/>
 
-                code = 返回状态码，200 成功，大于200即为失败，弹出错误提示，401为权限验证失败需要进行重新登录<br/>
+                code = 返回状态码，200 成功，大于200即为失败，弹出错误提示
+                401为权限验证失败需要进行重新登录,
+                402为token过期调用续签接口获取新的token,
+                422为获取游客token并重试上一个业务接口<br/>
+
                 <br/>
                 msg = 返回文本描述，code=200 为成功描述 例如：操作成功，code>200 失败描述例如：登陆失败<br/>
                 <br/>
@@ -64,6 +68,95 @@
                 data 数组对象:{"code":200,"msg":"success。","data":[{"aa":1,"bb":2},{"cc":3,"dd":4}]}<br/>
                 <br/><br/>
 
+                前端接口调用封装示例：
+                <pre>
+                yesCode = 200;
+                function callApi(url,data){
+                    $.ajax(){
+                       success: return data;
+                       fail:alert('服务器连接异常,请稍后重试');
+                       fail:alert('网络异常');
+                    };
+                }
+
+                function saveTokenUserType(token,userType){
+                    //保存token和userType到本地,返回的token可能是用户的也可能是游客的所有每次更新token均需要更新usertype
+                    return true;
+                }
+
+                function clearToken(){
+                    return true;
+                }
+
+
+                function getDeviceInfo(){
+                    return {device_type:1,device_code:'123123',system:'ios',model:'ipod'};
+                }
+
+                function callProcess(apiurl,paramsData,reTry=0){
+
+                    token = local.token
+                    if(token==''){ //本地或cookie没有token，调用account/visitortoken 获取游客token
+                        data = callApi('account/visitortoken',getDeviceInfo());
+                        if(data.code==yesCode){
+                            token = data.token
+                            saveReturn = saveToken(token); //保存token到本地
+                            if(saveReturn!=true){
+                                alert("没有保存内容到本地权限，重新获取权限");
+                                return false;
+                            }
+                        }else{
+                            alert(data.msg);
+                            return;
+                        }
+                    }
+
+                    if(reTry>0 && token==''){
+                        //已经进行重试但token任然为空不在继续防止无效循环，给与提示
+                        clearToken();
+                        alert("服务器连接异常,请稍后重试");
+                        return false;
+                    }
+
+                    data = callApi(apiurl,paramsData);
+                    if(data.code==yesCode){
+                        return data;
+                    }else if(data.code==401){//去登录
+                        //尚未登录跳转登录页面
+                    }else if(data.code==402){//token 过期进行续签
+                        if(reTry>0){
+                            //重试中不在续签直接抛出异常，防止死循环
+                            alert("服务器连接异常，请稍后再试");
+                            return false;
+                        }
+                        renewalData = callApi('account/renewal',getDeviceInfo());
+                        if(renewalData.code==yesCode){
+                            token = renewalData.token
+                            saveReturn = saveToken(token); //保存token到本地
+                            if(saveReturn!=true){
+                                alert("没有保存内容到本地权限，重新获取权限");
+                                return false;
+                            }
+                            callProcess(url,paramsData,reTry+1);//递归重试
+                        }else if(data.code==401){
+                            //尚未登录跳转登录页面
+                        }else{
+                            //其余情况输出错误提示
+                            alert(data.msg);
+                        }
+
+                    }else if(data.code==422){ //获取游客token重试
+                            //本地token无效清空本地token
+                            clearToken();
+                            callProcess(url,paramsData,reTry+1);//递归重试
+                    }else{
+                        //其余情况输出错误提示
+                        alert(data.msg);
+                    }
+
+
+                }
+                </pre>
 
             </div>
             <?php
@@ -89,7 +182,8 @@
 
                                 <a style="margin-left: 10px;"
                                    href="javascript:void(0);"
-                                   onclick="copyToClipboard('<?php echo $cname.'/'.$key ?>')" class="label label-success radius">点击复制C/A</a>
+                                   onclick="copyToClipboard('<?php echo $cname . '/' . $key ?>')"
+                                   class="label label-success radius">点击复制C/A</a>
 
                                 <h4><?php if (!empty($m['tags']['notes'])) {
                                         echo $m['tags']['notes'];
