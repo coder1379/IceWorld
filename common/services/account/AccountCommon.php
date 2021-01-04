@@ -25,6 +25,9 @@ class AccountCommon
     const LOGIN_TYPE_MOBILE = 2;//用户登录类型为手机号
     const LOGIN_TYPE_EMAIL = 3;//用户登录类型为邮箱
 
+    const USER_LOGIN_BIND_LIST = [self::LOGIN_TYPE_USERNAME, self::LOGIN_TYPE_MOBILE, self::LOGIN_TYPE_EMAIL];//用户普通登录绑定支持类别
+
+
     const LOGIN_TYPE_WECHAT = 10;//用户登录绑定类型为微信,login_bind_third保存使用
     const LOGIN_TYPE_WECHAT_APP = 11;//用户登录类型为微信app
     const LOGIN_TYPE_WECHAT_WEB = 12;//用户登录类型为微信网页
@@ -38,6 +41,9 @@ class AccountCommon
 
     const LOGIN_TYPE_APPLE = 40;//用户登录绑定类型为apple,login_bind_third保存使用
     const LOGIN_TYPE_APPLE_APP = 41;//用户登录类型为苹果app
+
+    const USER_LOGIN_BIND_THIRD_LIST = [self::LOGIN_TYPE_WECHAT,self::LOGIN_TYPE_QQ,self::LOGIN_TYPE_WB,self::LOGIN_TYPE_APPLE];//允许第三方登录绑定的类型
+
 
 
     const DEVICE_TYPE_APP = 1;//用户设备类型 移动端
@@ -69,7 +75,7 @@ class AccountCommon
             $jwtToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9' . '.' . $token;
             $jwtData = JWT::decode($jwtToken, Yii::$app->params['jwt']['jwt_md5_key'], array('HS256'));
         } catch (\Exception $exception) {
-            if(strlen($token)>10){
+            if (strlen($token) > 10) {
                 Yii::error('Jwt json 解码错误,有人使用非正常jwt');
             }
         }
@@ -245,12 +251,12 @@ class AccountCommon
     {
         $id = 0;
         $userType = intval($userType);
-        if(!empty($userData) && $userType!==UserCommon::TYPE_DEVICE_VISITOR){
+        if (!empty($userData) && $userType !== UserCommon::TYPE_DEVICE_VISITOR) {
             //非游客可以返回userid,部分场景可能判断当前用户是否为自己使用,游客userid设置为0避免前端判定混乱
             $id = intval($userData['id'] ?? 0);
         }
 
-        return ['id'=>$id,'user_type' => $userType, 'token' => $token, 'same' => $same];
+        return ['id' => $id, 'user_type' => $userType, 'token' => $token, 'same' => $same];
     }
 
 }

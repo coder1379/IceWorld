@@ -8,8 +8,6 @@ use common\queues\SendMobileSmsJobs;
 use common\services\application\AppCommon;
 use common\services\captcha\CaptchaLogic;
 use common\services\sms\SmsCommon;
-use common\services\sms\SmsMobileApiModel;
-use common\services\sms\SmsMobileLogic;
 use Yii;
 use common\ComBase;
 use common\services\user\UserCommon;
@@ -86,6 +84,51 @@ class AccountLogic
 
         $insertSql = 'INSERT INTO {{%user_login_bind}} (`user_id`, `type`, `bind_key`,`app_id`) VALUES (:user_id,:type,:bind_key,:app_id);';
         Yii::$app->db->createCommand($insertSql, [':user_id' => $userId, ':type' => $type, ':bind_key' => $key, ':app_id' => $appId])->execute();
+        return Yii::$app->db->getLastInsertID();
+    }
+
+    /**
+     * 写入用户第三方登录绑定表:微信，qq，微博，苹果等
+     * @param $userId
+     * @param $type
+     * @param $key
+     * @param $thirdUserData 第三方用户信息,字段同数据库
+     * @param int $appId 应用id
+     * @return bool
+     * @throws \yii\db\Exception
+     */
+    private function insertUserLoginBindWithThird($userId, $type, $key, $thirdUserData, $appId = 0)
+    {
+        if (empty($userId) || empty($type) || empty($key) || empty($thirdUserData)) {
+            $allArgs = func_get_args();
+            throw new \Exception('insertUserLoginBindWithThird 写入用户第三方登录绑定表参数不能为空:' . json_encode($allArgs));
+        }
+
+        $bindUnionid = $thirdUserData['bind_unionid'] ?? '';
+        $bindNum = $thirdUserData['bind_num'] ?? '';
+        $bindNickname = $thirdUserData['bind_nickname'] ?? '';
+        $bindAvatar = $thirdUserData['bind_avatar'] ?? '';
+        $bindSex = intval($thirdUserData['bind_sex'] ?? 0);// 1男 2女，0未知
+        $bindBirthday = $thirdUserData['bind_birthday'] ?? 0;//生日未时间戳
+        $bindDistrict = $thirdUserData['bind_district'] ?? '';
+
+
+        $saveArr = [
+            ':user_id' => $userId,
+            ':type' => $type,
+            ':bind_key' => $key,
+            ':app_id' => $appId,
+            ':bind_unionid' => $bindUnionid,
+            ':bind_num' => $bindNum,
+            ':bind_nickname' => $bindNickname,
+            ':bind_avatar' => $bindAvatar,
+            ':bind_sex' => $bindSex,
+            ':bind_birthday' => $bindBirthday,
+            ':bind_district' => $bindDistrict,
+        ];
+
+        $insertSql = 'INSERT INTO {{%user_login_bind_third}} (`user_id`, `type`, `bind_key`,`app_id`,`bind_unionid`,`bind_num`,`bind_nickname`,`bind_avatar`,`bind_sex`,`bind_birthday`,`bind_district`) VALUES (:user_id,:type,:bind_key,:app_id,:bind_unionid,:bind_num,:bind_nickname,:bind_avatar,:bind_sex,:bind_birthday,:bind_district);';
+        Yii::$app->db->createCommand($insertSql, $saveArr)->execute();
         return Yii::$app->db->getLastInsertID();
     }
 
@@ -292,9 +335,10 @@ class AccountLogic
     /**
      * 账号密码登录(根据正则判断用户名类型是username,mobile,email)
      * @param $params
+     * @param $visitorId 游客id
      * @return array
      */
-    public function loginByAccountPwd($params)
+    public function loginByAccountPwd($params,$visitorId=0)
     {
         $userName = trim(ComBase::getStrVal('username', $params));
         $password = trim(ComBase::getStrVal('password', $params));
@@ -363,6 +407,8 @@ class AccountLogic
 
                 $this->insertUserLoginLog($userId, $bindData['id'], $deviceId, AccountCommon::LOGIN_TYPE_USERNAME, $deviceArr, $appId);//写入登录日志
 
+                $this->loginSuccessCall($userId); //登录成功扩展预留
+
                 return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($userData['type'], $tokenArr['jwt_token'], $userData));
             }
         }
@@ -421,9 +467,10 @@ class AccountLogic
     /**
      * 通过用户名密码注册
      * @param array $params
+     * @param int $visitorId 游客id
      * @return array
      */
-    public function registerByUsername($params)
+    public function registerByUsername($params,$visitorId=0)
     {
         if (empty($params) || empty($params['username'])) {
             return ComBase::getParamsErrorReturnArray('用户名，密码参数错误');
@@ -478,33 +525,18 @@ class AccountLogic
             'app_id' => $appId,
         ];
 
-        $token = '';
-        $userId = 0;
-        $bindId = 0;
-        $deviceId = 0;
-        $db = Yii::$app->db;
-        $transaction = $db->beginTransaction();
-        try {
-            $db->createCommand()->insert('{{%user}}', $userData)->execute(); //创建用户主表
-            $userId = $db->getLastInsertID();//获取用户主表id
-            $tokenArr = AccountCommon::getUserLoginToken($userId, UserCommon::TYPE_REGISTER, $appId);//获取用户登录token
-            $bindId = $this->insertUserLoginBindWithPwd($userId, AccountCommon::LOGIN_TYPE_USERNAME, $userName, $appId); //写入用户登录绑定密码类
-            $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);//更新用户登录设备信息
-            $transaction->commit();
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            Yii::error('registerByUsername 用户注册事务回滚:' . $e->getMessage());
-            return ComBase::getServerBusyReturnArray();
-        } catch (\Throwable $e) {
-            $transaction->rollBack();
-            Yii::error('registerByUsername 用户注册事务回滚:' . $e->getMessage());
-            return ComBase::getServerBusyReturnArray();
+        //统一调用用户注册事务便于维护返回类事接口返回数组
+        $saveReturnArr = $this->saveRegisterUserDataTransaction($appId, AccountCommon::LOGIN_TYPE_USERNAME, $userName, $userData, $deviceArr, $visitorId);
+        if ($saveReturnArr['code'] !== ComBase::CODE_RUN_SUCCESS) {
+            return $saveReturnArr;
+        } else {
+            $this->insertUserLoginLog($saveReturnArr['data']['user_id'], $saveReturnArr['data']['bind_id'], $saveReturnArr['data']['device_id'], AccountCommon::LOGIN_TYPE_USERNAME, $deviceArr, $appId);//注册默认登录并写入登录日志
+
+            $userData['id'] = $saveReturnArr['data']['user_id'];
+            $this->registerSuccessCall($userData['id'],$visitorId);//注册成功扩展调用
+
+            return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_REGISTER, $saveReturnArr['data']['jwt_token'], $userData));//注册成功即表示登录了，同时返回数据
         }
-
-        $this->insertUserLoginLog($userId, $bindId, $deviceId, AccountCommon::LOGIN_TYPE_USERNAME, $deviceArr, $appId);//注册默认登录并写入登录日志
-
-        $userData['id'] = $userId;
-        return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_REGISTER, $tokenArr['jwt_token'], $userData));//注册成功即表示登录了，同时返回数据
     }
 
 
@@ -524,9 +556,10 @@ class AccountLogic
     /**
      * 发送手机验证码
      * @param $params
+     * @param $visitorId 游客id
      * @return array
      */
-    public function sendMobileCode($params)
+    public function sendMobileCode($params,$visitorId=0)
     {
         $mobile = ComBase::getStrVal('mobile', $params);
         $areaCode = SmsCommon::getMobileAreaCode(ComBase::getStrVal('area_code', $params));
@@ -608,9 +641,10 @@ class AccountLogic
     /**
      * 通过手机号注册
      * @param array $params
+     * @param int $visitorId 游客id
      * @return array
      */
-    public function registerByMobile($params)
+    public function registerByMobile($params, $visitorId)
     {
         if (empty($params) || empty($params['mobile']) || empty($params['code'])) {
             return ComBase::getParamsErrorReturnArray('手机号或验证码参数错误');
@@ -661,45 +695,130 @@ class AccountLogic
                 'add_time' => $newTime,
             ];
 
-            $token = '';
-            $userId = 0;
-            $bindId = 0;
-            $deviceId = 0;
-            $db = Yii::$app->db;
-            $transaction = $db->beginTransaction();
-            try {
-                $db->createCommand()->insert('{{%user}}', $userData)->execute(); //创建用户主表
-                $userId = $db->getLastInsertID();//获取用户主表id
-                $tokenArr = AccountCommon::getUserLoginToken($userId, UserCommon::TYPE_REGISTER, $appId);//获取用户登录token
-                $bindId = $this->insertUserLoginBindWithPwd($userId, AccountCommon::LOGIN_TYPE_MOBILE, $saveMobile, $appId); //写入用户登录绑定密码类
-                $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);//更新用户登录设备信息
-                $transaction->commit();
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-                Yii::error('registerByMobile 用户手机号注册事务回滚:' . $e->getMessage());
-                return ComBase::getServerBusyReturnArray();
-            } catch (\Throwable $e) {
-                $transaction->rollBack();
-                Yii::error('registerByMobile 用户手机号注册事务回滚:' . $e->getMessage());
-                return ComBase::getServerBusyReturnArray();
+            //统一调用用户注册事务便于维护返回类事接口返回数组
+            $saveReturnArr = $this->saveRegisterUserDataTransaction($appId, AccountCommon::LOGIN_TYPE_MOBILE, $saveMobile, $userData, $deviceArr, $visitorId);
+            if ($saveReturnArr['code'] !== ComBase::CODE_RUN_SUCCESS) {
+                return $saveReturnArr;
+            } else {
+                $this->insertUserLoginLog($saveReturnArr['data']['user_id'], $saveReturnArr['data']['bind_id'], $saveReturnArr['data']['device_id'], AccountCommon::LOGIN_TYPE_MOBILE, $deviceArr, $appId);//注册默认登录并写入登录日志
+
+                $capLog->deleteSendCodeCache($key);//删除当前验证码
+                $userData['id'] = $saveReturnArr['data']['user_id'];
+                $this->registerSuccessCall($userData['id'],$visitorId);//注册成功扩展调用
+
+                return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_REGISTER, $saveReturnArr['data']['jwt_token'], $userData));//注册成功即表示登录了，同时返回数据
             }
 
-            $this->insertUserLoginLog($userId, $bindId, $deviceId, AccountCommon::LOGIN_TYPE_MOBILE, $deviceArr, $appId);//注册默认登录并写入登录日志
-            $capLog->deleteSendCodeCache($key);
-            $userData['id'] = $userId;
-            return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_REGISTER, $tokenArr['jwt_token'], $userData));//注册成功即表示登录了，同时返回数据
         }
 
         return ComBase::getParamsFormatErrorReturnArray('验证码错误');
 
     }
 
+
+    /**
+     * 注册成功调用扩展
+     * @param int $userId
+     * @param int $visitorId
+     * @return bool
+     */
+    private function registerSuccessCall($userId=0,$visitorId=0){
+        //注册成功后的预留扩展，例如后续注册成功与渠道相关关系等,自行维护
+
+        return true;
+    }
+
+    /**
+     * 登录成功调用扩展
+     * @param int $userId
+     * @return bool
+     */
+    private function loginSuccessCall($userId=0){
+        //登录成功后的预留扩展，例如后续登录成功与积分相关功能等
+
+        return true;
+    }
+
+    /**
+     * 统一封装用户注册事务便于维护与扩展,返回http参数规则
+     * @param $appId 应用id 传入，必须
+     * @param $registerType 注册类型必须如:AccountCommon::LOGIN_TYPE_MOBILE,LOGIN_TYPE_USERNAME,LOGIN_TYPE_WECHAT等
+     * @param $bindSaveKey 保存类型对应key,用户名,手机号，微信唯一key，QQ唯一key等
+     * @param $userData 保存的用户主表数据 外部初始化完成传入
+     * @param $deviceArr 设备相关参数外部校验完成传入
+     * @param int $visitorId 游客id，可为0
+     * @param array $thirdUserData 第三方用户信息字段同user_login_bind_third,第三方登录注册使用
+     * @return array
+     */
+    private function saveRegisterUserDataTransaction($appId, $registerType, $bindSaveKey, $userData, $deviceArr, $visitorId = 0, $thirdUserData = null)
+    {
+
+        if (empty($registerType) || empty($bindSaveKey) || empty($userData) || empty($deviceArr)) {
+            //理论不会进入,如果发生记录错误日志并返回前端提示
+            $allArgs = func_get_args();
+            Yii::error('saveRegisterUserDataTransaction 注册用户参数错误:' . json_encode($allArgs));
+            return ComBase::getParamsErrorReturnArray('注册参数校验异常，请联系客服');
+        }
+
+        if (!in_array($registerType, AccountCommon::USER_LOGIN_BIND_LIST, true) && !in_array($registerType, AccountCommon::USER_LOGIN_BIND_THIRD_LIST, true)) {
+            //理论不会进入,如果发生记录错误日志并返回前端提示
+            $allArgs = func_get_args();
+            Yii::error('saveRegisterUserDataTransaction 注册用户类型参数错误:' . json_encode($allArgs));
+            return ComBase::getParamsErrorReturnArray('不支持的注册类型，请联系客服');
+        }
+
+        $db = Yii::$app->db;
+        $transaction = $db->beginTransaction();
+        try {
+            $db->createCommand()->insert('{{%user}}', $userData)->execute(); //创建用户主表
+            $userId = $db->getLastInsertID();//获取用户主表id
+
+            $tokenArr = AccountCommon::getUserLoginToken($userId, UserCommon::TYPE_REGISTER, $appId);//获取用户登录token
+
+            //用户注册更多相关内容扩展区域，例如维护一个用户扩展表是要一同初始化等
+
+
+            //此处根据用户注册类型自动判断是放入用户名手机号绑定表还是第三方绑定表
+            $bindId = 0;
+            if (in_array($registerType, AccountCommon::USER_LOGIN_BIND_LIST, true)) {
+                //普通登录绑定表
+                $bindId = $this->insertUserLoginBindWithPwd($userId, $registerType, $bindSaveKey, $appId);
+            } else if (in_array($registerType, AccountCommon::USER_LOGIN_BIND_THIRD_LIST, true)) {
+                //第三方登录绑定表
+                $bindId = $this->insertUserLoginBindWithThird($userId, $registerType, $bindSaveKey, $thirdUserData, $appId);
+            }
+
+            $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);//更新用户登录设备信息
+            $transaction->commit();
+
+            if(!empty($visitorId)){//游客id不为空注册成功后更新游客表，便于统计转化率
+                Yii::$app->db->createCommand('update {{%device_visitor}} set user_id=:user_id,convert_time=:convert_time where id=:id and user_id=0', [':user_id' => $userId,':convert_time'=>time(), ':id' => $visitorId])->execute();
+            }
+
+            //事务完成返回数组
+            return ComBase::getReturnArray(['jwt_token' => $tokenArr['jwt_token'], 'user_id' => $userId, 'device_id' => $deviceId, 'bind_id' => $bindId]);
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            $allArgs = func_get_args();
+            Yii::error('saveRegisterUserDataTransaction 用户注册回滚' . 'msg:' . $e->getMessage() . '___params:' . json_encode($allArgs));
+            return ComBase::getServerBusyReturnArray();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            $allArgs = func_get_args();
+            Yii::error('saveRegisterUserDataTransaction 用户注册回滚' . 'msg:' . $e->getMessage() . '___params:' . json_encode($allArgs));
+            return ComBase::getServerBusyReturnArray();
+        }
+
+    }
+
     /**
      * 手机号验证码登录
      * @param $params
+     * @param $visitorId 游客id
      * @return array
      */
-    public function loginByMobileCode($params)
+    public function loginByMobileCode($params,$visitorId=0)
     {
 
         if (empty($params) || empty($params['mobile']) || empty($params['code'])) {
@@ -746,6 +865,8 @@ class AccountLogic
                 $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);
 
                 $this->insertUserLoginLog($userId, $bindData['id'], $deviceId, AccountCommon::LOGIN_TYPE_MOBILE, $deviceArr, $appId);//写入登录日志
+
+                $this->loginSuccessCall($userId); //登录成功扩展预留
 
                 return ComBase::getReturnArray(['user_type' => intval($userData['type']), 'token' => $tokenArr['jwt_token']]);
 

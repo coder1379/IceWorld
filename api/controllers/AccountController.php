@@ -13,7 +13,9 @@ use yii\helpers\Json;
 class AccountController extends ApiCommonContoller
 {
     public $enableCsrfValidation = false;
-    public $excludeVisitorVer = ['visitortoken'];//排除游客验证action,//这里排除了获取游客token
+
+    //排除游客验证action,//这里排除了获取游客token,与续签避免逻辑错误
+    public $excludeVisitorVer = ['visitortoken','renewal'];
 
     /**
      * 通过用户名注册
@@ -30,7 +32,7 @@ class AccountController extends ApiCommonContoller
     public function actionRegisterbyusername()
     {
         $logic = new AccountLogic();
-        $result = $logic->registerByUsername($this->post());
+        $result = $logic->registerByUsername($this->post(),$this->visitorUserId);
         return Json::encode($result);
     }
 
@@ -49,7 +51,7 @@ class AccountController extends ApiCommonContoller
     public function actionLogin()
     {
         $logic = new AccountLogic();
-        $result = $logic->loginByAccountPwd($this->post());
+        $result = $logic->loginByAccountPwd($this->post(),$this->visitorUserId);
         return Json::encode($result);
     }
 
@@ -64,7 +66,7 @@ class AccountController extends ApiCommonContoller
     public function actionSendmobilecode()
     {
         $logic = new AccountLogic();
-        $result = $logic->sendMobileCode($this->post());
+        $result = $logic->sendMobileCode($this->post(),$this->visitorUserId);
         return Json::encode($result);
     }
 
@@ -83,7 +85,7 @@ class AccountController extends ApiCommonContoller
     public function actionRegisterbymobile()
     {
         $logic = new AccountLogic();
-        $result = $logic->registerByMobile($this->post());
+        $result = $logic->registerByMobile($this->post(),$this->visitorUserId);
         return Json::encode($result);
     }
 
@@ -102,7 +104,7 @@ class AccountController extends ApiCommonContoller
     public function actionMobilecodelogin()
     {
         $logic = new AccountLogic();
-        $result = $logic->loginByMobileCode($this->post());
+        $result = $logic->loginByMobileCode($this->post(),$this->visitorUserId);
         return Json::encode($result);
     }
 
