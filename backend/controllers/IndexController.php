@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use common\services\admin\AdminLoginLogModel;
 use Yii;
 use common\base\BackendCommon;
 class IndexController extends AuthController
@@ -201,6 +202,23 @@ class IndexController extends AuthController
                     }else{
                         Yii::$app->session->remove('__captcha/index/captcha');
                         Yii::$app->session->remove('__captcha/index/captchacount');
+                        //登录成功写入登录日志
+                        $loginLogModel = new AdminLoginLogModel();
+                        $loginLogModel->admin_id = $this->getAdminId();
+                        $loginLogModel->type = 1;
+                        $loginLogModel->add_time = time();
+                        $loginLogModel->ip = Yii::$app->request->getRemoteIP();
+                        $loginLogModel->status = 1;
+                        $loginLogModel->device_desc = Yii::$app->request->getUserAgent();
+                        if(mb_strlen($loginLogModel->device_desc)>250){
+                            $loginLogModel->device_desc = mb_substr($loginLogModel->device_desc, 0, 250);
+                        }
+                        $loginLogModel->scenario = 'create';
+                        $bool = $loginLogModel->save();
+                        if(!$bool){
+                            $messageArr = $loginLogModel->getErrors();
+                            Yii::error('admin登录日志写入错误:'.json_encode($messageArr));
+                        }
                         return $this->redirect(array('index/index'));
                     }
 

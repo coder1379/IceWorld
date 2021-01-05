@@ -140,6 +140,13 @@ class AccountController extends ApiCommonContoller
     }
 
     /**
+     * 第三方登录待完善
+     */
+    public function actionThirdlogin(){
+
+    }
+
+    /**
      * 邮箱注册待扩展
      */
 
