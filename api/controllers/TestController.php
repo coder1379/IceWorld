@@ -60,6 +60,7 @@ class TestController extends ApiCommonContoller
         ComBase::getIntVal('id', $params);
         ComBase::getParamsErrorReturnArray();
         ComBase::getNoLoginReturnArray();
+
         exit();
         Yii::$app->db->createCommand("insert into {{%test_use_table}} (name,status,add_time,content) values (1,1,1,'1')")->execute();
         return Json::encode(ComBase::getReturnArray(['id' => Yii::$app->db->getLastInsertID()]));
