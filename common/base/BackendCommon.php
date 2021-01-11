@@ -112,7 +112,7 @@ class BackendCommon extends BaseCommon
      * 清除登陆cookie
      */
     public function clearLoginCookie(){
-        $cookies = Yii::$app->request->cookies;
+        $cookies = Yii::$app->response->cookies;
         $cookies->remove('adminloginname');
         $cookies->remove('adminlogintime');
         $cookies->remove('adminloginkey');

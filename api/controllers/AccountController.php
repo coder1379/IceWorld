@@ -27,6 +27,7 @@ class AccountController extends ApiCommonContoller
      * @param string $device_code 设备号(device_type=3使用fingerprintjs生成) 1
      * @param string $system 系统(device_type=1和2必填),选项：IOS|Android 0
      * @param string $model 型号(device_type=1和2必填),如RedMi5等 0
+     * @param int $source_channel_id 来源渠道id 0
      * @return json yes {"data":{"user_type":1,"token":"token"}}
      */
     public function actionRegisterbyusername()
@@ -80,6 +81,7 @@ class AccountController extends ApiCommonContoller
      * @param string $device_code 设备号(device_type=3使用fingerprintjs生成) 1
      * @param string $system 系统(device_type=1和2必填),选项：IOS|Android 0
      * @param string $model 型号(device_type=1和2必填),如RedMi5等 0
+     * @param int $source_channel_id 来源渠道id 0
      * @return json yes {"data":{"user_type":1,"token":"token"}}
      */
     public function actionRegisterbymobile()

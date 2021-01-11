@@ -523,6 +523,7 @@ class AccountLogic
             'type' => UserCommon::TYPE_REGISTER,
             'add_time' => $newTime,
             'app_id' => $appId,
+            'source_channel_id' => intval(ComBase::getIntVal('source_channel_id', $params)),//来源渠道ID,如果是传递字符串自行实现ID查询对应 m_source_channel table
         ];
 
         //统一调用用户注册事务便于维护返回类事接口返回数组
@@ -556,7 +557,7 @@ class AccountLogic
     /**
      * 发送手机验证码
      * @param $params
-     * @param $visitorId 游客id
+     * @param int $visitorId 游客id
      * @return array
      */
     public function sendMobileCode($params,$visitorId=0)
@@ -693,6 +694,7 @@ class AccountLogic
                 'status' => UserCommon::STATUS_YES,
                 'type' => UserCommon::TYPE_REGISTER,
                 'add_time' => $newTime,
+                'source_channel_id' => intval(ComBase::getIntVal('source_channel_id', $params)),//来源渠道ID,如果是传递字符串自行实现ID查询对应 m_source_channel table
             ];
 
             //统一调用用户注册事务便于维护返回类事接口返回数组
