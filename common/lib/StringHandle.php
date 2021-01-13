@@ -324,5 +324,18 @@ class StringHandle
         return $browser;
     }
 
+    /**
+     * 获取html 图片
+     * @param $content
+     * @param string $order
+     * @return string
+     */
+    public static function getHtmlImgs($content, $order = 0)
+    {
+        $pattern = "/<img.*?src=[\'|\"](.*?)[\'|\"].*?[\/]?>/";
+        preg_match_all($pattern, $content, $match);
+        return $match;
+    }
+
 
 }
