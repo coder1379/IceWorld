@@ -19,7 +19,7 @@ return [
             'tablePrefix' => 'm_',
             'username' => 'root',
             'password' => 'password',
-            'charset' => 'utf8',
+            'charset' => 'utf8mb4',
         ],
         //reids根据需要开启，测试默认不使用
         /*'redis' => [
