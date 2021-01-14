@@ -274,3 +274,7 @@ $saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
 ### user 字段 status 表示用户目前状态 -1删除或注销，1正常，2冻结，只有1表示正常，其余值都表示无法正常使用
 
 ###游客表仅用作与访问表进行转化统计不做其他使用
+
+[感谢Yii](https://www.yiiframework.com/)
+
+[感谢jetbrains为此项目提供的License](https://www.jetbrains.com/?from=IceWorld)
