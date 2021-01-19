@@ -1,6 +1,8 @@
 ICE WORLD 
 项目基础模板
-常用后台(crud,富文本,图,关联,下拉,多选),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app),account(jwt+token+续签+多app)
+常用后台(crud,富文本,图,关联,下拉,多选,导出),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app),account(jwt+token+续签+多app),多渠道管理(需自行生成后端代码),多app管理(需自行生成后端代码)
+
+待实现功能:admin管理接口debug,第三方登录集成,短信风控,api接口限速,backend加入编辑快捷模型,backend点击title排序,后台行为记录,用户转换率处理,接口调用频率监控
 ===============================
 ##新项目复制流程
 1.获取代码,
@@ -274,6 +276,7 @@ $saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
 ### user 字段 status 表示用户目前状态 -1删除或注销，1正常，2冻结，只有1表示正常，其余值都表示无法正常使用
 
 ###游客表仅用作与访问表进行转化统计不做其他使用
+
 
 [感谢Yii](https://www.yiiframework.com/)
 
