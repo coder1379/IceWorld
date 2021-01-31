@@ -376,10 +376,10 @@ class BaseLogic
 
         //填充返回分页数据
         $pagination = [
-            'page_size' => $pagination->getPageSize(),
+            'page_size' => intval($pagination->getPageSize()),
             'total_page' => $pagination->getPageCount(),
-            'page' => $pagination->getPage() + 1,
-            'total_count' => $pagination->totalCount,
+            'page' => intval($pagination->getPage()) + 1,
+            'total_count' => intval($pagination->totalCount),
         ];
         $listArray = [
             'list' => $list,
