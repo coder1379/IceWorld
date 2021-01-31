@@ -101,6 +101,19 @@ AllapitestController.php 中手动写入需要全量测试的接口
 
 制作一套类似postman的系统，可以预定义参数，参数保存在后台用户里面
 
+基本安全如xss，csrf，文件上传，cookie等问题规范处理
+xss问题处理：
+对诸如<script>、<img>、<a>等标签进行过滤
+像一些常见的符号，如<>在输入的时候要对其进行转换编码，这样做浏览器是不会对该标签进行解释执行的，同时也不影响显示效果
+xss攻击要能达成往往需要较长的字符串，因此对于一些可以预期的输入可以通过限制长度强制截断来进行防御
+例如：htmlspecialchars($string,ENT_QUOTES)
+参考：https://blog.csdn.net/qq_33862644/article/details/79344684
+https://zhuanlan.zhihu.com/p/52437131
+https://segmentfault.com/q/1010000004067521
+https://blog.csdn.net/levones/article/details/80654233
+待测试更多细节与封装
+
+
 ```
 composer 常用流程
 1 初始化项目:
