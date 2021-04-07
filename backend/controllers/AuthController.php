@@ -1,8 +1,10 @@
 <?php
+
 namespace backend\controllers;
 
 
 use common\ComBase;
+use common\lib\StringHandle;
 use Yii;
 use common\controllers\BaseContoller;
 use common\base\BackendCommon;
@@ -17,68 +19,123 @@ class AuthController extends BaseContoller
 
     public function beforeAction($action)
     {
+        if(Yii::$app->params['save_admin_action_log']===true){
+            $this->saveAdminLog();// 统一每次请求都进行记录
+        }
+
         $backendCommon = new BackendCommon();
 
         ////////////////检查是否属于无需权限验证的操作
-        if(!in_array($action->id,$this->noLoginAccess,true)){
+        if (!in_array($action->id, $this->noLoginAccess, true)) {
             ////需要进行权限验证
-            if($backendCommon->checkLogin()===true){
+            if ($backendCommon->checkLogin() === true) {
 
                 //获取并设置权限字段
-                $authList  = $backendCommon->getAuthList();
-                $authJson = json_decode(empty($authList['auth_list'])==true?'':$authList['auth_list']);//获取主权限json
+                $authList = $backendCommon->getAuthList();
+                $authJson = json_decode(empty($authList['auth_list']) == true ? '' : $authList['auth_list']);//获取主权限json
                 $this->adminMainRoleJson = $authJson; //将主权限付给变量
                 //辅权限设置
-                $otherAuthArray = explode(',',empty($authList['other_auth_list'])==true?'':$authList['other_auth_list']);
+                $otherAuthArray = explode(',', empty($authList['other_auth_list']) == true ? '' : $authList['other_auth_list']);
                 $this->adminOtherRoleArray = $otherAuthArray; //设置辅助权限控制器全局变量
 
 
-                if(!empty($authList)){
-                    
-                    if(!empty($authList['is_admin']) && $authList['is_admin']===1){
+                if (!empty($authList)) {
+
+                    if (!empty($authList['is_admin']) && $authList['is_admin'] === 1) {
                         return true;
                     }
-                    
-                    $controllerId=$action->controller->id;
-                    $actionId=$action->id;
+
+                    $controllerId = $action->controller->id;
+                    $actionId = $action->id;
 
                     $authLevel = Yii::$app->params['authLevel'];
-                    if($authLevel==1){
-                        if(!empty($authJson->$controllerId)){
+                    if ($authLevel == 1) {
+                        if (!empty($authJson->$controllerId)) {
                             return true;
                         }
-                    }else if($authLevel==2){
-                        if(!empty($authJson->$controllerId->$actionId)){
+                    } else if ($authLevel == 2) {
+                        if (!empty($authJson->$controllerId->$actionId)) {
                             return true;
                         }
                     }
 
-                    if(in_array($controllerId.'/'.$actionId,$otherAuthArray,true)){
+                    if (in_array($controllerId . '/' . $actionId, $otherAuthArray, true)) {
                         //主权验证不通过验证辅权限
                         return true;
                     }
                 }
-                
+
                 ///////////////没有操作权限 start
-                if(Yii::$app->request->isAjax==true){
-                    $this->echoJson([],ComBase::CODE_NO_AUTH_ERROR,'您没有当前操作的权限!');
-                }else{
+                if (Yii::$app->request->isAjax == true) {
+                    $this->echoJson([], ComBase::CODE_NO_AUTH_ERROR, '您没有当前操作的权限!');
+                } else {
                     echo "您没有当前操作的权限!";
                     exit();
                 }
                 ///////////////没有操作权限 end
-            }else{
+            } else {
                 ///////////////登录已超时 start
                 if (Yii::$app->request->isAjax == true) {
-                    $this->echoJson([],ComBase::CODE_NO_AUTH_ERROR,'登录已超时，请重新登录！');
-                    } else {
-                        echo "登录已超时，请重新登录！";
-                        exit();
-                    }
+                    $this->echoJson([], ComBase::CODE_NO_AUTH_ERROR, '登录已超时，请重新登录！');
+                } else {
+                    echo "登录已超时，请重新登录！";
+                    exit();
+                }
                 ///////////////登录已超时 end
             }
         }
         return true;
+    }
+
+    /**
+     * 保存管理员操作日志
+     */
+    private function saveAdminLog()
+    {
+        try {
+            $allParams = [];
+            $requestList = $this->getRequestAll();
+            if (!empty($requestList)) {
+                foreach ($requestList as $key => $item) {
+                    if (is_array($item)) {
+                        $tepStr = json_encode($item);
+                        if (mb_strlen($tepStr) > 100) {
+                            $tepStr = mb_substr($tepStr, 0, 100) . '...';
+                        }
+                        $allParams[$key] = $tepStr;
+
+                    } else {
+                        $item = strval($item);
+                        if (stripos($key, 'token') !== false || stripos($key, 'password') !== false || stripos($key, 'pwd') !== false || stripos($key, 'mobile') !== false || stripos($key, 'auth') !== false) {
+                            $item = StringHandle::getStarsString($item);
+                        }
+                        if (mb_strlen($item) < 50) {
+                            $allParams[$key] = $item;
+                        } else {
+                            $allParams[$key] = mb_substr($item, 0, 50) . '...';
+                        }
+                    }
+                }
+            }
+            if (!empty($_FILES)) {
+                $allParams = array_merge($allParams, $_FILES);
+            }
+            $allParams = json_encode($allParams);
+
+            $saveData = [
+                ':admin_id' => $this->getAdminId(),
+                ':module' => $this->module->id,
+                ':contoller' => $this->id,
+                ':action' => $this->action->id,
+                ':ip' => Yii::$app->request->getRemoteIP(),
+                ':add_time' => time(),
+                ':all_params' => $allParams,
+            ];
+            $insertSql = 'insert into {{%admin_log}} (admin_id,module,contoller,action,ip,add_time,all_params) value (:admin_id,:module,:contoller,:action,:ip,:add_time,CAST(:all_params AS JSON));';
+            Yii::$app->db->createCommand($insertSql, $saveData)->execute();
+        } catch (\Exception $excep) {
+            Yii::error('管理员操作日志写入异常:' . $excep->getMessage());
+        }
     }
 
     /**
@@ -123,7 +180,8 @@ class AuthController extends BaseContoller
         return Json::encode($this->getJsonArray($data, $code, $msg));
     }
 
-    public function getAdminId(){
+    public function getAdminId()
+    {
         $backendCommon = new BackendCommon();
         return $backendCommon->getAdminId();
     }
