@@ -16,8 +16,6 @@ class AllapitestController extends AuthController
      */
     public $layout = 'main-iframe';
 
-    public $noLoginAccess = ['index'];
-
     /**
      * Lists all WebsiteNewsModel models.
      * @return mixed

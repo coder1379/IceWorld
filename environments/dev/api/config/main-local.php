@@ -14,18 +14,22 @@ if (!YII_ENV_TEST) {
 
     function checkDebugAccessAuthShowListAPI($action = null)
     {
-        #$actionId = $action->id??'';
         $modelId = $action->controller->module->id??'';
-        $remIp = Yii::$app->getRequest()->getHeaders()['remoteip'] ?? '';
-        $hostName = Yii::$app->getRequest()->getHeaders()['host'] ?? '';
-        $allowIp = Yii::$app->params['debug_access_ip'] ?? '';
-        $allowHost = Yii::$app->params['debug_access_host'] ?? '';
-        if (!empty($remIp) && !empty($allowIp) && in_array($remIp,$allowIp,true)) {
+        $apiDebugSaveId = Yii::$app->getRequest()->get('tempapidebugseaveid');
+        $md5TmpKey = Yii::$app->params['md5_tmp_key'];
+        $saveCookieKey = Yii::$app->params['api_debug_access_cookie'];
+        if(!empty($saveCookieKey) && strlen($saveCookieKey)>32 && strlen($saveCookieKey)<300 && $apiDebugSaveId === $saveCookieKey){
+            $cookies = Yii::$app->response->getCookies();
+            $cookies->add(new \yii\web\Cookie([
+                'name' => 'api_debug_'.md5($saveCookieKey.'_'.$md5TmpKey),
+                'value' => 'api_debug_value_'.md5($saveCookieKey).'_'.$md5TmpKey,
+                'expire'=>time()+3600,
+            ]));
             return true;
         }
 
-        if(!empty($hostName) && in_array($hostName,$allowHost,true)){
-            //本地代码直接返回true
+        $tempCookie = Yii::$app->request->cookies->getValue('api_debug_'.md5($saveCookieKey.'_'.$md5TmpKey));
+        if($tempCookie == 'api_debug_value_'.md5($saveCookieKey).'_'.$md5TmpKey){
             return true;
         }
 
@@ -38,7 +42,7 @@ if (!YII_ENV_TEST) {
 
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug']['class'] = 'yii\debug\Module';
-    $config['modules']['debug']['allowedIPs'] = ['127.0.0.1', '*'];
+    $config['modules']['debug']['allowedIPs'] = ['127.0.0.1', '*']; // 待测试 如果不知道任何ip无法进行访问
     $config['modules']['debug']['checkAccessCallback'] = "checkDebugAccessAuthShowListAPI";
     $config['modules']['debug']['historySize'] = 200;
 }
