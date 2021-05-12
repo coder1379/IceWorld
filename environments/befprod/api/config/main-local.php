@@ -38,7 +38,7 @@ function checkDebugAccessAuthShowListAPI($action = null)
     }
 
     $tempCookie = Yii::$app->request->cookies->getValue('api_debug_'.md5($saveCookieKey.'_'.$md5TmpKey));
-    if($tempCookie == 'api_debug_value_'.md5($saveCookieKey).'_'.$md5TmpKey){
+    if($tempCookie === 'api_debug_value_'.md5($saveCookieKey).'_'.$md5TmpKey){
         return true;
     }
 

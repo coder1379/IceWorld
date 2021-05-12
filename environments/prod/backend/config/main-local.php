@@ -26,7 +26,7 @@ function checkDebugAccessAuthShowList($action = null)
     $modelId = strtolower($modelId);
     $adminRoleId = Yii::$app->session["admin.roleid"] ?? 0;
     $adminRoleId = intval($adminRoleId);
-    $allowRole = Yii::$app->params['debug_access_role'] ?? [];
+    $allowRole = Yii::$app->params['backend_debug_access_role'] ?? [];
     if ($modelId === 'debug') {
         if (in_array($adminRoleId, $allowRole, true)) {
             return true;

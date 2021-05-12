@@ -4,8 +4,9 @@ return [
     'project_name' => 'IceWorld',//项目名称用于各类提示信息title !!******!!!
     'md5_tmp_key' => 'ice_world',//md5临时加密秘钥用于图片路径,jwtToken生成等场景 可变更不影响使用 !!******!!!
     'md5_forever_key' => 'ice_world',//md5 永久加密key 项目初始化时修改后将不能再修改避免影响用户密码登录 !!******!!!
-    'api_debug_access_cookie' => 'ice_world0547861135577646fjwli2671kjbbqwbufye24lxlkejfe342', // api_debug 允许访问的key默认值，务必修改防止他人使用  至少64位长度不含url get无法传递的特殊字符 !!******!!!
     'admin_auto_login_key'=>'ien5l3Kjrb',//后台加密串 初始化时修改 修改后将导致后台自动登录需要重新登录一次 !!******!!!
+    'api_debug_access_cookie' => 'ice_world0547861135577646fjwli2671kjbbqwbufye24lxlkejfe342', // api_debug 允许访问的key默认值，务必修改防止他人使用  至少64位长度不含url get无法传递的特殊字符 !!******!!!
+    'backend_debug_access_role' => [2], //允许访问后台debug的后台管理role权限 2为超级管理员
     'jwt'=>[
         'jwt_strict_verification' => false,//jwt严格验证,默认false不开启,true将验证token，除特殊项目外不建议开启,对性能有一定影响,每次将查询user_login_device table token是否存在 类似传统登录模式,注意：游客没有token验证模式
         'jwt_md5_key' => 'ice_world',//jwt Token生成key注意保护,可变更但会导致已经签发的jwt登录失效 !!******!!!
