@@ -1,8 +1,8 @@
 ICE WORLD 
 项目基础模板
-常用后台(crud,富文本,图,关联,下拉,多选,导出),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app),account(jwt+token+续签+多app),多渠道管理(需自行生成后端代码),多app管理(需自行生成后端代码),运营后台操作日志
+常用后台(crud,富文本,图,关联,下拉,多选,导出),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app),发送短信倒计时缓存处理,account(jwt+token+续签+多app),多渠道管理(需自行完成后端代码),多app管理(需自行完成后端代码),运营后台操作日志,admin管理接口debug,错误信息自动推送钉钉,消息队列
 
-#####待实现功能:admin管理接口debug,第三方登录集成,短信风控,api接口限速,backend加入编辑快捷模型,backend点击title排序,用户转换率处理,接口调用频率监控,敏感词处理
+#####待实现功能:第三方登录集成,短信风控,api接口限速,backend加入编辑快捷模型,backend点击title排序,用户转换率处理,接口调用频率监控,敏感词处理
 
 
 ===============================
@@ -10,7 +10,7 @@ ICE WORLD
 1.获取代码,
 2.创建db,
 3.导入db,
-4.配置api,admin域名,static(选择)
+4.配置api,admin域名,static(选择性配置)
 5.修改environments dev,befprod,prod 下 common/main-local.php common/params-local.php对应参数, 执行init
 6.修改commmon/params.php对应参数
 7.添加systemd queue守护进程 详见：systemd 常见配置
