@@ -580,7 +580,12 @@ class AccountLogic
 
         $saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
 
+        //短信防刷处理
+        //待开发
+
         $bindUser = AccountCommon::getUserLoginBindWithPwdTypes($saveMobile, $appId);
+
+        // 根据自己的场景进行相应判断与处理
         if ($scene === SmsCommon::CODE_SCENE_REGISTER) {
             if (!empty($bindUser)) {
                 return ComBase::getParamsErrorReturnArray('手机号已经注册');
