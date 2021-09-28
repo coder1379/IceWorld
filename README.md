@@ -21,6 +21,7 @@ ICE WORLD
 ```
 9.根据需求修改模板框架以提高开发速度,注意user仅可覆盖admin后台相关与apimodel，userLogic与userController不能覆盖齐相关内容
 10.发布与测试,根据是否有redis选择 CaptchaLogic 缓存方式
+11.根据是否有短信实现短信发送逻辑
 
 ===============
 
@@ -271,6 +272,7 @@ python:pip install PyJWT
 ###excel 导出 在search中
 
 ###短信相关内容在 SmsCommom 中指定对应参数 
+### 真实环境发送短信逻辑代码需要自行维护 在SendMobileSmsJobs中
 ###开启国际海外手机号支持流程 需修改 getMobileAreaCode 获取area_code规则，AccountCommon::getMobileFormatReturnError 完善海外手机号验证
 ###海外手机号模式 通过area_code判断是否为0或者86限制后续保存或缓存key是否携带区号和-
 ```

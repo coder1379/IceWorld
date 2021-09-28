@@ -23,6 +23,21 @@ class AuthController extends BaseContoller
             $this->saveAdminLog();// 统一每次请求都进行记录
         }
 
+        $controllerId = $action->controller->id;
+        $actionId = $action->id;
+
+        if(strlen($controllerId)>50 || strlen($action)>50){
+            // 检查控制器和action长度是否合规，尽可能避免问题
+            ///////////////没有操作权限 start
+            if (Yii::$app->request->isAjax == true) {
+                $this->echoJson([], ComBase::CODE_NO_AUTH_ERROR, '您没有当前操作的权限!');
+            } else {
+                echo "您没有当前操作的权限!";
+                exit();
+            }
+            ///////////////没有操作权限 end
+        }
+
         $backendCommon = new BackendCommon();
 
         ////////////////检查是否属于无需权限验证的操作
@@ -45,8 +60,8 @@ class AuthController extends BaseContoller
                         return true;
                     }
 
-                    $controllerId = $action->controller->id;
-                    $actionId = $action->id;
+                    /*$controllerId = $action->controller->id;
+                    $actionId = $action->id;*/
 
                     $authLevel = Yii::$app->params['authLevel'];
                     if ($authLevel == 1) {

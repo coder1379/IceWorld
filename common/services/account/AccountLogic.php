@@ -612,7 +612,7 @@ class AccountLogic
         }
 
         //创建异步发送验证码任务
-        $sendCode = StringHandle::getRandomNumber(6); //生产6位数字字符
+        $sendCode = StringHandle::getRandomNumber(4).mt_rand(10,99); //生成6位数字字符
         $name = SmsCommon::SCENE_STR_LIST[$scene] ?? '场景未配置';
         $paramsJson = [
             'code' => $sendCode,
