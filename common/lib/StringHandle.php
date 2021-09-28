@@ -337,5 +337,16 @@ class StringHandle
         return $match;
     }
 
+    /**
+     * 获取md5替换为l的字符串，根据时间戳
+     * @param $md5Str
+     * @param $time
+     * @return string
+     */
+    public static function getMd5ReplaceLStr($md5Str,$time){
+
+        return '';
+    }
+
 
 }
