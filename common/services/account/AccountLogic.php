@@ -3,6 +3,7 @@
 
 namespace common\services\account;
 
+use common\lib\CallLimit;
 use common\lib\StringHandle;
 use common\queues\SendMobileSmsJobs;
 use common\services\application\AppCommon;
@@ -581,7 +582,13 @@ class AccountLogic
         $saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
 
         //短信防刷处理
-        //待开发
+        $callLimit = new CallLimit();
+        $verify = $callLimit->verifyRequest($params, $mobile, Yii::$app->params['call_limit_keys']);
+        if($verify===true){
+            // 检查通过继续向下执行
+        }else{
+            return $verify;
+        }
 
         $bindUser = AccountCommon::getUserLoginBindWithPwdTypes($saveMobile, $appId);
 

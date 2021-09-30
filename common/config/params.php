@@ -32,4 +32,9 @@ return [
     'dingding_log_robot_token' => '123456',//钉钉日志机器人token ,如果生产与测试不同在local中自行覆盖 **
     'admin_site_show_name'=>'后台管理系统',//显示名称-可在local里覆盖标明测试环境 ***
     'send_sms' =>true,//短信消息是否真实发送,可在-local中false覆盖用于测试不真是发送
+    'call_limit_keys'=>[
+        'key0'=>'kwi2oi423iuyi2y22fwfer2',
+        'key1'=>'ljl23l2j34lj23lj5k3l4j5l3',
+        'key2'=>'fjwlejl34234234234345345345',
+    ], // 调用限制 md5 key列表注意一定要修改****
 ];

@@ -6,56 +6,132 @@ namespace common\lib;
 use common\ComBase;
 
 /**
- * 调用限制，目前主要用于短信调用限制
- * 设计规则：
- * 第一步 前端直接调用接口 不添加任何其他参数 返回：svtime=time(),m=m5(m5)time最后两位为l位置(*1小62为当前位置,过62取模为位置),type=不存在(直接处理并传回),1(加密前后约定k),2(数字验证码),3(行为验证码),4(结束) 等
- * 第二步递归判断(注意控制最多不超过5个防止异常导致无线循环)type类型并处理=不存在 判断l位置 替换为大i 规则见*1 回传 并添加参数 ff_type=type
- *                     type=1 添加传回参数svtime=第一步返回svtime,第一步m=m,m5=m5(svtime+m+key1)
- *                     type=2 显示图形码 传回带上type=1的 check_m5=m5(svtime+m+key2)
- *                     type=3 行为验证码 传回带上type=1的 check_m5=m5(svtime+m+key3)
- *                     type=4 结束
+ * 使用场景：主要用在一些防止批量调用得地方，目前主要用于短信调用限制
+ * 设计规则：前端第一次直接调用接口注意t参数不传或者为0,随后判断返回t除1,2,9外均结束并提示成功,129均按预定进行处理 type=1(加密前后约定k),2(数字验证码),9(替换)
+ * 第一步 前端直接调用接口 返回：t=n,e=time(),m=md5(md5(time+'_key0+'_'+'$keyword'))替换24位位l为I,time最后两位为l位置(位置%24+2)
+ * 第二步 根据第一步返回不同处理并回传对应需要参数结束流程
+ *       t=1 回传t=9外+m5=m5(e+_+key1+_+m)
+ *       t=2 回传t=9外+m5=m5(e+_+key2+_+m)图形验证码c=c
+ *       t=9 回传t=t,e=e,m=m(t最后两位为l位置(位置%24+2),替换为I回传）
+ *结束
+ *ip地址，mac地址，手机号等内容可自行扩充
  * Class CallLimit
  * @package common\lib
  */
 class CallLimit
 {
-    protected $firstKeys = [];
-    protected $limit1 = 1000; // 第一集限制
-
     /**
      * 检查
-     * @param $params
-     * @return bool 如果返回值！=true直接返回给前端 为true向下进行
+     * @param $params array 前端传递参数数组
+     * @param $keyword string 关键字 例如手机号
+     * @param $keys array 密钥数组
+     * @param $nextNum int 下一步对应返回t数字 默认为9，外部自行实现数量控制
+     * @return 如果返回值！=true直接返回给前端 为true向下进行
      */
-    public function check($params,$keys){
-        $key0 = $keys['key0']; // 后端使用
+    public function verifyRequest($params,$keyword,$keys,$nextNum=9){
+        $key0 = $keys['key0']; // 后端使用用于在低一步进行md5加密
         $key1 = $keys['key1']; // 前端对应type1
         $key2 = $keys['key2']; // 前端对应type2
-        $key3 = $keys['key3']; // 前端对应type3
-        if(empty($key0) || empty($key1) || empty($key2) || empty($key3)){
-            throw new \Exception('callLimit 调用限制keys参数缺失 需要4个key');
+        if(empty($key0) || empty($key1) || empty($key2) ){
+            throw new \Exception('callLimit 调用限制keys参数缺失 需要3个key');
         }
-
         $nowTime = time();
+        $nowMicTime = TimeLib::getMicrotimeInt();
+        $t = ComBase::getIntVal('t',$params); // 类别
 
-        $ffType = ComBase::getIntVal('ff_type',$params);
+        if(empty($t)){
+            // 第一步返回
+            $m = $this->getMd5ReplaceLStr($this->md5md5($nowMicTime,$key0,$keyword),$nowMicTime);
+            return ComBase::getReturnArray(['t'=>9,'e' => $nowMicTime, 'm' => $m]);
+        }else{
+            $eReq = ComBase::getStrVal('e', $params); // 时间
+            $mReq = ComBase::getStrVal('m', $params); // 加密替换后的值
+            $eTime = ceil(intval($eReq) / 1000);
 
-        if(empty($ffType)){
-            // $ffType 不存在为第一步返回数据
-            $m = StringHandle::getMd5ReplaceLStr(md5($nowTime . '_' . $key0),$nowTime);
-            return ComBase::getReturnArray(['svtime' => $nowTime, 'm' => $m]);
-        }else if($ffType===1){
-            $svtime = ComBase::getIntVal('svtime', $params);
+            $mOld = $this->getMd5ReplaceLStr($this->md5md5($eReq,$key0,$keyword),$eReq); // 重新生成的md5加密值
 
-            if(($svtime+30)>$nowTime){
-                // 时间未过期还有效
+            if($this->checkParamsStatus($mReq,$mOld,$eReq)){
+                if($t===9){
+                    if(($eTime+10)>$nowTime){
+                        // 时间未过期还有效,替换字符串模式有效时间不能超过10秒
+                        return true;
+                    }
+                }else if($t===1){
+                    //字符串加密模式
+                    if(($eTime+10)>$nowTime){
+                        // 时间未过期还有效,字符串加密模式有效时间不能超过10秒
+                        $m5 = ComBase::getStrVal('m5', $params);
+                        $m5New = $this->md5md5($eReq, $key1, $mReq);
+                        if(!empty($m5) && strlen($m5)>30 && strlen($m5)<100){
+                            if($m5 === $m5New){
+                                // 验证通过返回true
+                                return true;
+                            }
+                        }
+                    }
+                }else if($t===2){
+                    //图形验证码模式
+                    if(($eTime+300)>$nowTime){
+                        // 时间未过期还有效,验证码模式验证码有效时间不能超过5分钟
 
+                    }
+
+                }
             }
-
         }
 
+        return ComBase::getReturnArray([],ComBase::CODE_RUN_SUCCESS,'短信已发送');
+    }
 
-        return ComBase::getReturnArray(['type'=>4]);
+    /**
+     * 获取替换位置的值
+     * @param $micTime
+     * @return int
+     */
+    public function getReplacePositionStr($micTime){
+        return intval(substr($micTime, -2, 2))%24+2;
+    }
+
+    /**
+     * 获取md5替换为l的字符串，根据毫秒时间戳后三位
+     * @param $md5Str
+     * @param $micTime
+     * @return string
+     */
+    public function getMd5ReplaceLStr($md5Str,$micTime){
+        $micTime = strval($micTime);
+        $retainPosition = rand(2,30); // 保留l的位子 倒数第三第二
+        $replacePosition = $this->getReplacePositionStr($micTime); // 被替换为l得位子
+            if($replacePosition<16){
+                $retainPosition = $replacePosition + mt_rand(5,14);
+            }else{
+                $retainPosition = $replacePosition - mt_rand(5,14);
+            }
+        //echo $micTime.'_re:' . $retainPosition . '_pl:' . $replacePosition.PHP_EOL;
+        return substr_replace(substr_replace($md5Str,'l',$retainPosition,1),'l',$replacePosition,1);
+    }
+
+    /**
+     * 检查字符串规则是否通过
+     * @param $mReqStr string 获取的前端回传值
+     * @param $mOldStr string 后端重新加密的值
+     * @param $eReqStr string 前端传入的毫秒时间戳
+     * @return bool
+     */
+    public function checkParamsStatus($mReqStr,$mOldStr,$eReqStr){
+        if(!empty($mReqStr) && !empty($mOldStr) && strlen($mReqStr)>30 && strlen($mReqStr)<100 && strlen($mOldStr)>30){
+            $replacePosition = $this->getReplacePositionStr($eReqStr); // 被替换为l得位子
+            $positionVal = substr($mReqStr, $replacePosition, 1);
+            $newMd5Str = substr_replace($mReqStr, 'l', $replacePosition, 1);
+            if($positionVal==='I' && $newMd5Str === $mOldStr){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function md5md5($time,$key,$keyword){
+        return md5(md5($time . '_' . $key . '_' . $keyword));
     }
 
 }
