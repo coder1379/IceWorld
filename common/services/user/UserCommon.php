@@ -28,7 +28,7 @@ class UserCommon
      */
     public static function getUserByid($userId){
         $userId = intval($userId);
-        $sql = 'select * from {{%user}} where id=:id limit 1';
+        $sql = 'select * from {{%user}} where id=:id';
         return Yii::$app->db->createCommand($sql, [':id' => $userId])->queryOne();
     }
 
