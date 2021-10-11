@@ -3,11 +3,12 @@
 
 namespace common\lib;
 
+use common\base\BaseCache;
 use common\ComBase;
 
 /**
  * 使用场景：主要用在一些防止批量调用得地方，目前主要用于短信调用限制
- * 设计规则：前端第一次直接调用接口注意t参数不传或者为0,随后判断返回t除1,2,9外均结束并提示成功,129均按预定进行处理 type=1(加密前后约定k),2(数字验证码),9(替换)
+ * 设计规则：前端第一次直接调用接口注意t参数不传或者为0,随后判断返回t除1,2,9外均结束并提示成功,129均按预定进行处理 type=1(加密前后约定k),2(数字验证码,1010=验证码5分钟过期,重新获取并提交),9(替换)
  * 第一步 前端直接调用接口 返回：t=n,e=time(),m=md5(md5(time+'_key0+'_'+'$keyword'))替换24位位l为I,time最后两位为l位置(位置%24+2)
  * 第二步 根据第一步返回不同处理并回传对应需要参数结束流程
  *       t=1 回传t=9外+m5=m5(e+_+key1+_+m)
@@ -73,7 +74,11 @@ class CallLimit
                     //图形验证码模式
                     if(($eTime+300)>$nowTime){
                         // 时间未过期还有效,验证码模式验证码有效时间不能超过5分钟
+                        // 比较验证码
 
+
+                    }else{
+                        return ComBase::getReturnArray([],1010,'验证码已失效'); // 验证码失效告知用户，用户手动或自动刷新验证码，然后重新输入
                     }
 
                 }
@@ -130,8 +135,20 @@ class CallLimit
         return false;
     }
 
+    /**
+     * 生成md5
+     * @param $time
+     * @param $key
+     * @param $keyword
+     * @return string
+     */
     public function md5md5($time,$key,$keyword){
         return md5(md5($time . '_' . $key . '_' . $keyword));
+    }
+
+    public function getImageCode($keyword){
+       return BaseCache::getVal($keyword);
+       //////here
     }
 
 }

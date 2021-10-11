@@ -20,7 +20,7 @@ ICE WORLD
 * * * * * /usr/local/php74/bin/php /data/wwwroot/yii2/yii index/systemtour
 ```
 9.根据需求修改模板框架以提高开发速度,注意user仅可覆盖admin后台相关与apimodel，userLogic与userController不能覆盖齐相关内容
-10.发布与测试,根据是否有redis选择 CaptchaLogic 缓存方式
+10.发布与测试,根据是否有redis选择 CaptchaLogic 缓存方式，默认是文件，如果使用redis注意修改代码
 11.根据是否有短信实现短信发送逻辑
 
 ===============
