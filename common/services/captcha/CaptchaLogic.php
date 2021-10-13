@@ -6,7 +6,7 @@ use common\base\BaseCache;
 use Yii;
 
 /**
- * 验证码逻辑 注意使用当前类的 setCaptcha,getCaptcha 进行基本操作便于维护验证码的前缀
+ * 短信验证码逻辑 注意使用当前类的 setCaptcha,getCaptcha 进行基本操作便于维护验证码的前缀
  * 其余方法自动加入了业务前缀调用只需要传入具体值即可
  * @package common\services\captcha
  */
