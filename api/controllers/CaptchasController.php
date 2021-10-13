@@ -13,19 +13,29 @@ use yii\helpers\Json;
 class CaptchasController extends ApiCommonContoller
 {
 	public $enableCsrfValidation = false;
-    public $excludeAccessLog = ['captcha'];
-    public $excludeVisitorVer = ['captcha','getcaptcha'];
+    public $excludeAccessLog = ['imagecodecaptcha'];
+    public $excludeVisitorVer = ['imagecodecaptcha','getimagecodecaptcha'];
 
     /**
      * @inheritdoc
      */
     public function actions()
     {
+        $imageCodeTimeOut = 300;
+        $callLimitConfig = Yii::$app->params['call_limit'];
+        $imageCodeKeywordsName = null;
+        if(!empty($callLimitConfig) && !empty($callLimitConfig['sms']) && !empty($callLimitConfig['sms']['img_code_timeout'])){
+            $imageCodeTimeOut = $callLimitConfig['sms']['img_code_timeout'];
+            $imageCodeKeywordsName = $callLimitConfig['sms']['keywords_pre_name'];
+        }
+        if(empty($imageCodeKeywordsName)){
+            throw new \Exception('callLimit 调用限制缺少keywords_pre_name,statistics_pre_name默认值');
+        }
         return [
-            'captcha' =>  [ // 图像验证码
+            'imagecodecaptcha' =>  [ // 图像验证码
                 'class' => 'common\extend\ImageCaptchaAction',
-                'timeout' => 300,
-                'saveCacheKeywords' => 'calllimit_img_captcha_',
+                'timeout' => $imageCodeTimeOut,
+                'saveCacheKeywords' => $imageCodeKeywordsName,
                 'height' => 40,
                 'width' => 80,
                 'minLength' => 4,
@@ -35,9 +45,9 @@ class CaptchasController extends ApiCommonContoller
     }
 
     //非正式环境获取验证码测试使用
-    public function actionGetcaptcha(){
+    public function actionGetimagecodecaptcha(){
         if(YII_ENV!='prod'){
-            echo BaseCache::getVal('calllimit_img_captcha_'.Yii::$app->request->get('k'));
+            echo BaseCache::getVal(Yii::$app->params['call_limit']['sms']['keywords_pre_name'].Yii::$app->request->get('k'));
             exit();
         }
     }
