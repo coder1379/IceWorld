@@ -32,9 +32,25 @@ return [
     'dingding_log_robot_token' => '123456',//钉钉日志机器人token ,如果生产与测试不同在local中自行覆盖 **
     'admin_site_show_name'=>'后台管理系统',//显示名称-可在local里覆盖标明测试环境 ***
     'send_sms' =>true,//短信消息是否真实发送,可在-local中false覆盖用于测试不真是发送
-    'call_limit_keys'=>[
-        'key0'=>'kwi2oi423iuyi2y22fwfer2',
-        'key1'=>'ljl23l2j34lj23lj5k3l4j5l3',
-        'key2'=>'fjwlejl34234234234345345345',
+    'call_limit'=>[ //调用限速控制，如果没有使用可以直接屏蔽掉
+        'md5_keys'=>[
+            // md5md5限制的密钥，全项目相同公用
+            'key0'=>'kwi_2oi4=23iuyi2y-2fwr2', // 限速加密 !!******!!! 初始化时修改
+            'key1'=>'ljl=2332_l3jfg4=k3lj-l3',// 限速加密 !!******!!!初始化时修改
+            'key2'=>'fjwllmseei_wf234=3li_34565',// 限速加密 !!******!!! 初始化时修改
+        ],
+        'sms'=>[
+            // 短信控制的相关参数 keywords_pre_name，statistics_pre_name 主要为防止不同项目不同地方调用重名所以进行配置
+            'keywords_pre_name' => 'ice_sms_calllimit_img_captcha_', // 缓存关键字前缀配置名字 !!******!!! 建议替换ice为项目名称防止多项目公用redis导致意外问题
+            'statistics_pre_name' => 'ice_sms_calllimit_statistics_', // 缓存统计前缀配置名字 !!******!!! 建议替换ice为项目名称防止多项目公用redis导致意外问题
+            'img_code_timeout' => 300, //图片验证码过期时间
+
+            'level_1_day_max'=>500,// 每日最大值出现验证码 根据实际发送量调整,影响用户体验，建议值稍大一点
+            'level_1_hour_max'=>100,// 每小时最大值出现验证码 根据实际发送量调整,影响用户体验，建议值稍大一点
+
+            'level_2_day_max'=>2000,// 每日最大值二级验证 根据实际发送量不影响用户体验可以稍小
+            'level_2_hour_max'=>500,// 每小时最大值二级验证 根据实际发送量不影响用户体验可以稍小
+        ]
+        //如需要其他与短信分开的限制功能可以扩充，在new CallLimit(构造值),CaptchasController(类似imagecodecaptcha)时传入或直接写值即可
     ], // 调用限制 md5 key列表注意一定要修改****
 ];

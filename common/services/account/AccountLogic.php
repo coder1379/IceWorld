@@ -581,9 +581,9 @@ class AccountLogic
 
         $saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
 
-        //短信防刷处理
-        $callLimit = new CallLimit();
-        $verify = $callLimit->verifyRequest($params, $mobile, Yii::$app->params['call_limit_keys']);
+        //短信防刷处理 构成传入需要的基础参数 注意短信发送后调用 setStatisticsLevel设置统计量
+        $callLimit = new CallLimit(Yii::$app->params['call_limit']['sms']);
+        $verify = $callLimit->verifyRequest($params, $mobile);
         if($verify===true){
             // 检查通过继续向下执行
         }else{
@@ -647,6 +647,8 @@ class AccountLogic
         Yii::$app->db->createCommand()->insert('{{%sms_mobile}}', $saveParams)->execute();
         $lastId = Yii::$app->db->getLastInsertID();
         Yii::$app->queue->push(new SendMobileSmsJobs(['id' => $lastId]));
+
+        $callLimit->setStatisticsLevel(); // 设置统计短信发送的数量与等级，注意初始化对象与参数
 
         return ComBase::getReturnArray();
     }

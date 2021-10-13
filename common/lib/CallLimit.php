@@ -5,10 +5,11 @@ namespace common\lib;
 
 use common\base\BaseCache;
 use common\ComBase;
+use Yii;
 
 /**
  * 使用场景：主要用在一些防止批量调用得地方，目前主要用于短信调用限制
- * 设计规则：前端第一次直接调用接口注意t参数不传或者为0,随后判断返回t除1,2,9外均结束并提示成功,129均按预定进行处理 type=1(加密前后约定k),2(数字验证码,1010=验证码5分钟过期,重新获取并提交,type=2时就需要显示验证码(调用captchas/captcha获取,注意点击可以刷新)与输入验证码区域，输入验证码点击确定后进入第二步),9(替换)
+ * 设计规则：前端第一次直接调用接口注意t参数不传或者为0,随后判断返回t除1,2,9外均结束并提示成功,129均按预定进行处理 type=1(加密前后约定k),2(数字验证码,1010=验证码5分钟过期,重新获取并提交,type=2时就需要显示验证码(调用captchas/imagecodecaptcha获取,注意点击可以刷新)与输入验证码区域，输入验证码点击确定后进入第二步),9(替换)
  * 第一步 前端直接调用接口 返回：t=n,e=time(),m=md5(md5(time+'_key0+'_'+'$keyword'))替换24位位l为I,time最后两位为l位置(位置%24+2)
  * 第二步 根据第一步返回不同处理并回传对应需要参数结束流程
  *       t=1 回传t=9外+m5=m5m5(e+_+key1+_+m)
@@ -17,26 +18,67 @@ use common\ComBase;
  *结束
  *ip地址，mac地址，手机号等内容可自行扩充
  * Class CallLimit
+ *
+ * 前端使用方式如上。
+ * 后端使用方式：***
+ * 调用的地方创建calllimt对象，传入初始化参数对象或在params相关配置中配置然后初始化时传入。
+ * 调用完成相关方法后在调用 setStatisticsLevel 设置统计数及等级即可
+ *
  * @package common\lib
  */
 class CallLimit
 {
-    public $imageCodeCachePre = 'calllimit_img_cache_';
+    public $imageCodeCachePre = 'calllimit_img_captcha_'; // 缓存的图片验证码前缀
+    public $statisticsSavePre = 'calllimit_cache_'; // 限速缓存的关键字 默认值
+    public $imgCodeTimeout = 300; // 图像验证码过期时间 默认5分钟 可自行覆盖
+    public $md5Keys = null; // md5加密串
+    public $level1DayMax = 100; // 等级1每日最大值 可配置或传入覆盖
+    public $level1HourMax = 50; // 等级1 每小时最大值 可配置或传入覆盖
+    public $level2DayMax = 500; // 等级2每日最大值 可配置或传入覆盖
+    public $level2HourMax = 200; // 等级2每小时最大值 可配置或传入覆盖
 
     private $captchaTimeoutCode = 1010; // 验证码失效返回代号
+
+
+    public function __construct($configs)
+    {
+        if(empty($configs['keywords_pre_name']) || empty($configs['statistics_pre_name'])){
+            throw new \Exception('callLimit 调用限制缺少keywords_pre_name,statistics_pre_name默认值');
+        }
+        $this->imageCodeCachePre = $configs['keywords_pre_name'];
+        $this->statisticsSavePre = $configs['statistics_pre_name'];
+        if(!empty($configs['img_code_timeout'])){
+            $this->imgCodeTimeout = $configs['img_code_timeout'];
+        }
+        if(!empty($configs['level_1_day_max'])){
+            $this->level1DayMax = $configs['level_1_day_max'];
+        }
+
+        if(!empty($configs['level_1_hour_max'])){
+            $this->level1HourMax = $configs['level_1_hour_max'];
+        }
+
+        if(!empty($configs['level_2_day_max'])){
+            $this->level2DayMax = $configs['level_2_day_max'];
+        }
+
+        if(!empty($configs['level_2_hour_max'])){
+            $this->level2HourMax = $configs['level_2_hour_max'];
+        }
+
+        $this->md5Keys = Yii::$app->params['call_limit']['md5_keys'];
+    }
 
     /**
      * 检查
      * @param $params array 前端传递参数数组
      * @param $keyword string 关键字 例如手机号
-     * @param $keys array 密钥数组
-     * @param $nextNum int 下一步对应返回t数字 默认为9，外部自行实现数量控制
      * @return mixed 如果返回值！==true直接返回给前端 为true向下进行
      */
-    public function verifyRequest($params,$keyword,$keys,$nextNum=9){
-        $key0 = $keys['key0']; // 后端使用用于在低一步进行md5加密
-        $key1 = $keys['key1']; // 前端对应type1
-        $key2 = $keys['key2']; // 前端对应type2
+    public function verifyRequest($params,$keyword){
+        $key0 = $this->md5Keys['key0'] ?? null; // 后端使用用于在低一步进行md5加密
+        $key1 = $this->md5Keys['key1'] ?? null; // 前端对应type1
+        $key2 = $this->md5Keys['key2'] ?? null; // 前端对应type2
         if(empty($key0) || empty($key1) || empty($key2) ){
             throw new \Exception('callLimit 调用限制keys参数缺失 需要3个key');
         }
@@ -47,7 +89,7 @@ class CallLimit
         if(empty($t)){
             // 第一步返回
             $m = $this->getMd5ReplaceLStr($this->md5md5($nowMicTime,$key0,$keyword),$nowMicTime);
-            return ComBase::getReturnArray(['t'=>9,'e' => $nowMicTime, 'm' => $m]);
+            return ComBase::getReturnArray(['t'=>$this->getCurrentLimitLevel(),'e' => $nowMicTime, 'm' => $m]);
         }else{
             $eReq = ComBase::getStrVal('e', $params); // 时间
             $mReq = ComBase::getStrVal('m', $params); // 加密替换后的值
@@ -76,7 +118,7 @@ class CallLimit
                     }
                 }else if($t===2){
                     //图形验证码模式
-                    if(($eTime+300)>$nowTime){
+                    if(($eTime+$this->imgCodeTimeout)>$nowTime){
                         // 时间未过期还有效,验证码模式验证码有效时间不能超过5分钟
                         // 先比较校验码
                         $m5 = ComBase::getStrVal('m5', $params);
@@ -179,7 +221,41 @@ class CallLimit
      * @return mixed
      */
     public function getImageCode($keyword){
-       return BaseCache::getVal('calllimit_img_captcha_'.$keyword);
+       return BaseCache::getVal($this->imageCodeCachePre.$keyword);
+    }
+
+    /**
+     * 设置发送量及计算等级，可自行扩展风控去设置 $this->statisticsSavePre.'cur_level'的值,此处仅简单通过数量处理
+     */
+    public function setStatisticsLevel(){
+        // 缓存的keyname
+        $level1DayKey = $this->statisticsSavePre.'1day';
+        $level1HourKey = $this->statisticsSavePre.'1hour';
+        $level2DayKey = $this->statisticsSavePre.'2day';
+        $level2HourKey = $this->statisticsSavePre.'2hour';
+
+        //缓存keyname对应的值 INCR
+        $level1DayKeyVal = BaseCache::getVal($level1DayKey);
+        if(empty($level1DayKeyVal)){
+            $level1DayKeyVal = 0;
+        }else{
+            $level1DayKeyVal = intval($level1DayKeyVal);
+        }
+
+        // todo
+
+    }
+
+    /**
+     * 获取当前限制等级
+     */
+    public function getCurrentLimitLevel(){
+        $currentLimitLevel = BaseCache::getVal($this->statisticsSavePre.'cur_level');
+        if(empty($currentLimitLevel)){
+            $currentLimitLevel = 9;
+        }
+
+        return intval($currentLimitLevel);
     }
 
 }
