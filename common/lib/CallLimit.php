@@ -229,18 +229,23 @@ class CallLimit
      */
     public function setStatisticsLevel(){
         // 缓存的keyname
-        $level1DayKey = $this->statisticsSavePre.'1day';
-        $level1HourKey = $this->statisticsSavePre.'1hour';
-        $level2DayKey = $this->statisticsSavePre.'2day';
-        $level2HourKey = $this->statisticsSavePre.'2hour';
+        $nowTime = time();
+        $currentDayPre = $this->statisticsSavePre.date('Ymd', $nowTime).'_';
+        $currentHourPre = $this->statisticsSavePre.date('YmdH', $nowTime).'_';
 
-        //缓存keyname对应的值 INCR
-        $level1DayKeyVal = BaseCache::getVal($level1DayKey);
-        if(empty($level1DayKeyVal)){
-            $level1DayKeyVal = 0;
-        }else{
-            $level1DayKeyVal = intval($level1DayKeyVal);
-        }
+        $level1DayKey = $currentDayPre.'1day';
+        $level1HourKey = $currentHourPre.'1hour';
+        $level2DayKey = $currentDayPre.'2day';
+        $level2HourKey = $currentHourPre.'2hour';
+
+        $daySec = 86400; // 按天缓存过期时间
+        $hourSec = 3600; // 按小时缓存过期时间
+
+        //自增对应缓存的值并获取返回值
+        $level1DayKeyVal = BaseCache::getIncrValAndLt3SetEx($level1DayKey,$daySec);
+        $level1HourKeyVal = BaseCache::getIncrValAndLt3SetEx($level1HourKey,$hourSec);
+        $level2DayKeyVal = BaseCache::getIncrValAndLt3SetEx($level2DayKey,$daySec);
+        $level2HourKeyVal = BaseCache::getIncrValAndLt3SetEx($level2HourKey,$hourSec);
 
         // todo
 
