@@ -1,8 +1,8 @@
 ICE WORLD 
 项目基础模板
-常用后台(crud,富文本,图,关联,下拉,多选,导出),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app)(海外手机号),发送短信倒计时缓存处理,account(jwt+token+续签+多app),多渠道管理(需自行完成后端代码),多app管理(需自行完成后端代码),运营后台操作日志,admin管理接口debug,错误信息自动推送钉钉,消息队列
+常用后台(crud,富文本,图,关联,下拉,多选,导出),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app)(海外手机号),发送短信倒计时缓存处理,account(jwt+token+续签+多app),多渠道管理(需自行完成后端代码),多app管理(需自行完成后端代码),运营后台操作日志,admin管理接口debug,错误信息自动推送钉钉,消息队列,短信风控（仅后端逻辑代码，待前端同步测试）
 
-#####待实现功能:第三方登录集成,短信风控,backend加入编辑快捷模型,backend点击title排序,用户转换率处理,接口调用频率监控,敏感词处理,导出确认与相关处理
+#####待实现功能:第三方登录集成,backend点击title排序,用户转换率处理,导出确认与相关处理
 
 
 ===============================
@@ -20,7 +20,7 @@ ICE WORLD
 * * * * * /usr/local/php74/bin/php /data/wwwroot/yii2/yii index/systemtour
 ```
 9.根据需求修改模板框架以提高开发速度,注意user仅可覆盖admin后台相关与apimodel，userLogic与userController不能覆盖齐相关内容
-10.发布与测试,根据是否有redis选择 CaptchaLogic 缓存方式，默认是文件，如果使用redis注意修改代码,这里不全部统一使用cache配置redis方式是为了适应更多的场景，例如分布式时缓存与redis问题。
+10.发布与测试,根据是否有redis选择 CaptchaLogic 缓存方式，默认是文件，如果使用redis注意修改cacheType=2,这里不全部统一使用cache配置redis方式是为了适应更多的场景，例如分布式时缓存与redis问题。
 11.根据是否有短信实现短信发送逻辑
 
 ===============

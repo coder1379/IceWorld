@@ -28,6 +28,10 @@ use Yii;
  */
 class CallLimit
 {
+    const LEVEL_MD5 = 1; // md5加密枚举
+    const LEVEL_IMG_CODE = 2; // 图像验证码加密枚举
+    const LEVEL_REPLACE = 9; // 替换枚举
+
     public $imageCodeCachePre = 'calllimit_img_captcha_'; // 缓存的图片验证码前缀
     public $statisticsSavePre = 'calllimit_cache_'; // 限速缓存的关键字 默认值
     public $imgCodeTimeout = 300; // 图像验证码过期时间 默认5分钟 可自行覆盖
@@ -98,12 +102,12 @@ class CallLimit
             $mOld = $this->getMd5ReplaceLStr($this->md5md5($eReq,$key0,$keyword),$eReq); // 重新生成的md5加密值
 
             if($this->checkParamsStatus($mReq,$mOld,$eReq)){
-                if($t===9){
+                if($t===self::LEVEL_REPLACE){
                     if(($eTime+10)>$nowTime){
                         // 时间未过期还有效,替换字符串模式有效时间不能超过10秒
                         return true;
                     }
-                }else if($t===1){
+                }else if($t===self::LEVEL_MD5){
                     //字符串加密模式
                     if(($eTime+10)>$nowTime){
                         // 时间未过期还有效,字符串加密模式有效时间不能超过10秒
@@ -116,7 +120,7 @@ class CallLimit
                             }
                         }
                     }
-                }else if($t===2){
+                }else if($t===self::LEVEL_IMG_CODE){
                     //图形验证码模式
                     if(($eTime+$this->imgCodeTimeout)>$nowTime){
                         // 时间未过期还有效,验证码模式验证码有效时间不能超过5分钟
@@ -247,19 +251,52 @@ class CallLimit
         $level2DayKeyVal = BaseCache::getIncrValAndLt3SetEx($level2DayKey,$daySec);
         $level2HourKeyVal = BaseCache::getIncrValAndLt3SetEx($level2HourKey,$hourSec);
 
-        // todo
+        $currentLevelVarName = $this->getTodayCurrentLevelVarName();
 
+        if($level2DayKeyVal>$this->level2DayMax || $level2HourKeyVal>$this->level2HourMax){
+
+            $currentLevelVal = $this->getCurrentLimitLevel();
+            if($currentLevelVal===self::LEVEL_IMG_CODE){ // 如果当前等级已经等于2则不在修改设置
+                // 大于类型2图像验证码设置之后的访问需要验证码模式，当前等级过期时间为当天,可以考虑按小时进行重置
+                $retVal = BaseCache::setExVal($currentLevelVarName, self::LEVEL_IMG_CODE,$daySec);
+                if(empty($retVal)){
+                    // 等级切换失败,记录错误并提醒
+                    Yii::error('等级切换失败：calllimt限制等级切换为'.self::LEVEL_IMG_CODE.'不成功,注意排查问题,分类key：'.$this->statisticsSavePre);
+                }else{
+                    Yii::error('发生calllimt限制等级切换为'.self::LEVEL_IMG_CODE.',分类key：'.$this->statisticsSavePre);
+                }
+            }
+        }else if($level1DayKeyVal>$this->level1DayMax || $level1HourKeyVal>$this->level1HourMax){
+            // md5 类型范围内
+            $currentLevelVal = $this->getCurrentLimitLevel();
+            if($currentLevelVal===self::LEVEL_MD5){ // 如果当前等级已经等于1则不在修改设置
+                // 大于类型1 md5 设置之后的访问需要验证码模式，当前等级过期时间为当天
+                $retVal = BaseCache::setExVal($currentLevelVarName, self::LEVEL_MD5,$daySec);
+                if(empty($retVal)){
+                    // 等级切换失败,记录错误并提醒
+                    Yii::error('等级切换失败：calllimt限制等级切换为'.self::LEVEL_MD5.'不成功,注意排查问题,分类key：'.$this->statisticsSavePre);
+                }else{
+                    Yii::error('发生calllimt限制等级切换为'.self::LEVEL_MD5.',分类key：'.$this->statisticsSavePre);
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取今天当前等级的变量名
+     */
+    public function getTodayCurrentLevelVarName(){
+        return $this->statisticsSavePre . date('Ymd') . '_cur_level';
     }
 
     /**
      * 获取当前限制等级
      */
     public function getCurrentLimitLevel(){
-        $currentLimitLevel = BaseCache::getVal($this->statisticsSavePre.'cur_level');
+        $currentLimitLevel = BaseCache::getVal($this->getTodayCurrentLevelVarName());
         if(empty($currentLimitLevel)){
-            $currentLimitLevel = 9;
+            $currentLimitLevel = self::LEVEL_REPLACE;
         }
-
         return intval($currentLimitLevel);
     }
 

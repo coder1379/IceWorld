@@ -26,7 +26,7 @@ class AuthController extends BaseContoller
         $controllerId = $action->controller->id;
         $actionId = $action->id;
 
-        if(strlen($controllerId)>50 || strlen($action)>50){
+        if(strlen($controllerId)>50 || strlen($actionId)>50){
             // 检查控制器和action长度是否合规，尽可能避免问题
             ///////////////没有操作权限 start
             if (Yii::$app->request->isAjax == true) {
@@ -41,7 +41,7 @@ class AuthController extends BaseContoller
         $backendCommon = new BackendCommon();
 
         ////////////////检查是否属于无需权限验证的操作
-        if (!in_array($action->id, $this->noLoginAccess, true)) {
+        if (!in_array($actionId, $this->noLoginAccess, true)) {
             ////需要进行权限验证
             if ($backendCommon->checkLogin() === true) {
 

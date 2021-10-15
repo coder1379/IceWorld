@@ -93,7 +93,7 @@ class BaseCache
     }
 
     /**
-     * 获取自增后值，设置key自增如果小于3都将设置过期时间，尽可能防止参数脏数据
+     * 获取自增后值，设置key自增如果小于3都将设置过期时间，尽可能防止参数脏数据，主要提供给calllimit使用，其余地方注意看使用场景是否满足
      * @param $key
      * @param $expireTime int 多少秒后过期
      * @param object $db 存储数据主体(默认redis或cache),保存到不同存储区时使用
@@ -110,8 +110,8 @@ class BaseCache
                 $db = Yii::$app->redis;
             }
 
-            $incrNum = $db->incr($key);
-            if(intval($incrNum)<3){
+            $incrNum = intval($db->incr($key));
+            if($incrNum<3){
                 $db->expire($key, $expireTime);
             }
             return $incrNum;
