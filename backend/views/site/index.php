@@ -2,13 +2,12 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\GridView;
-use yii\widgets\Pjax;
 use common\base\BackendCommon;
 /* @var $this yii\web\View */
-/* @var $searchModel common\services\sms\SmsMobileSearch */
+/* @var $searchModel common\services\site\SiteSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = '短信记录';
+$this->title = '网站设置';
 $this->params['breadcrumbs'][] = $this->title;
 $common=new BackendCommon();
 $controllerId=Yii::$app->controller->id;
@@ -19,8 +18,8 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
 ?>
 <nav class="breadcrumb index-nav-list">
     <i class="Hui-iconfont">&#xe67f;</i> 首页
-    <span class="c-gray en">&gt;</span> 短信记录管理
-    <span class="c-gray en">&gt;</span> 短信记录列表
+    <span class="c-gray en">&gt;</span> 网站设置管理
+    <span class="c-gray en">&gt;</span> 网站设置列表
     <a class="btn btn-success radius r operation-reload-icon" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" >
         <i class="Hui-iconfont">&#xe68f;</i>
     </a>
@@ -28,7 +27,7 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
 <div class="page-container">
 
                 <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
-
+    
 <?php if($common->checkButtonAuth($mainAuthJson,$controllerId,'create',null)==true){ ?>    <div class="cl pd-5 mt-20">
         <span class="l">
             <a href="javascript:;" onclick="backend_create_data('添加','<?= Yii::$app->urlManager->createUrl(''.$controllerId.'/create') ?>',layerOpenWindowWidth,layerOpenWindowHeight)" class="btn btn-primary radius operation-add-icon">
@@ -51,28 +50,25 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
             'lastPageLabel'=>'尾页',
         ],
         'columns' => [
-            /*['class' => 'yii\grid\SerialColumn',
-                'header'=>'序号',
-            ],*/
-['class'=>'yii\grid\DataColumn','value'=>'id','label' => 'ID','enableSorting'=>true,'attribute' => 'id'],
-['class'=>'yii\grid\DataColumn','value'=>'name','label' => '短信名称','attribute' => 'id'],
-['class'=>'yii\grid\DataColumn','value'=>'object_id','label' => '短信对象ID'],
-['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->objectTypePredefine[$data['object_type']]??'';},'label' => '短信对象类型'],
-['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->userRecord->name??'';},'label' => '接收用户'],
-['class'=>'yii\grid\DataColumn','value'=>'mobile','label' => '手机号'],
-//['class'=>'yii\grid\DataColumn','value'=>'other_mobiles','label' => '其他接收手机号'],
-//['class'=>'yii\grid\DataColumn','value'=>'content','label' => '发送内容'],
-//['class'=>'yii\grid\DataColumn','value'=>'params_json','label' => '附加参数'],
-['class'=>'yii\grid\DataColumn','value'=>function($data){ if($data->send_time>0){ return date('Y-m-d H:i:s',$data->send_time); }else{ return ''; } },'label' => '发送时间'],
-['class'=>'yii\grid\DataColumn','value'=>'send_num','label' => '发送次数'],
-['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->typePredefine[$data['type']]??'';},'label' => '类型'],
-//['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->sendTypePredefine[$data['send_type']]??'';},'label' => '发送类型'],
-//['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->smsTypePredefine[$data['sms_type']]??'';},'label' => '短信渠道'],
-['class'=>'yii\grid\DataColumn','value'=>'template','label' => '发送模板'],
-//['class'=>'yii\grid\DataColumn','value'=>'feedback','label' => '发送反馈'],
-//['class'=>'yii\grid\DataColumn','value'=>'remark','label' => '短信备注'],
-['class'=>'yii\grid\DataColumn','value'=>function($data){ if($data->add_time>0){ return date('Y-m-d H:i:s',$data->add_time); }else{ return ''; } },'label' => '添加时间'],
-['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->statusPredefine[$data['status']]??'';},'label' => '状态'],
+            //['class' => 'yii\grid\SerialColumn',
+            //    'header'=>'序号',
+            //],
+
+['class'=>'yii\grid\DataColumn','value'=>'id','attribute' => 'id'],
+['class'=>'yii\grid\DataColumn','value'=>'name','attribute' => 'name'],
+//['class'=>'yii\grid\DataColumn','value'=>'introduce','attribute' => 'introduce'],
+['class'=>'yii\grid\DataColumn','value'=>'seo_title','attribute' => 'seo_title'],
+['class'=>'yii\grid\DataColumn','value'=>'seo_keywords','attribute' => 'seo_keywords'],
+//['class'=>'yii\grid\DataColumn','value'=>'seo_description','attribute' => 'seo_description'],
+['class'=>'yii\grid\DataColumn','value'=>'telphone','attribute' => 'telphone'],
+['class'=>'yii\grid\DataColumn','value'=>'mobile','attribute' => 'mobile'],
+['class'=>'yii\grid\DataColumn','value'=>'qq','attribute' => 'qq'],
+['class'=>'yii\grid\DataColumn','value'=>'email','attribute' => 'email'],
+['value'=>function($data){ return Html::a(Html::img($data->img_url,['class' => 'backend-index-img']),$data->img_url,['target' => '_blank']);},'attribute'=>'img_url','format'=>'raw'],
+//['value'=>function($data){ return Html::a(Html::img($data->cover,['class' => 'backend-index-img']),$data->cover,['target' => '_blank']);},'attribute'=>'cover','format'=>'raw'],
+['class'=>'yii\grid\DataColumn','value'=>function($data){ if($data->add_time>0){ return date('Y-m-d H:i:s',$data->add_time); }else{ return ''; } },'attribute' => 'add_time'],
+['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->statusPredefine[$data['status']]??'';},'attribute' => 'status'],
+//['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->typePredefine[$data['type']]??'';},'attribute' => 'type'],
             ['class' => 'yii\grid\ActionColumn',
                 'header' => '操作',
                 'template' => $buttonList,
@@ -87,6 +83,7 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
     ],
         ],
     ]); ?>
+
 </div>
 <script type="text/javascript">
  //自定义JS内容

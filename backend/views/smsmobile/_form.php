@@ -19,9 +19,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'object_id')->textInput() ?>
 
-    <?php echo $form->field($model, 'object_type')->label('短信对象类型')->dropDownList($model->objectTypePredefine,['options'=>[$model->object_type=>['Selected'=>true]]]); ?>
+    <?php echo $form->field($model, 'object_type')->dropDownList($model->objectTypePredefine,['options'=>[$model->object_type=>['Selected'=>true]]]); ?>
 
-    <?php echo $form->field($model, 'user_id')->label('接收用户')->dropDownList($model->getUserRecordList(),['options'=>[$model->user_id=>['Selected'=>true]]]); ?>
+    <?php echo $form->field($model, 'user_id')->dropDownList($model->getUserRecordList(),['options'=>[$model->user_id=>['Selected'=>true]]]); ?>
 
     <?php echo $form->field($model, 'area_code')->textInput(); ?>
 

@@ -63,21 +63,26 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
                 $hideStr = '//';
             }
            if($jsonV["type"]=="text"){
-            echo $hideStr."['label'=>'".$comarr[0]."','value'=>@\$model->".$jsonV["name"]."[\$model->".$name."]],\n";
+            //echo $hideStr."['label'=>'".$comarr[0]."','value'=>@\$model->".$jsonV["name"]."[\$model->".$name."]],\n"; // 原设置lable形式
+            echo $hideStr."['attribute'=>'".$name."','value'=>@\$model->".$jsonV["name"]."[\$model->".$name."]],\n";
                 }else if($jsonV["type"]=="db"){
-             echo $hideStr."['label'=>'".$comarr[0]."','value'=>@\$model->".$jsonV["name"]."->".$jsonV["showName"]."],\n";
+            // echo $hideStr."['label'=>'".$comarr[0]."','value'=>@\$model->".$jsonV["name"]."->".$jsonV["showName"]."],\n";
+            echo $hideStr."['attribute'=>'".$name."','value'=>@\$model->".$jsonV["name"]."->".$jsonV["showName"]."],\n";
                }else if($jsonV["type"]=="upload_image"){
-               echo $hideStr."['attribute' => '" . $name . "','label' => '".$comarr[0]."','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $name . ",['class'=>'backend-view-img']),\$model->" . $name . ",['target' => '_blank']),],\n";
+               //echo $hideStr."['attribute' => '" . $name . "','label' => '".$comarr[0]."','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $name . ",['class'=>'backend-view-img']),\$model->" . $name . ",['target' => '_blank']),],\n";
+               echo $hideStr."['attribute' => '" . $name . "','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $name . ",['class'=>'backend-view-img']),\$model->" . $name . ",['target' => '_blank']),],\n";
            }else if($jsonV["type"]=="more_text"){
                echo $hideStr."            '" . $name . "',\n";
            }else if($jsonV["type"]=="val"){
                if(!empty($jsonV["TimeFormat"]) && $jsonV["TimeFormat"]==1){
-                   echo $hideStr."['label'=>'".$comarr[0]."','value'=>((\$model->".$name.")>0?date('Y-m-d H:i:s',\$model->".$name."):''),\n";
+                   //echo $hideStr."['label'=>'".$comarr[0]."','value'=>((\$model->".$name.")>0?date('Y-m-d H:i:s',\$model->".$name."):''),\n";
+                   echo $hideStr."['attribute'=>'".$name."','value'=>((\$model->".$name.")>0?date('Y-m-d H:i:s',\$model->".$name."):''),\n";
                }else{
                    echo $hideStr."            '" . $name . "',\n";
                }
            }else if($jsonV["type"]=="rich_text"){
-               echo $hideStr."['attribute' => '" . $name . "','label' => '".$comarr[0]."','format' => 'raw','value'=>'<iframe srcdoc=\''.\$model->".$name.".'\' class=\'backend-view-iframe\' frameborder=\'1\'></iframe>'],\n";
+               //echo $hideStr."['attribute' => '" . $name . "','label' => '".$comarr[0]."','format' => 'raw','value'=>'<iframe srcdoc=\''.\$model->".$name.".'\' class=\'backend-view-iframe\' frameborder=\'1\'></iframe>'],\n";
+               echo $hideStr."['attribute' => '" . $name . "','format' => 'raw','value'=>'<iframe srcdoc=\''.\$model->".$name.".'\' class=\'backend-view-iframe\' frameborder=\'1\'></iframe>'],\n";
            }
           }else{
             if($name=='is_delete'){
@@ -106,23 +111,28 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
            if($jsonV["type"]=="text"){
 	   $format = $generator->generateColumnFormat($column);
 
-            echo $hideStr."['label'=>'".$comarr[0]."','value'=>@\$model->".$jsonV["name"]."[\$model->".$column->name."]],\n";
+            //echo $hideStr."['label'=>'".$comarr[0]."','value'=>@\$model->".$jsonV["name"]."[\$model->".$column->name."]],\n";
+            echo $hideStr."['attribute'=>'".$column->name."','value'=>@\$model->".$jsonV["name"]."[\$model->".$column->name."]],\n";
                 }else if($jsonV["type"]=="db"){
 
-             echo $hideStr."['label'=>'".$comarr[0]."','value'=>@\$model->".$jsonV["name"]."->".$jsonV["showName"]."],\n";
+             //echo $hideStr."['label'=>'".$comarr[0]."','value'=>@\$model->".$jsonV["name"]."->".$jsonV["showName"]."],\n";
+               echo $hideStr."['attribute'=>'".$column->name."','value'=>@\$model->".$jsonV["name"]."->".$jsonV["showName"]."],\n";
                                                   }else if($jsonV["type"]=="upload_image"){
-               echo $hideStr."['attribute' => '" . $column->name . "','label' => '".$comarr[0]."','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $column->name . ",['class'=>'backend-view-img']),\$model->" . $column->name . ",['target' => '_blank']),],\n";
+               //echo $hideStr."['attribute' => '" . $column->name . "','label' => '".$comarr[0]."','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $column->name . ",['class'=>'backend-view-img']),\$model->" . $column->name . ",['target' => '_blank']),],\n";
+               echo $hideStr."['attribute' => '" . $column->name . "','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $column->name . ",['class'=>'backend-view-img']),\$model->" . $column->name . ",['target' => '_blank']),],\n";
            }else if($jsonV["type"]=="more_text"){
                echo $hideStr."            '" . $column->name . ":ntext" . "',\n";
            }else if($jsonV["type"]=="val"){
                $format = $generator->generateColumnFormat($column);
                if(!empty($jsonV["TimeFormat"]) && $jsonV["TimeFormat"]==1){
-                   echo $hideStr."['label'=>'".$comarr[0]."','value'=>((\$model->".$column->name.")>0?date('Y-m-d H:i:s',\$model->".$column->name."):'')],\n";
+                   //echo $hideStr."['label'=>'".$comarr[0]."','value'=>((\$model->".$column->name.")>0?date('Y-m-d H:i:s',\$model->".$column->name."):'')],\n";
+                   echo $hideStr."['attribute'=>'".$column->name."','value'=>((\$model->".$column->name.")>0?date('Y-m-d H:i:s',\$model->".$column->name."):'')],\n";
                }else{
                    echo $hideStr."            '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
                }
            }else if($jsonV["type"]=="rich_text"){
-               echo $hideStr."['attribute' => '" . $column->name . "','label' => '".$comarr[0]."','format' => 'raw','value'=>'<iframe srcdoc=\''.\$model->".$column->name.".'\' class=\'backend-view-iframe\' frameborder=\'1\'></iframe>'],\n";
+               //echo $hideStr."['attribute' => '" . $column->name . "','label' => '".$comarr[0]."','format' => 'raw','value'=>'<iframe srcdoc=\''.\$model->".$column->name.".'\' class=\'backend-view-iframe\' frameborder=\'1\'></iframe>'],\n";
+               echo $hideStr."['attribute' => '" . $column->name . "','format' => 'raw','value'=>'<iframe srcdoc=\''.\$model->".$column->name.".'\' class=\'backend-view-iframe\' frameborder=\'1\'></iframe>'],\n";
            }
           }else{
                  if($column->name=='is_delete'){

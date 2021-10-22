@@ -112,23 +112,30 @@ if(empty($jsonV)!=true){
         $hideStr = '//';
     }
     if($jsonV["type"]=="text"){
-         echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>function(\$data){   return \$data->".$jsonV["name"]."[\$data['".$name."']]??'';},'label' => '".$commntstr."'],\n";
+         //echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>function(\$data){   return \$data->".$jsonV["name"]."[\$data['".$name."']]??'';},'label' => '".$commntstr."'],\n";
+        echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>function(\$data){   return \$data->".$jsonV["name"]."[\$data['".$name."']]??'';},'attribute' => '".$name."'],\n";
         }else if($jsonV["type"]=="db"){
-        echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>function(\$data){   return \$data->".$jsonV["name"]."->".$jsonV["showName"]."??'';},'label' => '".$commntstr."'],\n";
+        //echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>function(\$data){   return \$data->".$jsonV["name"]."->".$jsonV["showName"]."??'';},'label' => '".$commntstr."'],\n";
+        echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>function(\$data){   return \$data->".$jsonV["name"]."->".$jsonV["showName"]."??'';},'attribute' => '".$name."'],\n";
     }else if($jsonV["type"]=="upload_image"){
-        echo $hideStr."['value'=>function(\$data){ return Html::a(Html::img(\$data->".$name.",['class' => 'backend-index-img']),\$data->".$name.",['target' => '_blank']);},'label'=>'".$commntstr."','format'=>'raw'],\n";
+        //echo $hideStr."['value'=>function(\$data){ return Html::a(Html::img(\$data->".$name.",['class' => 'backend-index-img']),\$data->".$name.",['target' => '_blank']);},'label'=>'".$commntstr."','format'=>'raw'],\n";
+        echo $hideStr."['value'=>function(\$data){ return Html::a(Html::img(\$data->".$name.",['class' => 'backend-index-img']),\$data->".$name.",['target' => '_blank']);},'attribute'=>'".$name."','format'=>'raw'],\n";
     }else if($jsonV["type"]=="more_text"){
-        echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','label' => '".$commntstr."'],\n";
+        //echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','label' => '".$commntstr."'],\n";
+        echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','attribute' => '".$name."'],\n";
     }else if($jsonV["type"]=="val"){
         if(!empty($jsonV["TimeFormat"]) && $jsonV["TimeFormat"]==1){
-            echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>function(\$data){ if(\$data->".$name.">0){ return date('Y-m-d H:i:s',\$data->".$name."); }else{ return ''; } },'label' => '".$commntstr."'],\n";
+            //echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>function(\$data){ if(\$data->".$name.">0){ return date('Y-m-d H:i:s',\$data->".$name."); }else{ return ''; } },'label' => '".$commntstr."'],\n";
+            echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>function(\$data){ if(\$data->".$name.">0){ return date('Y-m-d H:i:s',\$data->".$name."); }else{ return ''; } },'attribute' => '".$name."'],\n";
         }else{
-            echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','label' => '".$commntstr."'],\n";
+            //echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','label' => '".$commntstr."'],\n";
+            echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','attribute' => '".$name."'],\n";
         }
     }
 }else{
     if($name=='is_delete'){}else{
-         echo "['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','label' => '".$commntstr."'],\n";
+         //echo "['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','label' => '".$commntstr."'],\n";
+        echo "['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','attribute' => '".$name."'],\n";
     }
 }
     }
