@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\GridView;
+use yii\widgets\Pjax;
 use common\base\BackendCommon;
 /* @var $this yii\web\View */
 /* @var $searchModel common\services\sms\SmsMobileSearch */
@@ -27,7 +28,7 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
 <div class="page-container">
 
                 <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
-    
+
 <?php if($common->checkButtonAuth($mainAuthJson,$controllerId,'create',null)==true){ ?>    <div class="cl pd-5 mt-20">
         <span class="l">
             <a href="javascript:;" onclick="backend_create_data('添加','<?= Yii::$app->urlManager->createUrl(''.$controllerId.'/create') ?>',layerOpenWindowWidth,layerOpenWindowHeight)" class="btn btn-primary radius operation-add-icon">
@@ -38,7 +39,7 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
 <?php } ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-    'layout'=>'<div>{items}</div><div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">{summary}</div><div id="DataTables_Table_0_paginate" class="dataTables_paginate paging_simple_numbers">{pager}</div></div>',
+    'layout'=>'<div>{sorter}</div><div>{items}</div><div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">{summary}</div><div id="DataTables_Table_0_paginate" class="dataTables_paginate paging_simple_numbers">{pager}</div></div>',
     'options'=>['class' => 'dataTables_wrapper','id'=>'DataTables_Table_0_wrapper'],
     'tableOptions'=>['class'=>'table table-border  table-bordered table-striped table-bg ','id'=>'DataTables_Table_0','role'=>'grid','aria-describedby'=>"DataTables_Table_0_info"
     ],
@@ -50,9 +51,9 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
             'lastPageLabel'=>'尾页',
         ],
         'columns' => [
-            //['class' => 'yii\grid\SerialColumn',
-            //    'header'=>'序号',
-            //],
+            /*['class' => 'yii\grid\SerialColumn',
+                'header'=>'序号',
+            ],*/
 
 ['class'=>'yii\grid\DataColumn','value'=>'id','label' => 'ID'],
 ['class'=>'yii\grid\DataColumn','value'=>'name','label' => '短信名称'],
@@ -87,7 +88,6 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
     ],
         ],
     ]); ?>
-
 </div>
 <script type="text/javascript">
  //自定义JS内容
