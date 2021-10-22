@@ -1,6 +1,6 @@
 ICE WORLD 
 项目基础模板
-常用后台(crud,富文本,图,关联,下拉,多选,导出(_search,nameSearch自行打开)),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app)(海外手机号),发送短信倒计时缓存处理,account(jwt+token+续签+多app),多渠道管理(需自行完成后端代码),多app管理(需自行完成后端代码),运营后台操作日志,admin管理接口debug,错误信息自动推送钉钉,消息队列,短信风控（仅后端逻辑代码，待前端同步测试）,backend点击title排序(自行修改nameSearch ActiveDataProvider->sort 具体如下方排序)
+常用后台(crud,富文本,图,关联,下拉,多选,导出(_search,nameSearch自行打开)),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app)(海外手机号),发送短信倒计时缓存处理,account(jwt+token+续签+多app),多渠道管理(需自行完成后端代码),多app管理(需自行完成后端代码),运营后台操作日志,admin管理接口debug,错误信息自动推送钉钉,消息队列,短信风控（仅后端逻辑代码，待前端同步测试）,backend点击title排序(默认关闭，自行修改nameSearch ActiveDataProvider->sort 具体如下方排序)
 
 #####待实现功能:第三方登录集成,用户转换率处理
 
@@ -301,22 +301,24 @@ $saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
 #######表头sort排序 注意 GridView::widget 'class'=>'yii\grid\DataColumn' 需要带有 attribute
 ```
 nameSearch 文件修改
-$dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_DESC
-                ],
-                'attributes' => [
-                    'id' => [
-                        'asc' => [
-                            'id' => SORT_ASC,
-                        ],
-                        'desc' => [
-                            'id' => SORT_DESC,
-                        ],
-                        'default' => SORT_ASC,
+
+  $dataProvider->setSort(false); // 默认关闭排序 使用设置为具体如下对应参数配合sort 及移除 $query->addOrderBy('<?php echo $idKey; ?> desc');
+
+open：
+        $dataProvider->setSort([
+            'defaultOrder' => [
+                'id' => SORT_DESC
+            ],
+            'attributes' => [
+                'id' => [
+                    'asc' => [
+                        'id' => SORT_ASC,
                     ],
+                    'desc' => [
+                        'id' => SORT_DESC,
+                    ],
+                    'default' => SORT_ASC,
+                ],
                 'name' => [
                     'asc' => [
                         'name' => SORT_ASC
@@ -327,8 +329,7 @@ $dataProvider = new ActiveDataProvider([
                     'default' => SORT_ASC,
                 ]
             ]
-          ]
-        ]);
+        ]); // 开启排序并设置排序属性及内容
 ```
 
 

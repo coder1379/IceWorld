@@ -164,6 +164,8 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
             $outputObj->run('导出'.date('YmdHis',time()),$header,$ext);
         }*/
 
+        $dataProvider->setSort(false); // 默认取消所有排序
+
         return $dataProvider;
     }
 }

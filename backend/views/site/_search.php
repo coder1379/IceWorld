@@ -8,7 +8,7 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="text-c search-form-group" style="">
+<div class="text-c search-form-group" style="display:none;">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
