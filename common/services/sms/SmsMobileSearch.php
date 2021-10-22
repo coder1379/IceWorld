@@ -48,6 +48,31 @@ class SmsMobileSearch extends SmsMobileModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_DESC
+                ],
+                'attributes' => [
+                    'id' => [
+                        'asc' => [
+                            'id' => SORT_ASC,
+                        ],
+                        'desc' => [
+                            'id' => SORT_DESC,
+                        ],
+                        'default' => SORT_ASC,
+                    ],
+                'name' => [
+                    'asc' => [
+                        'name' => SORT_ASC
+                    ],
+                    'desc' => [
+                        'name' => SORT_DESC,
+                    ],
+                    'default' => SORT_ASC,
+                ]
+            ]
+            ]
         ]);
 
         $this->load($params);
@@ -84,13 +109,15 @@ class SmsMobileSearch extends SmsMobileModel
             ->andFilterWhere(['like', 'remark', $this->remark]);
 
 
-        $query->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤
+        $query->andWhere(['>', 'status', ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤
 
         $query->with('userRecord');
-        
-            $query->addOrderBy('id desc');
 
-            
+        // $query->addOrderBy('id desc');
+
+
+      // $dataProvider->setSort(false);
+
         return $dataProvider;
     }
 }
