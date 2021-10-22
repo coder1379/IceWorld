@@ -100,6 +100,32 @@ class SiteSearch extends SiteModel
             $outputObj->run('导出'.date('YmdHis',time()),$header,$ext);
         }*/
 
+        $dataProvider->setSort([
+            'defaultOrder' => [
+                'id' => SORT_DESC
+            ],
+            'attributes' => [
+                'id' => [
+                    'asc' => [
+                        'id' => SORT_ASC,
+                    ],
+                    'desc' => [
+                        'id' => SORT_DESC,
+                    ],
+                    'default' => SORT_ASC,
+                ],
+                'name' => [
+                    'asc' => [
+                        'name' => SORT_ASC
+                    ],
+                    'desc' => [
+                        'name' => SORT_DESC,
+                    ],
+                    'default' => SORT_ASC,
+                ]
+            ]
+        ]); // 默认取消所有排序
+
         return $dataProvider;
     }
 }

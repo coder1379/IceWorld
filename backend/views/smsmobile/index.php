@@ -54,8 +54,8 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
             /*['class' => 'yii\grid\SerialColumn',
                 'header'=>'序号',
             ],*/
-['class'=>'yii\grid\DataColumn','value'=>'id','label' => 'ID','enableSorting'=>true,'attribute' => 'id'],
-['class'=>'yii\grid\DataColumn','value'=>'name','label' => '短信名称','attribute' => 'id'],
+['class'=>'yii\grid\DataColumn','value'=>'id','label' => 'ID','enableSorting'=>false,'attribute' => 'id'],
+['class'=>'yii\grid\DataColumn','value'=>'name','label' => '短信名称'],
 ['class'=>'yii\grid\DataColumn','value'=>'object_id','label' => '短信对象ID'],
 ['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->objectTypePredefine[$data['object_type']]??'';},'label' => '短信对象类型'],
 ['class'=>'yii\grid\DataColumn','value'=>function($data){   return $data->userRecord->name??'';},'label' => '接收用户'],
