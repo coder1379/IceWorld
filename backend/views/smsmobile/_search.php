@@ -8,7 +8,7 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="text-c search-form-group" style="display:none;">
+<div class="text-c search-form-group" style="">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -39,9 +39,9 @@ use yii\widgets\ActiveForm;
 
 <?php echo $form->field($model, 'send_num') ?>
 
- <?php echo $form->field($model, 'type')->label('类型')->dropDownList($model->typePredefine,['prompt' => '全部']) ?>
+ <?php echo $form->field($model, 'type')->dropDownList($model->typePredefine,['prompt' => '全部']) ?>
 
- <?php echo $form->field($model, 'send_type')->label('发送类型')->dropDownList($model->sendTypePredefine,['prompt' => '全部']) ?>
+ <?php echo $form->field($model, 'send_type')->dropDownList($model->sendTypePredefine,['prompt' => '全部']) ?>
 
  <?php echo $form->field($model, 'sms_type')->label('短信渠道')->dropDownList($model->smsTypePredefine,['prompt' => '全部']) ?>
 

@@ -1,8 +1,8 @@
 ICE WORLD 
 项目基础模板
-常用后台(crud,富文本,图,关联,下拉,多选,导出),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app)(海外手机号),发送短信倒计时缓存处理,account(jwt+token+续签+多app),多渠道管理(需自行完成后端代码),多app管理(需自行完成后端代码),运营后台操作日志,admin管理接口debug,错误信息自动推送钉钉,消息队列,短信风控（仅后端逻辑代码，待前端同步测试）
+常用后台(crud,富文本,图,关联,下拉,多选,导出(_search,nameSearch自行打开)),api接口(crud)logic,apid文档,接口测试,全量测试(自行实现业务),sms短信记录(多app)(海外手机号),发送短信倒计时缓存处理,account(jwt+token+续签+多app),多渠道管理(需自行完成后端代码),多app管理(需自行完成后端代码),运营后台操作日志,admin管理接口debug,错误信息自动推送钉钉,消息队列,短信风控（仅后端逻辑代码，待前端同步测试）,backend点击title排序(自行修改nameSearch ActiveDataProvider->sort 具体如下方排序)
 
-#####待实现功能:第三方登录集成,backend点击title排序,用户转换率处理,导出确认与相关处理
+#####待实现功能:第三方登录集成,用户转换率处理
 
 
 ===============================
@@ -90,11 +90,14 @@ AllapitestController.php 中手动写入需要全量测试的接口
 ##基本流程
 创建数据库表格->生成Model->生成curd
 
-
+约定：
 接口参数必填与文档问题：
-1.尽量使用yii2的rules必填字段进行字段属性控制
-2.在模型中控制哪些字段需要输入
-3.对于有默认值的字段如果不需要调用方输入则不写入场景中控制文档显示与输入
+mysql表尽量使用status = -1表示删除， 过滤有效数据时直接使用 status>-1
+controller 除首字母外其他均采用小写，common/service/，views/,下目录名也均采用小写，在yii3中优化，yii2均保存此方式
+尽量使用yii2的rules必填字段进行字段属性控制
+在模型中控制哪些字段需要输入
+对于有默认值的字段如果不需要调用方输入则不写入场景中控制文档显示与输入
+时间戳采用 int unsigned 
 
 遗留问题：-------------------
 接口参数自定义较为困难，需要优化
@@ -293,6 +296,40 @@ $saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
 ### user 字段 status 表示用户目前状态 -1删除或注销，1正常，2冻结，只有1表示正常，其余值都表示无法正常使用
 
 ###游客表仅用作与访问表进行转化统计不做其他使用
+
+
+#######表头sort排序 注意 GridView::widget 'class'=>'yii\grid\DataColumn' 需要带有 attribute
+```
+nameSearch 文件修改
+$dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_DESC
+                ],
+                'attributes' => [
+                    'id' => [
+                        'asc' => [
+                            'id' => SORT_ASC,
+                        ],
+                        'desc' => [
+                            'id' => SORT_DESC,
+                        ],
+                        'default' => SORT_ASC,
+                    ],
+                'name' => [
+                    'asc' => [
+                        'name' => SORT_ASC
+                    ],
+                    'desc' => [
+                        'name' => SORT_DESC,
+                    ],
+                    'default' => SORT_ASC,
+                ]
+            ]
+          ]
+        ]);
+```
 
 
 [感谢Yii](https://www.yiiframework.com/)

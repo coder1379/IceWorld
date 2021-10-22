@@ -110,10 +110,10 @@ foreach ($generator->getColumnNames() as $attribute) {
             if($tipShow==1){
                 $promptVal =  "'prompt' => ['text'=>'请选择".$lableArr[0]."','options'=>['value'=>'".$tipDefaultValue."']],";
             }
-            if($jsonV["type"]=="text"){
-                echo  "    <?php ".$hideStr."echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["name"].",[".$promptVal."'options'=>[\$model->".$attribute."=>['Selected'=>true]]]); ?>\n\n";
+            if($jsonV["type"]=="text"){ //->label('".$lableArr[0]."') 2021-10-22 删除使用配置
+                echo  "    <?php ".$hideStr."echo \$form->field(\$model, '".$attribute."')->dropDownList(\$model->".$jsonV["name"].",[".$promptVal."'options'=>[\$model->".$attribute."=>['Selected'=>true]]]); ?>\n\n";
             }else if($jsonV["type"]=="db"){
-                echo  "    <?php ".$hideStr."echo \$form->field(\$model, '".$attribute."')->label('".$lableArr[0]."')->dropDownList(\$model->".$jsonV["functionName"]."List(),[".$promptVal."'options'=>[\$model->".$attribute."=>['Selected'=>true]]]); ?>\n\n";
+                echo  "    <?php ".$hideStr."echo \$form->field(\$model, '".$attribute."')->dropDownList(\$model->".$jsonV["functionName"]."List(),[".$promptVal."'options'=>[\$model->".$attribute."=>['Selected'=>true]]]); ?>\n\n";
             }else if($jsonV["type"]=="upload_image"){
                 $mustFlag = 0;
                 echo '    <?php '.$hideStr.'echo $fileUploadHtml->createFileUpload($model,"'.$attribute.'","'.$lableArr[0].'"); ?>'."\n";

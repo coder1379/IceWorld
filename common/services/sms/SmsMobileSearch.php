@@ -72,7 +72,7 @@ class SmsMobileSearch extends SmsMobileModel
                     'default' => SORT_ASC,
                 ]
             ]
-            ]
+          ]
         ]);
 
         $this->load($params);
@@ -115,8 +115,6 @@ class SmsMobileSearch extends SmsMobileModel
 
         // $query->addOrderBy('id desc');
 
-
-      // $dataProvider->setSort(false);
 
         return $dataProvider;
     }

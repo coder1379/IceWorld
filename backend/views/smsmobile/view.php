@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'name',
             'object_id',
-['label'=>'短信对象类型','value'=>@$model->objectTypePredefine[$model->object_type]],
+['value'=>@$model->objectTypePredefine[$model->object_type],'attribute' => 'id'],
 ['label'=>'接收用户','value'=>@$model->userRecord->name],
             'mobile',
             'other_mobiles:ntext',
