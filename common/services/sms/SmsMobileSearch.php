@@ -13,6 +13,17 @@ use common\services\sms\SmsMobileModel;
  */
 class SmsMobileSearch extends SmsMobileModel
 {
+    
+    public $send_time_search_start_val; // send_time时间过滤开始值
+
+    public $send_time_search_end_val; // send_time时间过滤结束值
+
+            
+    public $add_time_search_start_val; // add_time时间过滤开始值
+
+    public $add_time_search_end_val; // add_time时间过滤结束值
+
+            
     /**
      * @inheritdoc
      */
@@ -21,7 +32,8 @@ class SmsMobileSearch extends SmsMobileModel
         return [
             [['id', 'object_id', 'object_type', 'user_id', 'area_code', 'send_time', 'send_num', 'type', 'send_type', 'sms_type', 'add_time', 'status'], 'integer'],
             [['name', 'mobile', 'other_mobiles', 'content', 'params_json', 'template', 'feedback', 'remark'], 'safe'],
-        ];
+                            [['send_time_search_start_val','send_time_search_end_val','add_time_search_start_val','add_time_search_end_val'], 'string'],
+                    ];
     }
 
     /**
@@ -46,34 +58,16 @@ class SmsMobileSearch extends SmsMobileModel
 
         // add conditions that should always apply here
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_DESC
-                ],
-                'attributes' => [
-                    'id' => [
-                        'asc' => [
-                            'id' => SORT_ASC,
-                        ],
-                        'desc' => [
-                            'id' => SORT_DESC,
-                        ],
-                        'default' => SORT_ASC,
-                    ],
-                'name' => [
-                    'asc' => [
-                        'name' => SORT_ASC
-                    ],
-                    'desc' => [
-                        'name' => SORT_DESC,
-                    ],
-                    'default' => SORT_ASC,
-                ]
-            ]
-          ]
-        ]);
+        //判断是否为导出
+        $dpArr = ['query' => $query,];
+        $exportFileFlag = $params['export_file_flag']??0;
+        $exportFileFlag = intval($exportFileFlag);
+        if($exportFileFlag === 1){
+            $query->limit(10000);
+            $dpArr['pagination'] = false;
+        }
+
+        $dataProvider = new ActiveDataProvider($dpArr);
 
         $this->load($params);
 
@@ -108,13 +102,61 @@ class SmsMobileSearch extends SmsMobileModel
             ->andFilterWhere(['like', 'feedback', $this->feedback])
             ->andFilterWhere(['like', 'remark', $this->remark]);
 
+        
+        if(!empty(trim($this->send_time_search_start_val))){
+                $searchStartTime = trim($this->send_time_search_start_val);
+                if(strlen($searchStartTime)==10){
+                    $searchStartTime = strtotime($searchStartTime.' 00:00:00');
+                }else{
+                    $searchStartTime = strtotime($searchStartTime);
+                }
+            $query->andFilterWhere(['>=','send_time',$searchStartTime]);
+        }
 
-        $query->andWhere(['>', 'status', ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤
+        if(!empty(trim($this->send_time_search_end_val))){
+                $searchEndTime = trim($this->send_time_search_end_val);
+                if(strlen($searchEndTime)==10){
+                $searchEndTime = strtotime($searchEndTime.' 23:59:59');
+                }else{
+                $searchEndTime = strtotime($searchEndTime);
+                }
+            $query->andFilterWhere(['<=','send_time',$searchEndTime]);
+        }
 
+        if(!empty(trim($this->add_time_search_start_val))){
+                $searchStartTime = trim($this->add_time_search_start_val);
+                if(strlen($searchStartTime)==10){
+                    $searchStartTime = strtotime($searchStartTime.' 00:00:00');
+                }else{
+                    $searchStartTime = strtotime($searchStartTime);
+                }
+            $query->andFilterWhere(['>=','add_time',$searchStartTime]);
+        }
+
+        if(!empty(trim($this->add_time_search_end_val))){
+                $searchEndTime = trim($this->add_time_search_end_val);
+                if(strlen($searchEndTime)==10){
+                $searchEndTime = strtotime($searchEndTime.' 23:59:59');
+                }else{
+                $searchEndTime = strtotime($searchEndTime);
+                }
+            $query->andFilterWhere(['<=','add_time',$searchEndTime]);
+        }
+
+        $query->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤
         $query->with('userRecord');
+            $query->addOrderBy('id desc');
+            
+        //导出实际执行,自行打开扩展
+        /*if($exportFileFlag===1){
+            $outputObj = new OutputExcel();
+            $header = ['标题1','标题2'];//导出标题
+            $query->select(['id']);//控制导出字段
+            $ext = $query->asArray()->all();//导出数据
+            $outputObj->run('导出'.date('YmdHis',time()),$header,$ext);
+        }*/
 
-        // $query->addOrderBy('id desc');
-
+        $dataProvider->setSort(false); // 默认取消所有排序
 
         return $dataProvider;
     }

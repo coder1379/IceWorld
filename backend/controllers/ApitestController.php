@@ -5,6 +5,7 @@ namespace backend\controllers;
 use common\lib\ApiReflection;
 use common\lib\Curl;
 use Yii;
+use yii\helpers\Inflector;
 
 class ApitestController extends AuthController
 {
@@ -27,7 +28,7 @@ class ApitestController extends AuthController
         $token = 0;
         if(!empty($contrl) && !empty($action)){
             $apiReflection = new ApiReflection();
-            $classNameTemp = ucwords($contrl);
+            $classNameTemp = Inflector::id2camel($contrl);
             $ref = new \ReflectionClass('\\api\\controllers\\' . $classNameTemp.'Controller');
             $parendRef = $ref->getParentClass();
                 $methods = $ref->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -40,7 +41,7 @@ class ApitestController extends AuthController
                 if (!empty($ownMethods)) {
                     foreach ($ownMethods as $own) {
                         $parm = [];
-                        $actionName = strtolower($own->getName());
+                        $actionName = $own->getName();
                         $apiName = '';
                         if (strlen($actionName) > 6) {
                             $apiName = substr($actionName, 0, 6);
@@ -50,7 +51,7 @@ class ApitestController extends AuthController
                             continue;
                         }
 
-                        $actionName = substr($actionName, 6, strlen($actionName) - 6);
+                        $actionName = Inflector::camel2id(substr($actionName, 6, strlen($actionName) - 6));
                         if($actionName == $action){
                             $parm['tags'] = $apiReflection->parseDocCommentTags($own);
                             if (empty($parm['tags']['description']) === false && strpos($parm['tags']['description'], 'targetDoc->') !== false) {
