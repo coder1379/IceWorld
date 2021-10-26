@@ -7,6 +7,7 @@ use common\lib\ApiReflection;
 use Yii;
 use yii\helpers\FileHelper;
 use yii\db\Schema;
+use yii\helpers\Inflector;
 
 class ApidocController extends AuthController
 {
@@ -53,10 +54,15 @@ class ApidocController extends AuthController
             $methodList = [];
             $ref = new \ReflectionClass('\\api\\controllers\\' . $name);
             $parendRef = $ref->getParentClass();
+
+            // 将大写转为横线
+            $name = Inflector::camel2id($name);
+            echo $name . PHP_EOL;
+
             $controllerDoc = $apiReflection->parseDocCommentTags($ref)['description'] ?? $name;
             $controllerDesString = explode("\n", $controllerDoc)[0];
             $controllerDoc = explode("\r\n", $controllerDesString)[0];
-            $name = str_replace('controller', '', strtolower($name));
+            $name = str_replace('-controller', '', strtolower($name));
             if(!empty($clickName) && $clickName == $name){
                 $methods = $ref->getMethods(\ReflectionMethod::IS_PUBLIC);
                 $parentMethods = $parendRef->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -65,7 +71,7 @@ class ApidocController extends AuthController
                 if (!empty($ownMethods)) {
                     foreach ($ownMethods as $own) {
                         $parm = [];
-                        $actionName = strtolower($own->getName());
+                        $actionName = $own->getName();
                         $apiName = '';
                         if (strlen($actionName) > 6) {
                             $apiName = substr($actionName, 0, 6);
@@ -75,7 +81,7 @@ class ApidocController extends AuthController
                             continue;
                         }
 
-                        $parm['name'] = substr($actionName, 6, strlen($actionName) - 6);
+                        $parm['name'] = Inflector::camel2id(substr($actionName, 6, strlen($actionName) - 6));
                         $parm['tags'] = $apiReflection->parseDocCommentTags($own);
                         if (empty($parm['tags']['description']) === false && strpos($parm['tags']['description'], 'targetDoc->') !== false) {
                             $newDocArr = explode('->', $parm['tags']['description']);

@@ -53,7 +53,18 @@ use yii\widgets\ActiveForm;
                 }else if($jsonV["type"]=="rich_text"){
 
                 }else {
-                    echo "<?php echo " . $generator->generateActiveSearchField($attribute) . " ?>\n\n";
+                    if($jsonV['TimeSearch']==1){
+                        ?>
+                        <div>
+                            <?php
+                           echo "<?php echo \$form->field(\$model, '".$attribute.'_search_start_val'."')->textInput(['onclick'=>\"WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd',maxDate:new Date()})\",'readonly'=>'readonly','placeholder'=>'选择时间'])->label('".$lableArr[0]."开始') ?>\n\n";
+                            echo "<?php echo \$form->field(\$model, '".$attribute.'_search_end_val'."')->textInput(['onclick'=>\"WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd',maxDate:new Date()})\",'readonly'=>'readonly','placeholder'=>'选择时间'])->label('".$lableArr[0]."结束') ?>\n\n";
+                            ?>
+                        </div>
+                        <?php
+                    }else{
+                        echo "<?php echo " . $generator->generateActiveSearchField($attribute) . " ?>\n\n";
+                    }
                 }
             }else{
                 echo "<?php echo " . $generator->generateActiveSearchField($attribute) . " ?>\n\n";

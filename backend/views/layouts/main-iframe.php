@@ -31,6 +31,7 @@ $staticFilePath=empty(Yii::$app->params["staticFilePath"])!=true?Yii::$app->para
     <script type="text/javascript" src="<?= $staticFilePath ?>/static/h-ui.admin/js/H-ui.admin.js"></script>
     <script type="text/javascript" src="<?= $staticFilePath ?>/static/js/vue.min.js"></script>
     <script type="text/javascript" src="<?= $staticFilePath ?>/static/js/elementui.min.js"></script>
+    <script type="text/javascript" src="<?= $staticFilePath ?>/lib/My97DatePicker/4.8/WdatePicker.js"></script>
     <script type="text/javascript" src="<?= $staticFilePath ?>/static/js/common.js?2"></script>
     <title><?= Html::encode($this->title) ?></title>
     <style>

@@ -46,6 +46,32 @@ if(!empty($searchConditions)){
     }
 }
 
+$timeSearchList = [];
+$timeSearchRulesList = [];
+$labelList =  $generator->getTableSchema();
+$oldLabels=[];
+foreach($labelList->columns as $nx){
+    $oldLabels[$nx->name]=$nx->comment;
+}
+
+
+foreach ($generator->getColumnNames() as $attribute) {
+
+    $commontStr = $oldLabels[$attribute];
+
+    $lableArr = explode('=+=',$commontStr);
+    $jsonV=false;
+    if(count($lableArr)>1){
+        $jsonV=json_decode($lableArr[1],true);
+    }
+
+    if(empty($jsonV)!=true){
+        if($jsonV["TimeSearch"]==1){
+            $timeSearchList[] = $attribute;
+        }
+    }
+}
+
 echo "<?php\n";
 ?>
 
@@ -63,6 +89,24 @@ use <?= ltrim($generator->modelClass, '\\') . (isset($modelAlias) ? " as $modelA
 class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $modelClass ?>
 
 {
+    <?php
+    if(!empty($timeSearchList)){
+        foreach ($timeSearchList as $tSearch){
+            $timeSearchRulesList[] = "'".$tSearch.'_search_start_val'."'";
+            $timeSearchRulesList[] = "'".$tSearch.'_search_end_val'."'";
+            ?>
+
+    public $<?php echo $tSearch.'_search_start_val'; ?>; // <?php echo $tSearch; ?>时间过滤开始值
+
+    public $<?php echo $tSearch.'_search_end_val'; ?>; // <?php echo $tSearch; ?>时间过滤结束值
+
+            <?php
+
+        }
+    }
+
+    ?>
+
     /**
      * @inheritdoc
      */
@@ -70,6 +114,12 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
     {
         return [
             <?= implode(",\n            ", $rules) ?>,
+            <?php
+            if(!empty($timeSearchRulesList)){
+                ?>
+                [[<?php echo implode(',',$timeSearchRulesList) ?>], 'string'],
+            <?php
+            } ?>
         ];
     }
 
@@ -116,6 +166,35 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
 
         // grid filtering conditions
         <?= implode("\n        ", $searchConditions) ?>
+
+        <?php
+        if(!empty($timeSearchList)){
+            foreach ($timeSearchList as $tSearch){
+                ?>
+
+        if(!empty(trim($this-><?php echo $tSearch.'_search_start_val'; ?>))){
+                $searchStartTime = trim($this-><?php echo $tSearch.'_search_start_val'; ?>);
+                if(strlen($searchStartTime)==10){
+                    $searchStartTime = strtotime($searchStartTime.' 00:00:00');
+                }else{
+                    $searchStartTime = strtotime($searchStartTime);
+                }
+            $query->andFilterWhere(['>=','<?php echo $tSearch; ?>',$searchStartTime]);
+        }
+
+        if(!empty(trim($this-><?php echo $tSearch.'_search_end_val'; ?>))){
+                $searchEndTime = trim($this-><?php echo $tSearch.'_search_end_val'; ?>);
+                if(strlen($searchEndTime)==10){
+                $searchEndTime = strtotime($searchEndTime.' 23:59:59');
+                }else{
+                $searchEndTime = strtotime($searchEndTime);
+                }
+            $query->andFilterWhere(['<=','<?php echo $tSearch; ?>',$searchEndTime]);
+        }
+<?php
+            }
+        }
+        ?>
 
         <?php
         if($includeDelete==1){

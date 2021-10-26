@@ -93,7 +93,7 @@ AllapitestController.php 中手动写入需要全量测试的接口
 约定：
 接口参数必填与文档问题：
 mysql表尽量使用status = -1表示删除， 过滤有效数据时直接使用 status>-1
-controller 除首字母外其他均采用小写，common/service/，views/,下目录名也均采用小写，在yii3中优化，yii2均保存此方式
+controller action 命名规则同yii 大小访问自动转-
 尽量使用yii2的rules必填字段进行字段属性控制
 在模型中控制哪些字段需要输入
 对于有默认值的字段如果不需要调用方输入则不写入场景中控制文档显示与输入
@@ -173,17 +173,6 @@ opcache.revalidate_freq=3 ;检查时间 测试尽可能短
 ;opcache.save_comments=0
 opcache.consistency_checks=0
 ;opcache.optimization_level=0
-
-
-#### api接口开启debug监控
-if (!YII_ENV_TEST) {
-    // configuration adjustments for 'dev' environment
-    $config['bootstrap'][] = 'debug';
-    $config['modules']['debug']['class'] = 'yii\debug\Module';
-    $config['modules']['debug']['allowedIPs'] = ['127.0.0.1', '*'];#注意可见ip
-    $config['modules']['debug']['historySize'] = 200;
-}
-
 
 ####du -h --max-depth=1 /data/wwwroot 查看服务器文件大小
 

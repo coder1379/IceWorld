@@ -10,7 +10,7 @@
     ],
 ];*/
 
-//上线前期观测阶段配置
+//上线前期观测阶段配置 start
 $config = [
     'components' => [
         'request' => [
@@ -56,3 +56,4 @@ $config['modules']['debug']['checkAccessCallback'] = "checkDebugAccessAuthShowLi
 $config['modules']['debug']['historySize'] = 200;
 
 return $config;
+//上线前期观测阶段配置 end
