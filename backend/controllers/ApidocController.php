@@ -26,7 +26,7 @@ class ApidocController extends AuthController
         $clickName = $this->get('cname', '');
 
         $docList = [];
-        $except = ['IndexController.php','TestController.php','SmsmobileController.php'];
+        $except = ['IndexController.php','TestController.php','SmsMobileController.php','CaptchasController.php'];
         $path = FileHelper::normalizePath(Yii::getAlias('@api') . '/controllers');
 
         $options = [
@@ -57,7 +57,6 @@ class ApidocController extends AuthController
 
             // 将大写转为横线
             $name = Inflector::camel2id($name);
-            echo $name . PHP_EOL;
 
             $controllerDoc = $apiReflection->parseDocCommentTags($ref)['description'] ?? $name;
             $controllerDesString = explode("\n", $controllerDoc)[0];
