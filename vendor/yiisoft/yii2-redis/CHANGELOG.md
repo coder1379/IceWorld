@@ -1,6 +1,18 @@
 Yii Framework 2 redis extension Change Log
 ==========================================
 
+2.0.16 October 04, 2021
+-----------------------
+
+- Enh #223: Add `Connection::$username` for using username for authentication (samdark, rvkulikov)
+
+
+2.0.15 May 05, 2021
+-------------------
+
+- Enh #227: Added support for adjusting PHP context options and parameters. This allows e.g. supporting self-signed certificates (akselikap)
+
+
 2.0.14 November 10, 2020
 ------------------------
 

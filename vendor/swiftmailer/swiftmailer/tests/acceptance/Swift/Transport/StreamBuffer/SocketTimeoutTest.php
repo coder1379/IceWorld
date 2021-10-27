@@ -8,7 +8,7 @@ class Swift_Transport_StreamBuffer_SocketTimeoutTest extends \PHPUnit\Framework\
 
     protected function setUp()
     {
-        if (!defined('SWIFT_SMTP_HOST')) {
+        if (!\defined('SWIFT_SMTP_HOST')) {
             $this->markTestSkipped(
                 'Cannot run test without an SMTP host to connect to (define '.
                 'SWIFT_SMTP_HOST in tests/acceptance.conf.php if you wish to run this test)'
@@ -53,7 +53,7 @@ class Swift_Transport_StreamBuffer_SocketTimeoutTest extends \PHPUnit\Framework\
         } catch (Exception $e) {
         }
         $this->assertInstanceOf('Swift_IoException', $e, 'IO Exception Not Thrown On Connection Timeout');
-        $this->assertRegExp('/Connection to .* Timed Out/', $e->getMessage());
+        $this->assertMatchesRegularExpression('/Connection to .* Timed Out/', $e->getMessage());
     }
 
     protected function tearDown()

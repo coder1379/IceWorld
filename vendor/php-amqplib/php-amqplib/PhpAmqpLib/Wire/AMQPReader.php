@@ -4,13 +4,12 @@ namespace PhpAmqpLib\Wire;
 
 use PhpAmqpLib\Exception\AMQPDataReadException;
 use PhpAmqpLib\Exception\AMQPInvalidArgumentException;
-use PhpAmqpLib\Exception\AMQPIOWaitException;
 use PhpAmqpLib\Exception\AMQPNoDataException;
 use PhpAmqpLib\Exception\AMQPOutOfBoundsException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Helper\MiscHelper;
 use PhpAmqpLib\Wire\IO\AbstractIO;
-use phpseclib\Math\BigInteger;
+use PhpAmqpLib\Helper\BigInteger;
 
 /**
  * This class can read from a string or from a stream
@@ -57,8 +56,6 @@ class AMQPReader extends AbstractClient
      */
     public function __construct($str, AbstractIO $io = null, $timeout = 0)
     {
-        parent::__construct();
-
         if (is_string($str)) {
             $this->str = (string)$str;
             $this->str_length = mb_strlen($this->str, 'ASCII');
@@ -262,7 +259,7 @@ class AMQPReader extends AbstractClient
     {
         list(, $res) = unpack('N', $this->rawread(4));
 
-        if ($this->is64bits) {
+        if (self::PLATFORM_64BIT) {
             return (int) sprintf('%u', $res);
         }
 
@@ -279,7 +276,7 @@ class AMQPReader extends AbstractClient
     {
         $this->resetCounters();
         list(, $res) = unpack('N', $this->rawread(4));
-        if (!$this->is64bits && $this->getLongMSB($res)) {
+        if (!self::PLATFORM_64BIT && $this->getLongMSB($res)) {
             return sprintf('%u', $res);
         }
 
@@ -289,7 +286,7 @@ class AMQPReader extends AbstractClient
     /**
      * @return int
      */
-    private function read_signed_long()
+    private function readSignedLong()
     {
         $this->resetCounters();
         list(, $res) = unpack('l', $this->correctEndianness($this->rawread(4)));
@@ -308,7 +305,7 @@ class AMQPReader extends AbstractClient
         $this->resetCounters();
         $bytes = $this->rawread(8);
 
-        if ($this->is64bits) {
+        if (self::PLATFORM_64BIT) {
             // we can "unpack" if MSB bit is 0 (at most 63 bit integer), fallback to BigInteger otherwise
             if (!$this->getMSB($bytes)) {
                 $res = unpack('J', $bytes);
@@ -335,7 +332,7 @@ class AMQPReader extends AbstractClient
         $this->resetCounters();
         $bytes = $this->rawread(8);
 
-        if ($this->is64bits) {
+        if (self::PLATFORM_64BIT) {
             $res = unpack('q', $this->correctEndianness($bytes));
             return $res[1];
         } else {
@@ -354,6 +351,28 @@ class AMQPReader extends AbstractClient
         $var = new BigInteger($bytes, -256);
 
         return $var->toString();
+    }
+
+    /**
+     * @return float
+     */
+    public function read_float()
+    {
+        $this->resetCounters();
+        list(, $res) = unpack('G', $this->rawread(4));
+
+        return (float)$res;
+    }
+
+    /**
+     * @return float
+     */
+    public function read_double()
+    {
+        $this->resetCounters();
+        list(, $res) = unpack('E', $this->rawread(8));
+
+        return (float)$res;
     }
 
     /**
@@ -497,7 +516,7 @@ class AMQPReader extends AbstractClient
                 $val = $this->read_short();
                 break;
             case AMQPAbstractCollection::T_INT_LONG:
-                $val = $this->read_signed_long();
+                $val = $this->readSignedLong();
                 break;
             case AMQPAbstractCollection::T_INT_LONG_U:
                 $val = $this->read_long();
@@ -510,7 +529,7 @@ class AMQPReader extends AbstractClient
                 break;
             case AMQPAbstractCollection::T_DECIMAL:
                 $e = $this->read_octet();
-                $n = $this->read_signed_long();
+                $n = $this->readSignedLong();
                 $val = new AMQPDecimal($n, $e);
                 break;
             case AMQPAbstractCollection::T_TIMESTAMP:
@@ -531,6 +550,12 @@ class AMQPReader extends AbstractClient
                 break;
             case AMQPAbstractCollection::T_VOID:
                 $val = null;
+                break;
+            case AMQPAbstractCollection::T_FLOAT:
+                $val = $this->read_float();
+                break;
+            case AMQPAbstractCollection::T_DOUBLE:
+                $val = $this->read_double();
                 break;
             default:
                 throw new AMQPInvalidArgumentException(sprintf(

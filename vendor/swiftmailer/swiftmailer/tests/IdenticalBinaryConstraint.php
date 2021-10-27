@@ -18,11 +18,9 @@ class IdenticalBinaryConstraint extends \PHPUnit\Framework\Constraint\Constraint
      * Evaluates the constraint for parameter $other. Returns TRUE if the
      * constraint is met, FALSE otherwise.
      *
-     * @param mixed $other Value or object to evaluate.
-     *
-     * @return bool
+     * @param mixed $other value or object to evaluate
      */
-    public function matches($other)
+    public function matches($other): bool
     {
         $aHex = $this->asHexString($this->value);
         $bHex = $this->asHexString($other);
@@ -32,10 +30,8 @@ class IdenticalBinaryConstraint extends \PHPUnit\Framework\Constraint\Constraint
 
     /**
      * Returns a string representation of the constraint.
-     *
-     * @return string
      */
-    public function toString()
+    public function toString(): string
     {
         return 'identical binary';
     }

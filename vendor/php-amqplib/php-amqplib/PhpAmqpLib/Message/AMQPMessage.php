@@ -131,7 +131,7 @@ class AMQPMessage
      * Reject an incoming message.
      *
      * @param bool $requeue If requeue is true, the server will attempt to requeue the message.
-     *                      If requeue is false or the requeue attempt fails the messages are discarded or dead-lettered.
+     *                     If requeue is false or the requeue attempt fails the messages are discarded or dead-lettered.
      * @since v2.12.0
      * @link https://www.rabbitmq.com/amqp-0-9-1-reference.html#basic.reject
      */
@@ -525,7 +525,7 @@ class AMQPMessage
             }
 
             $flag_bits |= (1 << $shift);
-            if ($prototype != 'bit') {
+            if ($prototype !== 'bit') {
                 $raw_bytes->{'write_' . $prototype}($val);
             }
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpAmqpLib\Wire\IO;
 
 use PhpAmqpLib\Exception\AMQPConnectionClosedException;
@@ -25,7 +26,7 @@ class StreamIO extends AbstractIO
      * @param int $port
      * @param float $connection_timeout
      * @param float $read_write_timeout
-     * @param null $context
+     * @param resource|array|null $context
      * @param bool $keepalive
      * @param int $heartbeat
      * @param string|null $ssl_protocol
@@ -49,6 +50,10 @@ class StreamIO extends AbstractIO
         }
          */
 
+        if (!is_resource($context) || get_resource_type($context) !== 'stream-context') {
+            $context = stream_context_create();
+        }
+
         $this->protocol = 'tcp';
         $this->host = $host;
         $this->port = $port;
@@ -61,14 +66,7 @@ class StreamIO extends AbstractIO
         $this->initial_heartbeat = $heartbeat;
         $this->canDispatchPcntlSignal = $this->isPcntlSignalEnabled();
 
-        if (!is_resource($this->context) || get_resource_type($this->context) !== 'stream-context') {
-            $this->context = stream_context_create();
-        }
-
-        // tcp_nodelay was added in 7.1.0
-        if (PHP_VERSION_ID >= 70100) {
-            stream_context_set_option($this->context, 'socket', 'tcp_nodelay', true);
-        }
+        stream_context_set_option($this->context, 'socket', 'tcp_nodelay', true);
 
         $options = stream_context_get_options($this->context);
         if (!empty($options['ssl'])) {
@@ -334,9 +332,18 @@ class StreamIO extends AbstractIO
      */
     protected function do_select($sec, $usec)
     {
+        if ($this->sock === null || !is_resource($this->sock)) {
+            $this->sock = null;
+            throw new AMQPConnectionClosedException('Broken pipe or closed connection', 0);
+        }
+
         $read = array($this->sock);
         $write = null;
         $except = null;
+
+        if ($sec === null && PHP_VERSION_ID >= 80100) {
+            $usec = null;
+        }
 
         return stream_select($read, $write, $except, $sec, $usec);
     }

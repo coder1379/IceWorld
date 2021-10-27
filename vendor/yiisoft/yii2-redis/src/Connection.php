@@ -277,6 +277,14 @@ class Connection extends Component
      */
     public $unixSocket;
     /**
+     * @var string|null username for establishing DB connection. Defaults to `null` meaning AUTH command will be performed without username.
+     * Username was introduced in Redis 6.
+     * @link https://redis.io/commands/auth
+     * @link https://redis.io/topics/acl
+     * @since 2.0.16
+     */
+    public $username;
+    /**
      * @var string the password for establishing DB connection. Defaults to null meaning no AUTH command is sent.
      * See https://redis.io/commands/auth
      */
@@ -299,6 +307,12 @@ class Connection extends Component
      * @since 2.0.12
      */
     public $useSSL = false;
+    /**
+     * @var array PHP context options which are used in the Redis connection stream.
+     * @see https://www.php.net/manual/en/context.ssl.php
+     * @since 2.0.15
+     */
+    public $contextOptions = [];
     /**
      * @var integer Bitmask field which may be set to any combination of connection flags passed to [stream_socket_client()](https://www.php.net/manual/en/function.stream-socket-client.php).
      * Currently the select of connection flags is limited to `STREAM_CLIENT_CONNECT` (default), `STREAM_CLIENT_ASYNC_CONNECT` and `STREAM_CLIENT_PERSISTENT`.
@@ -618,7 +632,8 @@ class Connection extends Component
             $errorNumber,
             $errorDescription,
             $this->connectionTimeout ?: ini_get('default_socket_timeout'),
-            $this->socketClientFlags
+            $this->socketClientFlags,
+            stream_context_create($this->contextOptions)
         );
 
         if ($socket) {
@@ -631,7 +646,7 @@ class Connection extends Component
                 stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
             }
             if ($this->password !== null) {
-                $this->executeCommand('AUTH', [$this->password]);
+                $this->executeCommand('AUTH', array_filter([$this->username, $this->password]));
             }
             if ($this->database !== null) {
                 $this->executeCommand('SELECT', [$this->database]);
