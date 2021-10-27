@@ -22,7 +22,7 @@ class LogSearch extends LogModel
         return [
             [['id', 'level'], 'integer'],
             [['category', 'prefix', 'message'], 'safe'],
-            [['log_time','log_time_start','log_time_end'], 'number'],
+            [['log_time','log_time_start','log_time_end'], 'string'],
         ];
     }
 
@@ -68,12 +68,25 @@ class LogSearch extends LogModel
             //'log_time' => $this->log_time,
         ]);
 
+
         if(!empty(trim($this->log_time_start))){
-            $query->andFilterWhere(['>=','log_time',intval(trim($this->log_time_start))]);
+            $searchStartTime = trim($this->log_time_start);
+            if(strlen($searchStartTime)==10){
+                $searchStartTime = strtotime($searchStartTime.' 00:00:00');
+            }else{
+                $searchStartTime = strtotime($searchStartTime);
+            }
+            $query->andFilterWhere(['>=','log_time',$searchStartTime]);
         }
 
         if(!empty(trim($this->log_time_end))){
-            $query->andFilterWhere(['<=','log_time',intval(trim($this->log_time_end))]);
+            $searchEndTime = trim($this->log_time_end);
+            if(strlen($searchEndTime)==10){
+                $searchEndTime = strtotime($searchEndTime.' 23:59:59');
+            }else{
+                $searchEndTime = strtotime($searchEndTime);
+            }
+            $query->andFilterWhere(['<=','log_time',$searchEndTime]);
         }
 
         $query->andFilterWhere(['like', 'prefix', $this->prefix])

@@ -22,9 +22,10 @@ use yii\widgets\ActiveForm;
     <?php echo $form->field($model, 'category') ?>
 
     <div>
-        <?php echo $form->field($model, 'log_time_start')->input('string',['placeholder'=>'时间戳']) ?>
+        <?php echo $form->field($model, 'log_time_start')->textInput(['onclick'=>"WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:new Date()})",'readonly'=>'readonly','placeholder'=>'选择时间'])->label('日志时间开始') ?>
 
-        <?php echo $form->field($model, 'log_time_end')->input('string',['placeholder'=>'时间戳']) ?>
+        <?php echo $form->field($model, 'log_time_end')->textInput(['onclick'=>"WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:new Date()})",'readonly'=>'readonly','placeholder'=>'选择时间'])->label('日志时间结束') ?>
+
     </div>
 
     <?php echo $form->field($model, 'prefix')->input('string', ['placeholder' => 'like搜索,大数据量谨慎使用']) ?>
