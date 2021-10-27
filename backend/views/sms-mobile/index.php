@@ -78,11 +78,11 @@ if($common->checkButtonAuth($mainAuthJson,$controllerId,'delete',null)==true){ $
                 'template' => $buttonList,
                 'buttons' => [
     'view' => function ($url, $model, $key) {
-    return '<a title="详情" href="javascript:;" onclick="backend_view_data(\'查看详情\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5 operation-icon operation-view-icon" style="text-decoration:none"><i class="Hui-iconfont">&#xe665;</i></a>'; },
+    return '<a title="详情" href="javascript:;" onclick="backend_view_data(\'查看详情\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5 operation-icon operation-view-icon index-table-view" style="text-decoration:none"><i class="Hui-iconfont">&#xe665;</i></a>'; },
                 'update' => function ($url, $model, $key) {
-    return '<a title="编辑" href="javascript:;" onclick="backend_update_data(\'编辑\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5 operation-icon operation-update-icon" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>'; },
+    return '<a title="编辑" href="javascript:;" onclick="backend_update_data(\'编辑\',\''.$url.'\',this,\''.$key.'\',layerOpenWindowWidth,layerOpenWindowHeight)" class="ml-5 operation-icon operation-update-icon index-table-edit" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>'; },
     'delete' => function ($url, $model, $key) {
-    return '<a title="删除" href="javascript:;" clickDelete="0" onclick="backend_delete_data(this,\''.$key.'\',\''.$model->name.'\',\''.$url.'\')" class="ml-5 operation-icon operation-del-icon" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>'; },
+    return '<a title="删除" href="javascript:;" clickDelete="0" onclick="backend_delete_data(this,\''.$key.'\',\''.$model->name.'\',\''.$url.'\')" class="ml-5 operation-icon operation-del-icon index-table-delete" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>'; },
                 ],
     ],
         ],
