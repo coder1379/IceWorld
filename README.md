@@ -321,6 +321,14 @@ open：
         ]); // 开启排序并设置排序属性及内容
 ```
 
+#########依赖内容版本更新
+先当前termina设置代理
+set http_proxy=http://127.0.0.1:10809
+set https_proxy=http://127.0.0.1:10809
+
+对指定包执行更新 并显示细节 -vvv
+
+composer update yiisoft/yii2 -vvv
 
 [感谢Yii](https://www.yiiframework.com/)
 
