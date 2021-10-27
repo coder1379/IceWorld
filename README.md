@@ -322,7 +322,7 @@ open：
 ```
 
 #########依赖内容版本更新
-先当前termina设置代理
+先当前termina设置代理,代理为本地实际值
 set http_proxy=http://127.0.0.1:10809
 set https_proxy=http://127.0.0.1:10809
 
