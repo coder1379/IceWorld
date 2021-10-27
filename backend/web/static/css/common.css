@@ -192,3 +192,18 @@
     margin-left: 10px;
     margin-top: 5px;
 }
+
+.index-table-view{
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+.index-table-edit{
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+.index-table-delete{
+    font-size: 16px;
+    margin-right: 5px;
+}
