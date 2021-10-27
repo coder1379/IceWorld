@@ -25,11 +25,11 @@ abstract class Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest e
         $this->initializeBuffer();
 
         $line = $this->buffer->readLine(0);
-        $this->assertRegExp('/^[0-9]{3}.*?\r\n$/D', $line);
+        $this->assertMatchesRegularExpression('/^[0-9]{3}.*?\r\n$/D', $line);
         $seq = $this->buffer->write("QUIT\r\n");
         $this->assertTrue((bool) $seq);
         $line = $this->buffer->readLine($seq);
-        $this->assertRegExp('/^[0-9]{3}.*?\r\n$/D', $line);
+        $this->assertMatchesRegularExpression('/^[0-9]{3}.*?\r\n$/D', $line);
         $this->buffer->terminate();
     }
 
@@ -38,17 +38,17 @@ abstract class Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest e
         $this->initializeBuffer();
 
         $line = $this->buffer->readLine(0);
-        $this->assertRegExp('/^[0-9]{3}.*?\r\n$/D', $line);
+        $this->assertMatchesRegularExpression('/^[0-9]{3}.*?\r\n$/D', $line);
 
         $seq = $this->buffer->write("HELO foo\r\n");
         $this->assertTrue((bool) $seq);
         $line = $this->buffer->readLine($seq);
-        $this->assertRegExp('/^[0-9]{3}.*?\r\n$/D', $line);
+        $this->assertMatchesRegularExpression('/^[0-9]{3}.*?\r\n$/D', $line);
 
         $seq = $this->buffer->write("QUIT\r\n");
         $this->assertTrue((bool) $seq);
         $line = $this->buffer->readLine($seq);
-        $this->assertRegExp('/^[0-9]{3}.*?\r\n$/D', $line);
+        $this->assertMatchesRegularExpression('/^[0-9]{3}.*?\r\n$/D', $line);
         $this->buffer->terminate();
     }
 
@@ -59,18 +59,18 @@ abstract class Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest e
         $is1 = $this->createMockInputStream();
         $is2 = $this->createMockInputStream();
 
-        $is1->expects($this->at(0))
+        $is1->expects($this->exactly(2))
             ->method('write')
-            ->with('x');
-        $is1->expects($this->at(1))
+            ->withConsecutive(
+                ['x'],
+                ['y']
+            );
+        $is2->expects($this->exactly(2))
             ->method('write')
-            ->with('y');
-        $is2->expects($this->at(0))
-            ->method('write')
-            ->with('x');
-        $is2->expects($this->at(1))
-            ->method('write')
-            ->with('y');
+            ->withConsecutive(
+                ['x'],
+                ['y']
+            );
 
         $this->buffer->bind($is1);
         $this->buffer->bind($is2);
@@ -104,12 +104,12 @@ abstract class Swift_Transport_StreamBuffer_AbstractStreamBufferAcceptanceTest e
         $is1 = $this->createMockInputStream();
         $is2 = $this->createMockInputStream();
 
-        $is1->expects($this->at(0))
+        $is1->expects($this->exactly(2))
             ->method('write')
-            ->with('x');
-        $is1->expects($this->at(1))
-            ->method('write')
-            ->with('y');
+            ->withConsecutive(
+                ['x'],
+                ['y']
+            );
         $is2->expects($this->once())
             ->method('write')
             ->with('x');

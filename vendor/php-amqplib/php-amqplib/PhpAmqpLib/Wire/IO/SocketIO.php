@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpAmqpLib\Wire\IO;
 
 use PhpAmqpLib\Exception\AMQPConnectionClosedException;
@@ -21,8 +22,14 @@ class SocketIO extends AbstractIO
      * @param int|float|null $write_timeout if null defaults to read timeout
      * @param int $heartbeat how often to send heartbeat. 0 means off
      */
-    public function __construct($host, $port, $read_timeout = 3, $keepalive = false, $write_timeout = null, $heartbeat = 0)
-    {
+    public function __construct(
+        $host,
+        $port,
+        $read_timeout = 3,
+        $keepalive = false,
+        $write_timeout = null,
+        $heartbeat = 0
+    ) {
         $this->host = $host;
         $this->port = $port;
         $this->read_timeout = $read_timeout;
@@ -135,7 +142,7 @@ class SocketIO extends AbstractIO
             $data .= $buffer;
         }
 
-        if (mb_strlen($data, 'ASCII') != $len) {
+        if (mb_strlen($data, 'ASCII') !== $len) {
             throw new AMQPIOException(sprintf(
                 'Error reading data. Received %s instead of expected %s bytes',
                 mb_strlen($data, 'ASCII'),
@@ -221,7 +228,7 @@ class SocketIO extends AbstractIO
     public function close()
     {
         $this->disableHeartbeat();
-        if (is_resource($this->sock)) {
+        if (is_resource($this->sock) || is_a($this->sock, \Socket::class)) {
             socket_close($this->sock);
         }
         $this->sock = null;
@@ -234,6 +241,11 @@ class SocketIO extends AbstractIO
      */
     protected function do_select($sec, $usec)
     {
+        if (!is_resource($this->sock) && !is_a($this->sock, \Socket::class)) {
+            $this->sock = null;
+            throw new AMQPConnectionClosedException('Broken pipe or closed connection', 0);
+        }
+
         $read = array($this->sock);
         $write = null;
         $except = null;

@@ -542,7 +542,7 @@ OEL;
         $expected = str_replace("\n", "\r\n", $expected);
 
         $actual = self::getBodyOfMessage($actual);
-        if (!$this->assertRegExp('%^'.$expected.'$\s*%m', $actual)) {
+        if (!$this->assertMatchesRegularExpression('%^'.$expected.'$\s*%m', $actual)) {
             return false;
         }
 
@@ -596,7 +596,7 @@ OEL;
 
         $headers = self::getHeadersOfMessage($content);
         foreach ($headers as $headerName => $value) {
-            if (!in_array($headerName, ['content-type', 'content-transfer-encoding', 'content-disposition'])) {
+            if (!\in_array($headerName, ['content-type', 'content-transfer-encoding', 'content-disposition'])) {
                 continue;
             }
 
@@ -604,7 +604,7 @@ OEL;
             $headerName = array_map('ucfirst', $headerName);
             $headerName = implode('-', $headerName);
 
-            if (strlen($value) > 62) {
+            if (\strlen($value) > 62) {
                 $value = wordwrap($value, 62, "\n ");
             }
 
@@ -644,7 +644,7 @@ OEL;
             }
 
             $header = explode(':', $headerLine, 2);
-            $currentHeaderName = strtolower($header[0]);
+            $currentHeaderName = strtolower($header[0] ?? '');
             $headers[$currentHeaderName] = trim($header[1]);
         }
 

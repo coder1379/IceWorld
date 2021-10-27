@@ -1,6 +1,6 @@
 <p align="center">
     <a href="http://redis.io/" target="_blank" rel="external">
-        <img src="http://download.redis.io/logocontest/82.png" height="100px">
+        <img src="http://download.redis.io/redis.png" height="100px">
     </a>
     <h1 align="center">Redis Cache, Session and ActiveRecord for Yii 2</h1>
     <br>
@@ -74,6 +74,13 @@ return [
             'port' => 6380,
             'database' => 0,
             'useSSL' => true,
+            // Use contextOptions for more control over the connection (https://www.php.net/manual/en/context.php), not usually needed
+            'contextOptions' => [
+                'ssl' => [
+                    'local_cert' => '/path/to/local/certificate',
+                    'local_pk' => '/path/to/local/private_key',
+                ],
+            ],
         ],
     ],
 ];
