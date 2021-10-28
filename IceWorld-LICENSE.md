@@ -1,6 +1,6 @@
-BSD 3-Clause License
+The IceWorld framework is free software. It is released under the terms of the following BSD 3-Clause License.
 
-Copyright (c) 2019, coder1379
+Copyright (c) 2019 by IceWorld (https://github.com/coder1379/IceWorld)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
