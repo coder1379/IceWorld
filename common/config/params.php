@@ -10,7 +10,7 @@ return [
     'jwt'=>[
         'jwt_strict_verification' => false,//jwt严格验证,默认false不开启,true将验证token，除特殊项目外不建议开启,对性能有一定影响,每次将查询user_login_device table token是否存在 类似传统登录模式,注意：游客没有token验证模式
         'jwt_md5_key' => 'ice_world',//jwt Token生成key注意保护,可变更但会导致已经签发的jwt登录失效 !!******!!!
-        'wt_expire_verify' => true,//开启jwt过期验证,需要前端配合进行过去续签切jwt_out_time不为0
+        'jwt_expire_verify' => true,//开启jwt过期验证,需要前端配合进行过期续签切jwt_out_time不为0 主要判断o_t过期时间
         'jwt_out_time' => 7200,//用户token过期时间，单位秒 2592000是30天,0为永不过期(可通过修改jwt_md5_key强制过期),当值较小时加入自动续签功能
         'jwt_refresh_min_time'=>3600,//jwt刷新小于值，防止无意义刷新 单位秒 默认小于1小时不刷新
         'jwt_refresh_max_time'=>2592000,//jwt允许刷新最大值，防止jwt过期超长时间任然可以刷新 单位秒,默认超过30天无法刷新必须重新登陆
