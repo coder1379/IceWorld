@@ -2,6 +2,7 @@
 
 namespace common\services\admin;
 
+use common\ComBase;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -17,7 +18,7 @@ class AdministratorSearch extends AdministratorModel
     public function rules()
     {
         return [
-            [['id', 'role_id', 'group_id', 'area_id', 'add_admin_id', 'show_sort', 'type', 'status', 'online', 'is_delete', 'is_admin'], 'integer'],
+            [['id', 'role_id', 'group_id', 'area_id', 'add_admin_id', 'show_sort', 'type', 'status', 'online', 'is_admin'], 'integer'],
             [['login_username', 'avatar', 'realname', 'nickname', 'mobile', 'remark', 'email', 'qq', 'wechat', 'company', 'login_password', 'token', 'add_time', 'last_login_time', 'last_login_ip'], 'safe'],
         ];
     }
@@ -69,7 +70,6 @@ class AdministratorSearch extends AdministratorModel
             'status' => $this->status,
             'last_login_time' => $this->last_login_time,
             'online' => $this->online,
-            'is_delete' => 0,
             'is_admin' => $this->is_admin,
         ]);
 
@@ -88,6 +88,8 @@ class AdministratorSearch extends AdministratorModel
             ->andFilterWhere(['like', 'last_login_ip', $this->last_login_ip]);
 
         $query->with('adminRoleRecord')->with('adminGroupRecord')->with('areaRecord')->with('addAdminRecord');
+
+        $query->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE]);//自动加入删除过滤
 
         $query->addOrderBy('id desc');
 

@@ -65,7 +65,7 @@ class BackendCommon extends BaseCommon
             return false;
         }
         $params=[':id'=>$adminId];
-        $roleRecord = Yii::$app->db->createCommand("select r.auth_list,r.other_auth_list,m.is_admin from {{%administrator}} m inner join {{%admin_role}} r on m.role_id=r.id where m.is_delete=0 and m.status=1 and m.id=:id and r.is_delete=0 and r.status=1")->bindValues($params)->queryOne();
+        $roleRecord = Yii::$app->db->createCommand("select r.auth_list,r.other_auth_list,m.is_admin from {{%administrator}} m inner join {{%admin_role}} r on m.role_id=r.id where m.status=1 and m.id=:id and r.is_delete=0 and r.status=1")->bindValues($params)->queryOne();
         if(empty($roleRecord)!=true){
             $list['auth_list'] = $roleRecord['auth_list'];
             $list['other_auth_list'] = $roleRecord['other_auth_list'];
@@ -169,8 +169,8 @@ class BackendCommon extends BaseCommon
      */
     public function setAdminLoginSession($adminName,$password,$online=0){
         $password = strval($password);
-        $params = [':login_username'=>$adminName,':is_delete'=>0,':status'=>1];
-        $adminRecord=Yii::$app->db->createCommand('select * from {{%administrator}} where login_username=:login_username and is_delete=:is_delete and status=:status')->bindValues($params)->queryOne();
+        $params = [':login_username'=>$adminName,':status'=>1];
+        $adminRecord=Yii::$app->db->createCommand('select * from {{%administrator}} where login_username=:login_username and status=:status')->bindValues($params)->queryOne();
         if(!empty($adminRecord) && !empty($password)){
             if($this->getSaveDBPassword($password)===$adminRecord['login_password']){
                 $this->setLoginInfoToSession($adminRecord);
@@ -191,8 +191,8 @@ class BackendCommon extends BaseCommon
      * @return bool
      */
     public function setAdminCookieLoginSession($adminName,$online=0){
-        $params = [':login_username'=>$adminName,':is_delete'=>0,':status'=>1];
-        $adminRecord=Yii::$app->db->createCommand('select * from {{%administrator}} where login_username=:login_username and is_delete=:is_delete and status=:status')->bindValues($params)->queryOne();
+        $params = [':login_username'=>$adminName,':status'=>1];
+        $adminRecord=Yii::$app->db->createCommand('select * from {{%administrator}} where login_username=:login_username and status=:status')->bindValues($params)->queryOne();
         if(empty($adminRecord)){
             return false;
         }

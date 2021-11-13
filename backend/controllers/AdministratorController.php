@@ -111,7 +111,7 @@ class AdministratorController extends AuthController
         $model->scenario = 'update';//修改场景，控制字段安全
         $model->loadDefaultValues();
         if ($model->load(Yii::$app->request->post())==true) {
-            if(empty($model->login_password)!=true && $model->login_password!=$model->getOldAttribute('password')){
+            if(empty($model->login_password)!=true && $model->login_password!=$model->getOldAttribute('login_password')){
                 $backendCommon = new BackendCommon();
                 $model->login_password=$backendCommon->getSaveDBPassword($model->login_password);
             }
@@ -144,7 +144,7 @@ class AdministratorController extends AuthController
             return $this->getJsonString([],10001,'参数错误!');
         }else{
             $obj->scenario = 'delete';//删除场景，控制字段安全
-            $obj->is_delete=1;
+            $obj->status=-1; // 将delete 改为status
             if($obj->update()==true){
                 return $this->getJsonString([],200,'删除成功!');
             }else{

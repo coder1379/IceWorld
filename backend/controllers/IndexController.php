@@ -114,7 +114,7 @@ class IndexController extends AuthController
 
         $backendCommon = new BackendCommon();
         if($backendCommon->checkLogin()===true){
-            $adminInfo = Yii::$app->db->createCommand("select a.*,b.name as role_name from {{%administrator}} a inner join {{%admin_role}} b on a.role_id=b.id where a.is_delete=0 and a.id=:id ")->bindValues([':id'=>Yii::$app->session["admin.adminid"]])->queryOne();
+            $adminInfo = Yii::$app->db->createCommand("select a.*,b.name as role_name from {{%administrator}} a inner join {{%admin_role}} b on a.role_id=b.id where a.status=1 and a.id=:id ")->bindValues([':id'=>Yii::$app->session["admin.adminid"]])->queryOne();
 
             return $this->render('admininfo',['adminInfo'=>$adminInfo]);
         }else{
@@ -129,7 +129,6 @@ class IndexController extends AuthController
         if($backendCommon->checkLogin()===true){
             $post = Yii::$app->request->post();
             if(!empty($post)){
-                $adminInfo = Yii::$app->db->createCommand("select * from {{%administrator}} where is_delete=0 and id=:id ")->bindValues([':id'=>Yii::$app->session["admin.adminid"]])->queryOne();
                 $oldPassword = $post['old_password']??'';
                 $oldPassword=trim($oldPassword);
                 $newPassword = $post['new_password']??'';
@@ -151,6 +150,16 @@ class IndexController extends AuthController
                     $this->echoJson([],100001,'新密码不匹配!');
                 }
 
+                $adminInfo = Yii::$app->db->createCommand("select * from {{%administrator}} where status>-1 and id=:id ")->bindValues([':id'=>Yii::$app->session["admin.adminid"]])->queryOne();
+
+                if(empty($adminInfo)){
+                    $this->echoJson([],100001,'管理用户不存在!');
+                }
+
+                if($adminInfo['status']!=1){
+                    $this->echoJson([],100001,'管理用户已被冻结!');
+                }
+
                 if($adminInfo['login_password'] !=  $backendCommon->getSaveDBPassword($oldPassword) ){
                     $this->echoJson([],100001,'旧密码错误!');
                 }
@@ -159,7 +168,7 @@ class IndexController extends AuthController
                     $this->echoJson([],100001,'新密码与旧密码相同!');
                 }
 
-                $updateFlag = Yii::$app->db->createCommand("update {{%administrator}} set login_password=:login_password where is_delete=0 and id=:id ")->bindValues([':id'=>Yii::$app->session["admin.adminid"],':login_password'=>$backendCommon->getSaveDBPassword($newPassword)])->execute();
+                $updateFlag = Yii::$app->db->createCommand("update {{%administrator}} set login_password=:login_password where status>-1 and id=:id ")->bindValues([':id'=>Yii::$app->session["admin.adminid"],':login_password'=>$backendCommon->getSaveDBPassword($newPassword)])->execute();
                 if(!empty($updateFlag)){
                     $this->echoJson([],200,'密码已修改!');
                 }else{

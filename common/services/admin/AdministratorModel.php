@@ -2,6 +2,7 @@
 
 namespace common\services\admin;
 
+use common\ComBase;
 use Yii;
 use common\services\admin\AdminRoleModel;
 use common\services\admin\AdminGroupModel;
@@ -34,7 +35,6 @@ use common\services\area\AreaModel;
  * @property string $last_login_time
  * @property string $last_login_ip
  * @property integer $online
- * @property integer $is_delete
  * @property integer $is_admin
  */
 class AdministratorModel extends \yii\db\ActiveRecord
@@ -100,7 +100,7 @@ class AdministratorModel extends \yii\db\ActiveRecord
 
      //获取area_id,城市 的LIST
      public function getAreaRecordList(){
-            $array = AreaModel::find()->select('id,name')->where(['is_delete'=>0])->orderBy("id desc")->limit(100)->asArray()->all();
+            $array = AreaModel::find()->select('id,name')->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE])->orderBy("id desc")->limit(100)->asArray()->all();
             $newArr = [];
 
             if(empty($array)!=true){
@@ -119,7 +119,7 @@ class AdministratorModel extends \yii\db\ActiveRecord
 
      //获取add_admin_id,添加人 的LIST
      public function getAddAdminRecordList(){
-            $array = AdministratorModel::find()->select('id,nickname')->where(['is_delete'=>0])->orderBy("id desc")->limit(100)->asArray()->all();
+            $array = AdministratorModel::find()->select('id,nickname')->andWhere(['>','status',ComBase::STATUS_COMMON_DELETE])->orderBy("id desc")->limit(100)->asArray()->all();
             $newArr = [];
 
             if(empty($array)!=true){
@@ -148,7 +148,7 @@ class AdministratorModel extends \yii\db\ActiveRecord
         ////////////字段验证规则
         return [
             [['login_username', 'nickname', 'role_id', 'login_password'], 'required'],
-            [['role_id', 'group_id', 'area_id', 'add_admin_id', 'show_sort', 'type', 'status', 'online', 'is_delete', 'is_admin'], 'integer'],
+            [['role_id', 'group_id', 'area_id', 'add_admin_id', 'show_sort', 'type', 'status', 'online', 'is_admin'], 'integer'],
             [['add_time', 'last_login_time'], 'safe'],
             [['login_username', 'realname', 'nickname', 'company'], 'string', 'max' => 20],
             [['avatar'], 'string', 'max' => 100],
@@ -169,7 +169,7 @@ class AdministratorModel extends \yii\db\ActiveRecord
 
         'update' => ['login_username','avatar','realname','nickname','mobile','remark','email','qq','wechat','company','role_id','group_id','area_id','login_password','token','add_admin_id','add_time','show_sort','type','status','last_login_time','last_login_ip','online','is_admin',],//修改场景
 
-        'delete' => ['is_delete'],//删除场景
+        'delete' => ['status'],//删除场景
         ];
     }
 
@@ -203,7 +203,6 @@ class AdministratorModel extends \yii\db\ActiveRecord
             'last_login_time' => '最后登陆时间',
             'last_login_ip' => '最后登陆IP',
             'online' => '在线状态',
-            'is_delete' => '是否删除',
             'is_admin' => '是否为超级管理员',
         ];
     }
