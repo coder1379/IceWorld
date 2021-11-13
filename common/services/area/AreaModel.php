@@ -21,7 +21,7 @@ class AreaModel extends \yii\db\ActiveRecord
     /*
      * @配置信息写入
      */
-
+    public $statusPredefine=["1"=>"正常","2"=>"冻结"];
 
     /*
     * @关系内容写入
@@ -44,7 +44,7 @@ class AreaModel extends \yii\db\ActiveRecord
         ////////////字段验证规则
         return [
             [['name'], 'required'],
-            [['type', 'parent_id', 'show_sort', 'is_delete'], 'integer'],
+            [['status','type', 'parent_id', 'show_sort', 'is_delete'], 'integer'],
             [['name'], 'string', 'max' => 20],
         ];
     }
@@ -53,11 +53,11 @@ class AreaModel extends \yii\db\ActiveRecord
     {
         ///////模型使用场景
                 return [
-        'create' => ['name','type','parent_id','show_sort',],//创建场景
+        'create' => ['name','status','type','parent_id','show_sort',],//创建场景
 
-        'update' => ['name','type','parent_id','show_sort',],//修改场景
+        'update' => ['name','status','type','parent_id','show_sort',],//修改场景
 
-        'delete' => ['is_delete'],//删除场景
+        'delete' => ['status'],//删除场景
         ];
     }
 
@@ -69,6 +69,7 @@ class AreaModel extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => '地区名称',
+            'status' => '状态',
             'type' => '地区类型',
             'parent_id' => '上级区域',
             'show_sort' => '排序',
