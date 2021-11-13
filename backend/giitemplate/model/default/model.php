@@ -19,6 +19,7 @@ echo "<?php\n";
 namespace <?= $generator->ns ?>;
 
 use Yii;
+use common\ComBase;
 <?php
 $haveArray=[];
 foreach ($labels as $name => $label){
