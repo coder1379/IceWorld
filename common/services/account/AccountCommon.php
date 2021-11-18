@@ -244,7 +244,7 @@ class AccountCommon
      * @param $userType
      * @param $token
      * @param $userData
-     * @param $same 是否为相同的token，主要用于判定无意义刷新返回前端处理
+     * @param $same 是否为相同的token，主要用于判定无意义刷新返回前端处理, 1为相同，前端忽略继续执行
      * @return array
      */
     public static function getReturnTokenDataFormat($userType, $token, $userData = null, $same = 0)
