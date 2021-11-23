@@ -20,7 +20,8 @@ PHP>=7.2 建议至少>=7.2.5
 #yii2 每分钟进行一次系统检测发现异常钉钉推送
 * * * * * /usr/local/php74/bin/php /data/wwwroot/yii2/yii index/systemtour
 ```
-9.根据需求修改模板框架以提高开发速度,注意user仅可覆盖admin后台相关与apimodel，userLogic与userController不能覆盖齐相关内容
+9.根据需求修改模板框架以提高开发速度,**注意user表仅可生成覆盖后台相关的UserModel,UserQuery,UserSearch,UserApiModel,userLogic与backend/userController,api/userController,注意生成后输出的token及pwd相关字段UserApiModel中屏蔽。不能覆盖UserCommon,account相关部分，已有特定代码
+
 10.发布与测试,根据是否有redis选择 CaptchaLogic 缓存方式，默认是文件，如果使用redis注意修改cacheType=2,这里不全部统一使用cache配置redis方式是为了适应更多的场景，例如分布式时缓存与redis问题。
 11.根据是否有短信实现短信发送逻辑
 
