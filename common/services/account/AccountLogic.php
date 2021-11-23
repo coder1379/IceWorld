@@ -246,7 +246,7 @@ class AccountLogic
                     $lastExTime = $jwtTime - $nowTime;
                     if (!empty($jwtTime)) {//$jwtTime = 0为永久有效，但在续签的业务中如果调用了续签还是生成新的jwt-token防止用户状态不刷新
                         if ($lastExTime > Yii::$app->params['jwt']['jwt_refresh_min_time']) {
-                            return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($jwtUserType, $oldToken, ['id' => $userId], 1));//防止无意义刷新,将yuan
+                            return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($jwtUserType, $oldToken, ['id' => $userId], 1,$lastExTime));//防止无意义刷新,将yuan
                         } else if ($exMaxTime > Yii::$app->params['jwt']['jwt_refresh_max_time']) { //防止超长时间过期刷新
                             if ($jwtUserType !== UserCommon::TYPE_DEVICE_VISITOR) { //非游客续签直接根据配置返回
                                 return $this->getRenewalFailReturnArray($params);

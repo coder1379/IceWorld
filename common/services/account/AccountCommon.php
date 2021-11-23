@@ -245,9 +245,10 @@ class AccountCommon
      * @param $token
      * @param $userData
      * @param $same 是否为相同的token，主要用于判定无意义刷新返回前端处理, 1为相同，前端忽略继续执行
+     * @param $exSp 如果same=1 $exSp则非0，回传给前端
      * @return array
      */
-    public static function getReturnTokenDataFormat($userType, $token, $userData = null, $same = 0)
+    public static function getReturnTokenDataFormat($userType, $token, $userData = null, $same = 0, $exSp = 0 )
     {
         $id = 0;
         $userType = intval($userType);
@@ -256,7 +257,13 @@ class AccountCommon
             $id = intval($userData['id'] ?? 0);
         }
 
-        return ['id' => $id, 'user_type' => $userType, 'token' => $token, 'same' => $same];
+        // ex_sp 过期间隔秒数，返回前端便于前端本地缓存过期时间，防止本地时间与服务器时间不同，本地无限过期
+        $exSpTime = Yii::$app->params['jwt']['jwt_out_time'];
+        if($same==1){
+            // 重复续签，重新计算一下过期时间给前端
+            $exSpTime = $exSp;
+        }
+        return ['id' => $id, 'user_type' => $userType, 'token' => $token, 'same' => $same,'ex_sp'=>$exSpTime];
     }
 
 }

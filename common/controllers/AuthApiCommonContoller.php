@@ -18,7 +18,7 @@ class AuthApiCommonContoller extends ApiCommonContoller
 
     public $allowVisitorAccessActions = null; //允许游客访问的actions,由于权限验证类大部分不允许游客访问所以采用允许例外而不是排除,仅当用户类型为游客时判断,若要排除游客验证直接使用 allowAccessActions不做任何验证,游客校验会受到全局配置影响,注意如果关闭了游客模式，允许游客访问的内容将自动降级为不做任何访问限制
 
-    public $verifyShortTokenActions = [];//需要进行短token校验的action(强安全性要求时使用例如修改密码,发表评论等),注意大小写要保持一致，是区分大小写的,建议均使用小写进行action命名
+    public $verifyShortTokenActions = [];//需要进行短token校验的action(强安全性要求时使用例如修改密码,发表评论等),注意大小写要保持一致，是区分大小写的,建议均使用小写进行action命名,大写action 注意需要转换为-才能访问，$action->id 也为-值
 
     public function beforeAction($action)
     {
