@@ -11,10 +11,10 @@ return [
         'jwt_strict_verification' => false,//jwt严格验证,默认false不开启,true将验证token，除特殊项目外不建议开启,对性能有一定影响,每次将查询user_login_device table token是否存在 类似传统登录模式,注意：游客没有token验证模式
         'jwt_md5_key' => 'ice_world',//jwt Token生成key注意保护,可变更但会导致已经签发的jwt登录失效 !!******!!!
         'jwt_expire_verify' => true,//开启jwt过期验证,需要前端配合进行过期续签切jwt_out_time不为0 主要判断o_t过期时间
-        'jwt_out_time' => 7200,//用户token过期时间，单位秒 2592000是30天,0为永不过期(可通过修改jwt_md5_key强制过期),当值较小时加入自动续签功能
+        'jwt_out_time' => 7200,//用户token过期时间，单位秒 2592000是30天,0为永不过期(可通过修改jwt_md5_key强制过期),当值较小时加入自动续签功能,建议值为30天，过期时间较短需自行考虑每个接口续签重试问题。
         'jwt_refresh_min_time'=>3600,//jwt刷新小于值，防止无意义刷新 单位秒 默认小于1小时不刷新
         'jwt_refresh_max_time'=>2592000,//jwt允许刷新最大值，防止jwt过期超长时间任然可以刷新 单位秒,默认超过30天无法刷新必须重新登陆
-        'jwt_device_visitor_verification' => true,//jwt设备访客验证模式,默认开启,除特例接口外均需要进行游客token有效性验证,user_token验证例外也将进行游客有效性验证,建议开启并记录访问便于分析,跟随业务后续可以选择配合前端一起关闭,开启需要前端进行配合调用续签
+        'jwt_device_visitor_verification' => true,//jwt设备访客验证模式,默认开启,除特例接口外均需要进行游客token有效性验证,user_token验证例外也将进行游客有效性验证,建议开启并记录访问便于分析,跟随业务后续可以选择配合前端一起关闭,开启需要前端进行配合调用续签，注意：开启后除特定排除接口外无游客身份均无法访问.
     ],
     'save_access_log' => true, //保存接口访问日志,根据情况缓存日志 可自行扩展模式 **
     'save_admin_action_log' => false, //是否保存管理员操作日志 可持续自行扩展 默认不保存 true|false

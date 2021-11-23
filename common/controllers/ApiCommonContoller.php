@@ -161,7 +161,8 @@ class ApiCommonContoller extends BaseContoller
      */
     public function visitorVerification($verifyCode, $actionId)
     {
-        if ($this->userType === UserCommon::TYPE_DEVICE_VISITOR && Yii::$app->params['jwt']['jwt_device_visitor_verification'] === true && $verifyCode !== ComBase::CODE_RUN_SUCCESS) {//是游客用户 & 开启jwt游客验证 & 验证不通过
+        if ($this->userType === UserCommon::TYPE_DEVICE_VISITOR && Yii::$app->params['jwt']['jwt_device_visitor_verification'] === true && $verifyCode !== ComBase::CODE_RUN_SUCCESS) {
+            //是游客用户 & 开启jwt游客验证 & 验证不通过 $this->userType默认为游客，所以当开启游客验证后如果没有游客token除排除游客接口外都将返回422
 
             if (!empty($this->excludeVisitorVer) && in_array($actionId, $this->excludeVisitorVer, true)) {
                 //如果为游客验证排除数据则不进行验证
