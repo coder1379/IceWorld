@@ -230,6 +230,10 @@ class AccountLogic
             return ComBase::getParamsErrorReturnArray($deviceArr['msg']);
         }
 
+        if(Yii::$app->params['jwt']['jwt_expire_renewal'] === false){
+            return ComBase::getNoLoginReturnArray(); // 如果关闭了续签则全部返回401
+        }
+
         if (!empty($oldToken) && strlen($oldToken) < 500) {
             $jwtUser = AccountCommon::decodeUserLoginToken($oldToken);
             if (!empty($jwtUser)) {
@@ -247,14 +251,15 @@ class AccountLogic
                     if (!empty($jwtTime)) {//$jwtTime = 0为永久有效，但在续签的业务中如果调用了续签还是生成新的jwt-token防止用户状态不刷新
                         if ($lastExTime > Yii::$app->params['jwt']['jwt_refresh_min_time']) {
                             return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($jwtUserType, $oldToken, ['id' => $userId], 1,$lastExTime));//防止无意义刷新,将yuan
-                        } else if ($exMaxTime > Yii::$app->params['jwt']['jwt_refresh_max_time']) { //防止超长时间过期刷新
+                        } else if ($exMaxTime > Yii::$app->params['jwt']['jwt_refresh_max_time']) { //过期一定时间后就不在支持续签，仅允许重新登录.
                             if ($jwtUserType !== UserCommon::TYPE_DEVICE_VISITOR) { //非游客续签直接根据配置返回
-                                return $this->getRenewalFailReturnArray($params);
+                                return ComBase::getNoLoginReturnArray(); // 如果非游客过期直接返回重新登录，由原来非游客过期返回游客修改，非游客过期直接返回游客容易导致业务复杂度上升
+                                //return $this->getRenewalFailReturnArray($params);
                             }
                         }
                     }
 
-                    if ($jwtUserType === UserCommon::TYPE_DEVICE_VISITOR) { //设备游客续签，直接调用获取游客token结束流程
+                    if ($jwtUserType === UserCommon::TYPE_DEVICE_VISITOR) { //设备游客续签，直接调用获取游客token结束流程 后续流程均为非游客的处理
                         return $this->getVisitorToken($params);
                     }
 
@@ -268,13 +273,13 @@ class AccountLogic
                             //成功续签前检查是否有禁止登录等内容
                             $checkArr = AccountCommon::getBeforeLoginErrorCheck($userData);
                             if ($checkArr !== false) {
-                                return $this->getRenewalFailReturnArray($params);//如果状态有异常则根据游客配置返回不同结果
+                                return $checkArr;// 如果用户登录续签校验异常直接返回异常给前端
                             }
 
                             $userType = intval($userData['type']);
                             if (!empty($deviceData) && !empty($userData)) {
                                 $userStatus = intval($userData['status']);
-                                if ($userStatus === UserCommon::STATUS_YES) {//只有状态正常的用户才能续签
+                                if ($userStatus === UserCommon::STATUS_YES) { // 只有状态正常的用户才能续签 这里和getBeforeLoginErrorCheck可能会有重复，如果修改注意同时处理，不建议修改status状态
                                     $tokenArr = AccountCommon::getUserLoginToken($userId, $userData['type'], $appId);
                                     $deviceType = $deviceArr['data']['device_type'];//设备类型
                                     $deviceCode = $deviceArr['data']['device_code'] ?? '';//设备号
@@ -300,7 +305,7 @@ class AccountLogic
                                                 }
 
                                             } else {
-                                                //浏览器类型可以直接续签新浏览器主要用于app内打开网页场景
+                                                //浏览器类型可以直接续签新浏览器主要用于app内打开网页场景 ,使用app token进入浏览器，但浏览器内还没有token导致需要登录这种场景
                                                 $deviceId = $this->insertUserLoginDevice($userId, $deviceArr, $tokenArr['token'], $appId);
                                                 if (!empty($deviceId)) {
                                                     return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($userType, $tokenArr['jwt_token'], $userData));//返回新的jwt_token及其他格式化数据
@@ -314,12 +319,23 @@ class AccountLogic
                             Yii::error('jwt续签异常:' . $exc->getMessage());
                         }
                     }
+
+                    // 在可以判断当前token是否为游客清空下使用不同返回
+                    // 如果为游客判断是否返回新的游客信息防止前端游客业务中断
+                    if($jwtUserType === UserCommon::TYPE_DEVICE_VISITOR){
+                        return $this->getRenewalFailReturnArray($params);
+                    }else{
+                        return ComBase::getNoLoginReturnArray(); // 非游客直接重新登录
+                    }
                 }
 
             }
+
+        }else{
+            Yii::error('续签出现错误的jwt数据:' . $oldToken);
         }
 
-        return $this->getRenewalFailReturnArray($params);
+        return ComBase::getNoLoginReturnArray(); // 其他情况导致无法续签均返回重新登录 防止全都保留错误信息，前端401跳转登录或提供相应处理解决方案，并清空当前user登录状态缓存
     }
 
     /**

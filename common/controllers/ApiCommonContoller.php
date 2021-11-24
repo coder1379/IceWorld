@@ -170,9 +170,15 @@ class ApiCommonContoller extends BaseContoller
             }
 
             if ($verifyCode === ComBase::CODE_LOGIN_EXPIRE) {
-                //jwt过期直接输出json 前端续签
-                echo Json::encode(ComBase::getReturnArray([], ComBase::CODE_LOGIN_EXPIRE, ComBase::MESSAGE_LOGIN_EXPIRE));
-                exit();//结束后面所有流程
+                if(Yii::$app->params['jwt']['jwt_expire_renewal']){
+                    // 配置开启续签返回续签给前端
+                    echo Json::encode(ComBase::getReturnArray([], ComBase::CODE_LOGIN_EXPIRE, ComBase::MESSAGE_LOGIN_EXPIRE));
+                    exit();//结束后面所有流程
+                }else{
+                    // 没有开启续签 则直接返回422
+                    echo Json::encode(ComBase::getReturnArray([], ComBase::CODE_GET_VISITOR_TOKEN_RETRY, ComBase::MESSAGE_GET_VISITOR_TOKEN_RETRY));
+                    exit();//结束后面所有流程
+                }
             }
 
             //无效jwt，由于游客没有登录状态，所以直接返回重新获取游客token进行重试,便于前端判断状态

@@ -296,7 +296,7 @@ $saveMobile = AccountCommon::getSaveMobile($mobile, $areaCode);
 
 ###使用 cache文件保存时注意 一定时间后使用： $cache = new FileCache(); $cache->gc(true); //回收过期缓存文件
 
-###成功登录前验证扩展：AccountCommon::getBeforeLoginErrorCheck
+###成功登录前验证扩展：AccountCommon::getBeforeLoginErrorCheck 续签采用相同逻辑，如果需要限制指定类型或状态不允许登录 扩展此方法,注意如果修改了用户status 正常判断方式，续签时可能也需要相应status 判断
 
 ### user 字段 status 表示用户目前状态 -1删除或注销，1正常，2冻结，只有1表示正常，其余值都表示无法正常使用
 

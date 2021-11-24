@@ -68,9 +68,17 @@ class AuthApiCommonContoller extends ApiCommonContoller
                 }
                 return true;
             } else if (ComBase::CODE_LOGIN_EXPIRE === $verifyCode) {
-                //jwt过期直接输出json 前端续签
-                echo Json::encode(ComBase::getReturnArray([], ComBase::CODE_LOGIN_EXPIRE, ComBase::MESSAGE_LOGIN_EXPIRE));
-                exit();//结束后面所有流程
+
+                if(Yii::$app->params['jwt']['jwt_expire_renewal']){
+                    // 配置开启续签返回续签给前端
+                    echo Json::encode(ComBase::getReturnArray([], ComBase::CODE_LOGIN_EXPIRE, ComBase::MESSAGE_LOGIN_EXPIRE));
+                    exit();//结束后面所有流程
+                }else{
+                    //直接返回需要重新登录
+                    echo Json::encode(ComBase::getNoLoginReturnArray());
+                    exit();//结束后面所有流程
+                }
+
             } else {
                 //无效jwt直接返回未登录 判断是否允许游客访问 返回内容
                 echo Json::encode($this->getJwtVerificationFailReturnArray($actionId));
@@ -86,9 +94,15 @@ class AuthApiCommonContoller extends ApiCommonContoller
                 if(ComBase::CODE_RUN_SUCCESS === $verifyCode){
                     return true;
                 }else if(ComBase::CODE_LOGIN_EXPIRE === $verifyCode){
-                    //jwt过期直接输出json 前端续签
-                    echo Json::encode(ComBase::getReturnArray([], ComBase::CODE_LOGIN_EXPIRE, ComBase::MESSAGE_LOGIN_EXPIRE));
-                    exit();//结束后面所有流程
+                    if(Yii::$app->params['jwt']['jwt_expire_renewal']){
+                        // 配置开启续签返回续签给前端
+                        echo Json::encode(ComBase::getReturnArray([], ComBase::CODE_LOGIN_EXPIRE, ComBase::MESSAGE_LOGIN_EXPIRE));
+                        exit();//结束后面所有流程
+                    }else{
+                        //直接返回需要重新登录
+                        echo Json::encode(ComBase::getNoLoginReturnArray());
+                        exit();//结束后面所有流程
+                    }
                 }else{
                     //开启了游客模式并且允许游客访问此action，游客无效返回重新后去游客token重试
                     echo Json::encode(ComBase::getReturnArray([], ComBase::CODE_GET_VISITOR_TOKEN_RETRY, ComBase::MESSAGE_GET_VISITOR_TOKEN_RETRY));
