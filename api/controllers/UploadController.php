@@ -28,7 +28,7 @@ class UploadController extends AuthApiCommonContoller
             return Json::encode(ComBase::getReturnArray([], ComBase::CODE_PARAM_ERROR, ComBase::MESSAGE_PARAM_ERROR));
         }
         $uploadLogic = new UploadLogic('','image');//上传图片类型
-        $result = $uploadLogic->upload($_FILES['Filedata'], Yii::$app->params['uploadMode'],'app');
+        $result = $uploadLogic->upload($_FILES['file_data'], Yii::$app->params['uploadMode'],'app');
         return Json::encode($result);
     }
 
