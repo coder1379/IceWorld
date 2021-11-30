@@ -16,7 +16,7 @@ return [
         'jwt_refresh_max_time'=>2592000,//jwt允许刷新最大值，防止jwt过期超长时间任然可以刷新 单位秒,默认超过30天无法刷新必须重新登陆
         'jwt_device_visitor_verification' => true,//jwt设备访客验证模式,默认开启,除特例接口外均需要进行游客token有效性验证,user_token验证例外也将进行游客有效性验证,建议开启并记录访问便于分析,跟随业务后续可以选择配合前端一起关闭,开启需要前端进行配合调用续签，注意：开启后除特定排除接口外无游客身份均无法访问.
     ],
-    'save_access_log' => true, //保存接口访问日志,根据情况缓存日志 可自行扩展模式 **
+    'save_access_log' => true, //保存接口访问日志,根据情况缓存日志 可自行扩展模式 ** 默认写入数据库 在访问量不大时需要知道用户访问详情时使用，较大访问量建议修改数据保存方式
     'save_admin_action_log' => false, //是否保存管理员操作日志 可持续自行扩展 默认不保存 true|false
     'uploadMode' => 'local',//图片上传地址 local 上传本地 oss 上传阿里云oss服务器(需配置下发oss参数) **
     'local_static_link' => 'http://static.yii.com',//本地静态保存文件域名参数 **

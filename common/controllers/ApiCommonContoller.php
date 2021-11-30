@@ -53,6 +53,10 @@ class ApiCommonContoller extends BaseContoller
                     $requestList = $this->getRequestAll();
                     if (!empty($requestList)) {
                         foreach ($requestList as $key => $item) {
+                            if($key === 'token'){
+                                // 当前应用自身token不保存
+                                continue;
+                            }
                             if (is_array($item)) {
                                 $tepStr = json_encode($item);
                                 if (mb_strlen($tepStr) > 100) {
