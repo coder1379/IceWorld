@@ -46,7 +46,7 @@ class OutputExcel
             $row = $data[$t];
             foreach ($row as $i => $v) {
                 if (!empty($v) && !is_numeric($v)) {
-                    $row[$i] = iconv('utf-8', 'gbk//IGNORE', $v);
+                    $row[$i] =  str_replace(',','，',iconv('utf-8', 'gbk//IGNORE', $v));
                 } else {
                     $row[$i] = $v;
                 }
