@@ -28,6 +28,7 @@ return [
         'oss_base_link' => 'http://www.test.com/',//阿里云静态文件自定义前缀 设置空则使用bucket阿里云地址 **
     ],
     'api_root_url' => 'http://api.localhost.com/',//api 域名生产地址 local中覆盖测试 **
+    'mobile_root_url' => 'https://m.localhost.com/',//移动前端页面 域名生产地址 local中覆盖测试 **
     'admin_root_url' => 'http://admin.localhost.com/',//admin后台域名生产地址 local中覆盖测试 **
     'dingding_log_robot_token' => '123456',//钉钉日志机器人token ,如果生产与测试不同在local中自行覆盖 **
     'admin_site_show_name'=>'后台管理系统',//显示名称-可在local里覆盖标明测试环境 ***

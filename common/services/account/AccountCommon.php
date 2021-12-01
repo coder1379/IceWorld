@@ -49,7 +49,9 @@ class AccountCommon
     const DEVICE_TYPE_APP = 1;//用户设备类型 移动端
     const DEVICE_TYPE_PC = 2;//用户设备类型 PC电脑端
     const DEVICE_TYPE_WEB = 3;//用户设备类型 浏览器
-    const DEVICE_ARR = [self::DEVICE_TYPE_APP, self::DEVICE_TYPE_PC, self::DEVICE_TYPE_WEB];//用户设备数组便于判断
+    const DEVICE_TYPE_MOBILE_WEB = 4;//用户设备类型 浏览器 移动端
+    const DEVICE_ARR = [self::DEVICE_TYPE_APP, self::DEVICE_TYPE_PC, self::DEVICE_TYPE_WEB, self::DEVICE_TYPE_MOBILE_WEB];//用户设备数组便于判断
+    const DEVICE_WEBS_ARR = [self::DEVICE_TYPE_WEB, self::DEVICE_TYPE_MOBILE_WEB]; //用户设备为浏览器数组 用于判断
 
     /**
      * 获取账号用户登录设备通过user_id + 短token + app_id

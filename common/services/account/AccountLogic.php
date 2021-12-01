@@ -51,7 +51,8 @@ class AccountLogic
         $userDeviceModel = '';
         $deviceDesc = '';
 
-        if ($deviceType === AccountCommon::DEVICE_TYPE_WEB) {
+        // 设备类型属于 浏览器数组
+        if (in_array($deviceType,AccountCommon::DEVICE_WEBS_ARR,true)) {
             $deviceDesc = Yii::$app->request->getUserAgent();
             $deviceCode = trim(ComBase::getStrVal('device_code', $params));
             $userDeviceSystem = StringHandle::getWebSystem($deviceDesc);
@@ -293,11 +294,12 @@ class AccountLogic
                                         }
                                     } else {
 
-                                        if ($deviceType === AccountCommon::DEVICE_TYPE_WEB) {
+                                        if (in_array($deviceType,AccountCommon::DEVICE_WEBS_ARR,true)) {
                                             $deviceDataWeb = $this->getUserLoginDeviceByDeviceCode($userId, $deviceCode, $appId);//获取设备信息
                                             if (!empty($deviceDataWeb)) {
                                                 $webDeviceType = intval($deviceDataWeb['type'] ?? 0);
-                                                if ($webDeviceType === AccountCommon::DEVICE_TYPE_WEB) {
+                                                if (in_array($webDeviceType,AccountCommon::DEVICE_WEBS_ARR,true)) {
+                                                    // 原始设备类型为浏览器
                                                     $updateFlg = $this->updateUserLoginDevice($deviceDataWeb['id'], $tokenArr['token']);//浏览器设备号相同视为同一个浏览器直接更新旧token
                                                     if (!empty($updateFlg)) {
                                                         return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($userType, $tokenArr['jwt_token'], $userData));//返回新的jwt_token及其他格式化数据
@@ -899,8 +901,7 @@ class AccountLogic
                 $this->insertUserLoginLog($userId, $bindData['id'], $deviceId, AccountCommon::LOGIN_TYPE_MOBILE, $deviceArr, $appId);//写入登录日志
 
                 $this->loginSuccessCall($userId); //登录成功扩展预留
-
-                return ComBase::getReturnArray(['user_type' => intval($userData['type']), 'token' => $tokenArr['jwt_token']]);
+                return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(intval($userData['type']), $tokenArr['jwt_token'], $userData));
 
             }
         }
