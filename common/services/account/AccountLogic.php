@@ -65,6 +65,9 @@ class AccountLogic
         if (empty($deviceCode) || empty($userDeviceSystem) || empty($userDeviceModel)) {
             return ComBase::getParamsErrorReturnArray('访问参数无效');
         }
+        if(strlen($deviceDesc)>250){
+            $deviceDesc = substr($deviceDesc, 0, 250);
+        }
         return ComBase::getReturnArray(['device_type' => $deviceType, 'device_code' => $deviceCode, 'system' => $userDeviceSystem, 'model' => $userDeviceModel, 'device_desc' => $deviceDesc]);
     }
 
@@ -197,12 +200,11 @@ class AccountLogic
      * 获取用户设备信息by user_id 设备号
      * @param $userId
      * @param $deviceCode
-     * @param int $type
      * @param int $appId 应用id 默认0
      * @return array|false
      * @throws \yii\db\Exception
      */
-    private function getUserLoginDeviceByDeviceCode($userId, $deviceCode, $type = 0, $appId = 0)
+    private function getUserLoginDeviceByDeviceCode($userId, $deviceCode, $appId = 0)
     {
         if (empty($userId) || empty($deviceCode)) {
             $allArgs = func_get_args();
