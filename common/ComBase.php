@@ -65,6 +65,8 @@ class ComBase
     const CODE_SERVER_BUSY = 503;
     const MESSAGE_SERVER_BUSY = '服务繁忙，请稍后再试';
 
+    const MESSAGE_PARAMS_LOST = '参数丢失，请关闭后重试'; // 当游客或其他参数丢失时一般使用此描述让用户重新打开获取新的游客token等
+
     /**
      * 返回数据格式数组
      * 注意：返回值可以添加更多字段与修改msg字段，但code与data字段结构不能修改，除前端外其他服务端也使用了该规则，可额外在封装一层自行转换

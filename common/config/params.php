@@ -54,4 +54,9 @@ return [
         ]
         //如需要其他与短信分开的限制功能可以扩充，在new CallLimit(构造值),CaptchasController(类似imagecodecaptcha)时传入或直接写值即可
     ], // 调用限制 md5 key列表注意一定要修改****
+    'weixin_config' => [
+        // 微信参数配置
+        'appid' => '',
+        'secret'=>''
+    ],
 ];

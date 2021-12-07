@@ -15,7 +15,7 @@ class AccountController extends ApiCommonContoller
     public $enableCsrfValidation = false;
 
     //排除游客验证action,//这里排除了获取游客token,与续签避免逻辑错误
-    public $excludeVisitorVer = ['visitortoken','renewal'];
+    public $excludeVisitorVer = ['visitortoken','renewal','wxweblogin','wxsharesign'];
 
     /**
      * 通过用户名注册
@@ -138,6 +138,27 @@ class AccountController extends ApiCommonContoller
     public function actionVisitortoken(){
         $logic = new AccountLogic();
         $result = $logic->getVisitorToken($this->post());
+        return Json::encode($result);
+    }
+
+    /**
+     * 微信公众号登录
+     * @notes 登录成功直接跳转到wxlogin页面，失败支持输出错误提示信息
+     * @return string
+     */
+    public function actionWxweblogin(){
+        $logic = new AccountLogic();
+        $logic->wxThirdWebLogin($this->get(),$this->visitorUserId);
+    }
+
+    /**
+     * 微信分享签名
+     * @param string $url 分享页面url一般用location.href即可 1
+     * @return json yes {"data":{"appid":"","nonce_str":"nonce_str","timestamp":"timestamp","signature":"signature"}}
+     */
+    public function actionWxsharesign(){
+        $logic = new AccountLogic();
+        $result = $logic->wxShareSign($this->post(),$this->visitorUserId);
         return Json::encode($result);
     }
 

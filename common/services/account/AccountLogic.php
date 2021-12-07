@@ -9,9 +9,11 @@ use common\queues\SendMobileSmsJobs;
 use common\services\application\AppCommon;
 use common\services\captcha\CaptchaLogic;
 use common\services\sms\SmsCommon;
+use GuzzleHttp\Client;
 use Yii;
 use common\ComBase;
 use common\services\user\UserCommon;
+use yii\helpers\Json;
 
 /**
  * 账号逻辑封装用户登录注册等
@@ -52,7 +54,7 @@ class AccountLogic
         $deviceDesc = '';
 
         // 设备类型属于 浏览器数组
-        if (in_array($deviceType,AccountCommon::DEVICE_WEBS_ARR,true)) {
+        if (in_array($deviceType, AccountCommon::DEVICE_WEBS_ARR, true)) {
             $deviceDesc = Yii::$app->request->getUserAgent();
             $deviceCode = trim(ComBase::getStrVal('device_code', $params));
             $userDeviceSystem = StringHandle::getWebSystem($deviceDesc);
@@ -65,9 +67,11 @@ class AccountLogic
         if (empty($deviceCode) || empty($userDeviceSystem) || empty($userDeviceModel)) {
             return ComBase::getParamsErrorReturnArray('访问参数无效');
         }
-        if(strlen($deviceDesc)>250){
+
+        if (strlen($deviceDesc) > 250) {
             $deviceDesc = substr($deviceDesc, 0, 250);
         }
+
         return ComBase::getReturnArray(['device_type' => $deviceType, 'device_code' => $deviceCode, 'system' => $userDeviceSystem, 'model' => $userDeviceModel, 'device_desc' => $deviceDesc]);
     }
 
@@ -102,7 +106,7 @@ class AccountLogic
      * @return bool
      * @throws \yii\db\Exception
      */
-    private function insertUserLoginBindWithThird($userId, $type, $key, $thirdUserData, $appId = 0)
+    private function insertUserLoginBindWithThird($userId, $type, $key, $thirdUserData = [], $appId = 0)
     {
         if (empty($userId) || empty($type) || empty($key) || empty($thirdUserData)) {
             $allArgs = func_get_args();
@@ -233,7 +237,7 @@ class AccountLogic
             return ComBase::getParamsErrorReturnArray($deviceArr['msg']);
         }
 
-        if(Yii::$app->params['jwt']['jwt_expire_renewal'] === false){
+        if (Yii::$app->params['jwt']['jwt_expire_renewal'] === false) {
             return ComBase::getNoLoginReturnArray(); // 如果关闭了续签则全部返回401
         }
 
@@ -253,7 +257,7 @@ class AccountLogic
                     $lastExTime = $jwtTime - $nowTime;
                     if (!empty($jwtTime)) {//$jwtTime = 0为永久有效，但在续签的业务中如果调用了续签还是生成新的jwt-token防止用户状态不刷新
                         if ($lastExTime > Yii::$app->params['jwt']['jwt_refresh_min_time']) {
-                            return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($jwtUserType, $oldToken, ['id' => $userId], 1,$lastExTime));//防止无意义刷新,将yuan
+                            return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($jwtUserType, $oldToken, ['id' => $userId], 1, $lastExTime));//防止无意义刷新,将yuan
                         } else if ($exMaxTime > Yii::$app->params['jwt']['jwt_refresh_max_time']) { //过期一定时间后就不在支持续签，仅允许重新登录.
                             if ($jwtUserType !== UserCommon::TYPE_DEVICE_VISITOR) { //非游客续签直接根据配置返回
                                 return ComBase::getNoLoginReturnArray(); // 如果非游客过期直接返回重新登录，由原来非游客过期返回游客修改，非游客过期直接返回游客容易导致业务复杂度上升
@@ -296,12 +300,12 @@ class AccountLogic
                                         }
                                     } else {
 
-                                        if (in_array($deviceType,AccountCommon::DEVICE_WEBS_ARR,true)) {
+                                        if (in_array($deviceType, AccountCommon::DEVICE_WEBS_ARR, true)) {
                                             $deviceDataWeb = $this->getUserLoginDeviceByDeviceCode($userId, $deviceCode, $appId);//获取设备信息
                                             if (!empty($deviceDataWeb)) {
                                                 $webDeviceType = intval($deviceDataWeb['type'] ?? 0);
-                                                if (in_array($webDeviceType,AccountCommon::DEVICE_WEBS_ARR,true)) {
-                                                    // 原始设备类型为浏览器
+                                                if (in_array($webDeviceType, AccountCommon::DEVICE_WEBS_ARR, true)) {
+                                                    // 旧设备类型在浏览器中
                                                     $updateFlg = $this->updateUserLoginDevice($deviceDataWeb['id'], $tokenArr['token']);//浏览器设备号相同视为同一个浏览器直接更新旧token
                                                     if (!empty($updateFlg)) {
                                                         return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat($userType, $tokenArr['jwt_token'], $userData));//返回新的jwt_token及其他格式化数据
@@ -323,19 +327,17 @@ class AccountLogic
                             Yii::error('jwt续签异常:' . $exc->getMessage());
                         }
                     }
-
                     // 在可以判断当前token是否为游客清空下使用不同返回
                     // 如果为游客判断是否返回新的游客信息防止前端游客业务中断
-                    if($jwtUserType === UserCommon::TYPE_DEVICE_VISITOR){
+                    if ($jwtUserType === UserCommon::TYPE_DEVICE_VISITOR) {
                         return $this->getRenewalFailReturnArray($params);
-                    }else{
+                    } else {
                         return ComBase::getNoLoginReturnArray(); // 非游客直接重新登录
                     }
                 }
 
             }
-
-        }else{
+        } else {
             Yii::error('续签出现错误的jwt数据:' . $oldToken);
         }
 
@@ -345,13 +347,13 @@ class AccountLogic
     /**
      * 获取续签失败的返回值，只要判断是否开启游客模式
      */
-    private function getRenewalFailReturnArray($params)
+    /*private function getRenewalFailReturnArray($params)
     {
         if (Yii::$app->params['jwt']['jwt_device_visitor_verification'] === true) { //开启了游客模式不返回重新登录而是直接返回一个有效的新游客token，在用这个游客token去访问具体业务的时候返回是否需要重新登录
             return $this->getVisitorToken($params);
         }
         return ComBase::getNoLoginReturnArray();
-    }
+    }*/
 
     /**
      * 账号密码登录(根据正则判断用户名类型是username,mobile,email)
@@ -359,7 +361,7 @@ class AccountLogic
      * @param $visitorId 游客id
      * @return array
      */
-    public function loginByAccountPwd($params,$visitorId=0)
+    public function loginByAccountPwd($params, $visitorId = 0)
     {
         $userName = trim(ComBase::getStrVal('username', $params));
         $password = trim(ComBase::getStrVal('password', $params));
@@ -491,7 +493,7 @@ class AccountLogic
      * @param int $visitorId 游客id
      * @return array
      */
-    public function registerByUsername($params,$visitorId=0)
+    public function registerByUsername($params, $visitorId = 0)
     {
         if (empty($params) || empty($params['username'])) {
             return ComBase::getParamsErrorReturnArray('用户名，密码参数错误');
@@ -555,7 +557,7 @@ class AccountLogic
             $this->insertUserLoginLog($saveReturnArr['data']['user_id'], $saveReturnArr['data']['bind_id'], $saveReturnArr['data']['device_id'], AccountCommon::LOGIN_TYPE_USERNAME, $deviceArr, $appId);//注册默认登录并写入登录日志
 
             $userData['id'] = $saveReturnArr['data']['user_id'];
-            $this->registerSuccessCall($userData['id'],$visitorId);//注册成功扩展调用
+            $this->registerSuccessCall($userData['id'], $visitorId);//注册成功扩展调用
 
             return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_REGISTER, $saveReturnArr['data']['jwt_token'], $userData));//注册成功即表示登录了，同时返回数据
         }
@@ -581,7 +583,7 @@ class AccountLogic
      * @param int $visitorId 游客id
      * @return array
      */
-    public function sendMobileCode($params,$visitorId=0)
+    public function sendMobileCode($params, $visitorId = 0)
     {
         $mobile = ComBase::getStrVal('mobile', $params);
         $areaCode = SmsCommon::getMobileAreaCode(ComBase::getStrVal('area_code', $params));
@@ -604,9 +606,9 @@ class AccountLogic
         //短信防刷处理 构成传入需要的基础参数 注意短信发送后调用 setStatisticsLevel设置统计量
         $callLimit = new CallLimit(Yii::$app->params['call_limit']['sms']);
         $verify = $callLimit->verifyRequest($params, $mobile);
-        if($verify===true){
+        if ($verify === true) {
             // 检查通过继续向下执行
-        }else{
+        } else {
             return $verify;
         }
 
@@ -639,7 +641,7 @@ class AccountLogic
         }
 
         //创建异步发送验证码任务
-        $sendCode = StringHandle::getRandomNumber(4).mt_rand(10,99); //生成6位数字字符
+        $sendCode = StringHandle::getRandomNumber(4) . mt_rand(10, 99); //生成6位数字字符
         $name = SmsCommon::SCENE_STR_LIST[$scene] ?? '场景未配置';
         $paramsJson = [
             'code' => $sendCode,
@@ -740,7 +742,7 @@ class AccountLogic
 
                 $capLog->deleteSendCodeCache($key);//删除当前验证码
                 $userData['id'] = $saveReturnArr['data']['user_id'];
-                $this->registerSuccessCall($userData['id'],$visitorId);//注册成功扩展调用
+                $this->registerSuccessCall($userData['id'], $visitorId);//注册成功扩展调用
 
                 return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_REGISTER, $saveReturnArr['data']['jwt_token'], $userData));//注册成功即表示登录了，同时返回数据
             }
@@ -758,7 +760,8 @@ class AccountLogic
      * @param int $visitorId
      * @return bool
      */
-    private function registerSuccessCall($userId=0,$visitorId=0){
+    private function registerSuccessCall($userId = 0, $visitorId = 0)
+    {
         //注册成功后的预留扩展，例如后续注册成功与渠道相关关系等,自行维护
 
         return true;
@@ -769,7 +772,8 @@ class AccountLogic
      * @param int $userId
      * @return bool
      */
-    private function loginSuccessCall($userId=0){
+    private function loginSuccessCall($userId = 0)
+    {
         //登录成功后的预留扩展，例如后续登录成功与积分相关功能等
 
         return true;
@@ -827,8 +831,8 @@ class AccountLogic
             $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);//更新用户登录设备信息
             $transaction->commit();
 
-            if(!empty($visitorId)){//游客id不为空注册成功后更新游客表，便于统计转化率
-                Yii::$app->db->createCommand('update {{%device_visitor}} set user_id=:user_id,convert_time=:convert_time where id=:id and user_id=0', [':user_id' => $userId,':convert_time'=>time(), ':id' => $visitorId])->execute();
+            if (!empty($visitorId)) {//游客id不为空注册成功后更新游客表，便于统计转化率
+                Yii::$app->db->createCommand('update {{%device_visitor}} set user_id=:user_id,convert_time=:convert_time where id=:id and user_id=0', [':user_id' => $userId, ':convert_time' => time(), ':id' => $visitorId])->execute();
             }
 
             //事务完成返回数组
@@ -854,7 +858,7 @@ class AccountLogic
      * @param $visitorId 游客id
      * @return array
      */
-    public function loginByMobileCode($params,$visitorId=0)
+    public function loginByMobileCode($params, $visitorId = 0)
     {
 
         if (empty($params) || empty($params['mobile']) || empty($params['code'])) {
@@ -903,6 +907,7 @@ class AccountLogic
                 $this->insertUserLoginLog($userId, $bindData['id'], $deviceId, AccountCommon::LOGIN_TYPE_MOBILE, $deviceArr, $appId);//写入登录日志
 
                 $this->loginSuccessCall($userId); //登录成功扩展预留
+
                 return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(intval($userData['type']), $tokenArr['jwt_token'], $userData));
 
             }
@@ -967,6 +972,220 @@ class AccountLogic
 
         $tokenArr = AccountCommon::getUserLoginToken($deviceUserId, UserCommon::TYPE_DEVICE_VISITOR, $appId);
         return ComBase::getReturnArray(AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_DEVICE_VISITOR, $tokenArr['jwt_token'], ['id' => $deviceUserId]));//统一获取token返回值
+    }
+
+    /**
+     * 获取游客数据
+     * @param int $visitorId
+     * @return array|false|null
+     * @throws \yii\db\Exception
+     */
+    public function getVisitorData($visitorId = 0)
+    {
+        $returnArr = null;
+        if (!empty($visitorId)) {
+            $returnArr = Yii::$app->db->createCommand('select id,user_id,device_code,app_id,source_channel_id,type,system,model,device_desc,district,ip,add_time,convert_time from {{%device_visitor}} where id=:id', [':id' => $visitorId])->queryOne();
+        }
+        return $returnArr;
+    }
+
+    /**
+     * 微信第三方登录
+     * @param $params
+     * @param int $visitorId
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \yii\db\Exception
+     */
+    public function wxThirdWebLogin($params, $visitorId = 0)
+    {
+        $code = $params['code'] ?? '';
+        if (empty($code)) {
+            echo ComBase::MESSAGE_PARAMS_LOST;
+            exit();
+        } else {
+            $httpClient = new Client(['verify' => false, 'timeout' => 10]);
+            $wxAppId = Yii::$app->params['weixin_config']['appid'];
+            $wxSecret = Yii::$app->params['weixin_config']['secret'];
+            $text = $httpClient->get('https://api.weixin.qq.com/sns/oauth2/access_token?appid=' . $wxAppId . '&secret=' . $wxSecret . '&code=' . $code . '&grant_type=authorization_code')->getBody()->getContents();
+            $textJson = Json::decode($text);
+            $accessToken = $textJson['access_token'] ?? '';
+
+            if (empty($accessToken)) {
+                echo ComBase::MESSAGE_PARAMS_LOST;
+                exit();
+            }
+
+            $userText = $httpClient->get('https://api.weixin.qq.com/sns/userinfo?access_token=' . $accessToken . '&openid=' . $textJson['openid'] . '&lang=zh_CN')->getBody()->getContents();
+            $userJson = Json::decode($userText);
+            $openId = $userJson['openid'] ?? '';
+            $nickName = $userJson['nickname'] ?? '';
+            $nickName = mb_convert_encoding($nickName,'UTF-8');
+            $headimgurl = $userJson['headimgurl'] ?? '';
+            $province = $userJson['province'] ?? '';
+            $city = $userJson['city'] ?? '';
+            $country = $userJson['country'] ?? '';
+            $sex = $userJson['sex'] ?? '';
+
+            if (empty($openId)) {
+                echo ComBase::MESSAGE_PARAMS_LOST;
+                exit();
+            }
+
+            $appId = AppCommon::getAppId();
+            $visitorDeviceData = ['device_type' => AccountCommon::DEVICE_TYPE_MOBILE_WEB, 'device_code' => $openId]; // 微信登录默认使用openid作为device_code,设备类型为浏览器移动端
+            $deviceArr = $this->getDeviceInfo($visitorDeviceData);//获取并判断设备信息,后续保存用户设备信息使用 由于微信登录存在问题所有改为主动设置
+            if ($deviceArr['code'] != ComBase::CODE_RUN_SUCCESS) {
+                echo ComBase::MESSAGE_PARAMS_LOST;
+                exit();
+            }
+            $visitorData = $this->getVisitorData($visitorId);
+            if (!empty($visitorData['system'])) {
+                $deviceArr['data']['system'] = $visitorData['system'];
+            }
+            if (!empty($visitorData['model'])) {
+                $deviceArr['data']['model'] = $visitorData['model'];
+            }
+
+            $bindData = AccountCommon::getUserLoginBindThirdByTypeKey(AccountCommon::LOGIN_TYPE_WECHAT, $openId, $appId);
+            if (empty($bindData)) {
+                // 创建微信用户账号
+
+                $newTime = time();
+
+                $userData = [
+                    'app_id' => $appId,
+                    'name' => $nickName,
+                    'status' => UserCommon::STATUS_YES,
+                    'type' => UserCommon::TYPE_REGISTER,
+                    'avatar' => $headimgurl,
+                    'add_time' => $newTime,
+                    'source_channel_id' => AppCommon::getSourceChannelId($params),//来源渠道ID,如果是传递字符串自行实现ID查询对应 m_source_channel table
+                ];
+
+                $thirdUserData = ['bind_unionid' => $openId, 'bind_num' => $wxAppId, 'bind_nickname' => $nickName, 'bind_avatar' => $headimgurl]; // 第三方表对应数据
+
+                //统一调用用户注册事务便于维护返回类事接口返回数组
+                $saveReturnArr = $this->saveRegisterUserDataTransaction($appId, AccountCommon::LOGIN_TYPE_WECHAT, $openId, $userData, $deviceArr, $visitorId, $thirdUserData);
+                if ($saveReturnArr['code'] !== ComBase::CODE_RUN_SUCCESS) {
+                    echo $saveReturnArr['msg'];
+                    exit();
+                } else {
+                    $this->insertUserLoginLog($saveReturnArr['data']['user_id'], $saveReturnArr['data']['bind_id'], $saveReturnArr['data']['device_id'], AccountCommon::LOGIN_TYPE_WECHAT, $deviceArr, $appId);//注册默认登录并写入登录日志
+
+                    $userData['id'] = $saveReturnArr['data']['user_id'];
+                    $this->registerSuccessCall($userData['id'], $visitorId);//注册成功扩展调用
+
+                    // 微信登录回调前端指定页面由前端页面完成跳转
+                    $userJwtTokenObj = AccountCommon::getReturnTokenDataFormat(UserCommon::TYPE_REGISTER, $saveReturnArr['data']['jwt_token'], $userData);
+
+                    $url = Yii::$app->params['mobile_root_url'] . 'wxlogin?wxtk=' . $userJwtTokenObj['token'] . '&wxtkid=' . $userJwtTokenObj['id'] . '&wxtkut=' . $userJwtTokenObj['user_type'] . '&ex_sp=' . $userJwtTokenObj['ex_sp'];
+                    Header("Location: $url");
+                    exit();
+                }
+            } else {
+                // 已有绑定第三方登录账号完成登录后续
+                $userData = UserCommon::getUserByid($bindData['user_id']);//通过登录绑定的user_id获取用户信息
+
+                if (empty($userData)) {
+                    Yii::error('微信绑定用户无法找到，userId:' . $bindData['user_id']);
+                    echo '微信绑定用户无法找到，请联系管理员';
+                    exit();
+                }
+
+                //成功登录前检查是否有禁止登录等内容
+                $checkArr = AccountCommon::getBeforeLoginErrorCheck($userData);
+                if ($checkArr !== false) {
+                    echo $checkArr['msg'];
+                    exit();
+                }
+                $userId = $userData['id'];
+                $tokenArr = AccountCommon::getUserLoginToken($userId, $userData['type'], $appId);
+                //更新用户设备信息
+                $deviceId = $this->saveUserLoginDevice($userId, $tokenArr['token'], $deviceArr, $appId);
+
+                $this->insertUserLoginLog($userId, $bindData['id'], $deviceId, AccountCommon::LOGIN_TYPE_WECHAT, $deviceArr, $appId);//写入登录日志
+
+                $this->loginSuccessCall($userId); //登录成功扩展预留
+
+                $userJwtTokenObj = AccountCommon::getReturnTokenDataFormat($userData['type'], $tokenArr['jwt_token'], $userData);
+
+                $url = Yii::$app->params['mobile_root_url'] . 'wxlogin?wxtk=' . $userJwtTokenObj['token'] . '&wxtkid=' . $userJwtTokenObj['id'] . '&wxtkut=' . $userJwtTokenObj['user_type'] . '&ex_sp=' . $userJwtTokenObj['ex_sp'];
+                Header("Location: $url");
+                exit();
+            }
+        }
+    }
+
+    /**
+     * @param $params
+     * @param int $visitorId
+     */
+    public function wxShareSign($params, $visitorId = 0)
+    {
+        $callHttpUrl = $params['url'] ?? '';
+        if(empty($callHttpUrl)){
+            return ComBase::getParamsErrorReturnArray('缺少分享url');
+        }
+        $selectTime = time() - 6000;
+        $accessToken = '';
+        $wxAppId = Yii::$app->params['weixin_config']['appid'];
+        $wxSecret = Yii::$app->params['weixin_config']['secret'];
+        $oldTokenData = Yii::$app->db->createCommand("select c_val from {{%system_config}} where name='wx-access-token' and update_time>" . $selectTime)->queryOne();
+        if (!empty($oldTokenData) && !empty($oldTokenData['c_val'])) {
+            $accessToken = $oldTokenData['c_val'];
+        }
+
+        if (empty($accessToken)) {
+
+            $httpClient = new Client(['verify' => false, 'timeout' => 10]);
+            $contentText = $httpClient->get('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' . $wxAppId . '&secret=' . $wxSecret)->getBody()->getContents();
+            $retJson = Json::decode($contentText);
+            if (!empty($retJson['access_token'])) {
+                $accessToken = $retJson['access_token'];
+                $updateConfigFlag = Yii::$app->db->createCommand("update {{%system_config}} set c_val=:cVal,update_time=:updateTime where name=:name", [':cVal' => $accessToken, ':updateTime' => time(), ':name' => 'wx-access-token'])->execute();
+                if(empty($updateConfigFlag)){
+                    Yii::error('修改微信分享签名系统值发生保存错误');
+                }
+            }
+        }
+
+        if(empty($accessToken)){
+            return ComBase::getParamsErrorReturnArray('分享参数获取错误');
+        }
+
+        $ticket = '';
+        $oldTicketData = Yii::$app->db->createCommand("select c_val from {{%system_config}} where name='wx-ticket' and update_time>" . $selectTime)->queryOne();
+        if (!empty($oldTicketData) && !empty($oldTicketData['c_val'])) {
+            $ticket = $oldTicketData['c_val'];
+        }
+
+        if(empty($ticket)){
+            $contentText = $httpClient->get('https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=' . $accessToken . '&type=jsapi')->getBody()->getContents();
+            $retJson = Json::decode($contentText);
+            $ticket = $retJson['ticket'];
+            if(!empty($ticket)){
+                $updateConfigFlag = Yii::$app->db->createCommand("update {{%system_config}} set c_val=:cVal,update_time=:updateTime where name=:name", [':cVal' => $ticket, ':updateTime' => time(), ':name' => 'wx-ticket'])->execute();
+                if(empty($updateConfigFlag)){
+                    Yii::error('修改微信分享签名票据系统值发生保存错误');
+                }
+            }
+        }
+
+        if(empty($ticket)){
+            return ComBase::getParamsErrorReturnArray('分享参数获取错误');
+        }
+
+        $nonceStr = uniqid('', true);
+        $nowTime = time();
+
+        $sha1Str = "jsapi_ticket={$ticket}&noncestr={$nonceStr}&timestamp=" . $nowTime . "&url={$callHttpUrl}";
+        $returnArr = [
+            'appid' => $wxAppId,
+            'nonce_str' => $nonceStr,
+            'timestamp' => $nowTime,
+            'signature' => sha1($sha1Str),
+        ];
+        return ComBase::getReturnArray($returnArr);
     }
 
 }
