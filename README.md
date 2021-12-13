@@ -41,6 +41,8 @@ jwt过期时间很短：当某些应用需要较短的jwt过期时间则需要�
 
 13.游客Model 如有扩展注意getName为拼接，sourcechannel可重新生成并扩展
 
+14.dockerconfig为docker模式下配置文件，镜像来源：webdevops/php-nginx:7.4-alpine，推荐使用php+nginx镜像，php,nginx独立镜像代码映射与多容器更新较为复杂且不易滚动发布。nginxconfg为vm形式nginx配置来源:oneinstack，替换localhost为指定域名或通过oneinstack直接创建。
+
 ==================================
 
 

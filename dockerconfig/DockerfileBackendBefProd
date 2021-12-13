@@ -1,0 +1,11 @@
+FROM webdevops/php-nginx:7.4-alpine
+
+MAINTAINER IceWorld
+
+ADD . /app
+
+ENV WEB_DOCUMENT_ROOT=/app/backend/web
+ENV WEB_DOCUMENT_INDEX=index.php
+
+WORKDIR /app
+RUN php init --env=BeforeProduction  --overwrite=y
