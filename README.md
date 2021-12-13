@@ -350,6 +350,38 @@ set https_proxy=http://127.0.0.1:10809
 
 composer update yiisoft/yii2 -vvv 或 composer update -vvv //执行全部更新
 
+########ali docker 测试环境搭建
+```
+
+ECS
+cd /home/publish
+git clone ...
+
+vim Dockerfile
+---------  start
+FROM webdevops/php-nginx:7.4-alpine
+
+MAINTAINER IceWorld
+
+ENV WEB_DOCUMENT_ROOT=/app/api/web
+ENV WEB_DOCUMENT_INDEX=index.php
+
+COPY dockerconfig/nginx/10-general.conf /opt/docker/etc/nginx/vhost.common.d/10-general.conf
+COPY dockerconfig/nginx/10-http.conf /opt/docker/etc/nginx/conf.d/10-http.conf
+
+WORKDIR /app
+------------ end
+
+docker run -d -p 50818:80 -v /home/publish/IceWorld:/app --name iceworldapi iceworld:latest
+
+docker run -d -p 50828:80 -v /home/publish/IceWorld:/app --name iceworldbackend iceworld:latest
+
+进入容器执行 init
+
+
+```
+
+
 [感谢Yii](https://www.yiiframework.com/)
 
 [感谢jetbrains为此项目提供的License](https://www.jetbrains.com/?from=IceWorld)
