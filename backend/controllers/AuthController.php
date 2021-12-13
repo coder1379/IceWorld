@@ -9,6 +9,7 @@ use Yii;
 use common\controllers\BaseContoller;
 use common\base\BackendCommon;
 use yii\helpers\Json;
+use yii\helpers\Url;
 
 class AuthController extends BaseContoller
 {
@@ -200,4 +201,15 @@ class AuthController extends BaseContoller
         $backendCommon = new BackendCommon();
         return $backendCommon->getAdminId();
     }
+
+    // k8s下可能导致后端获取的http或https错误导致修改添加后无法重定向到正确页面，打开注释修改重定向方式覆盖父类
+    /*public function redirect($url, $statusCode = 302)
+    {
+        // calling Url::to() here because Response::redirect() modifies route before calling Url::to()
+        $scheme = false;
+        if(YII_ENV==='prod'){
+            $scheme = 'https';
+        }
+        return $this->response->redirect(Url::to($url,$scheme), $statusCode);
+    }*/
 }
