@@ -90,4 +90,21 @@ class TestController extends ApiCommonContoller
         return Json::encode(ComBase::getReturnArray(['jwt'=>$jwt,'djwt'=>$deJwt]));
     }
 
+    /**
+     * 测试获取列表
+     * @return string
+     */
+    public function actionTestList(){
+        $list = [];
+        for ($i=0;$i<10;$i++){
+            $list[] = microtime(true) * 10000;
+        }
+
+        if(time()%5==0){
+            array_pop($list);
+        }
+
+        return Json::encode(ComBase::getReturnArray(['list' => $list]));
+    }
+
 }
