@@ -71,17 +71,17 @@ class Uploader
         $file = $this->file = $_FILES[$this->fileField];
         if (!$file) {
             $this->stateInfo = $this->getStateInfo("ERROR_FILE_NOT_FOUND");
-            return;
+            return $this;
         }
         if ($this->file['error']) {
             $this->stateInfo = $this->getStateInfo($file['error']);
-            return;
+            return $this;
         } else if (!file_exists($file['tmp_name'])) {
             $this->stateInfo = $this->getStateInfo("ERROR_TMP_FILE_NOT_FOUND");
-            return;
+            return $this;
         } else if (!is_uploaded_file($file['tmp_name'])) {
             $this->stateInfo = $this->getStateInfo("ERROR_TMPFILE");
-            return;
+            return $this;
         }
 
         $this->oriName = $file['name'];
@@ -95,22 +95,22 @@ class Uploader
         //检查文件大小是否超出限制
         if (!$this->checkSize()) {
             $this->stateInfo = $this->getStateInfo("ERROR_SIZE_EXCEED");
-            return;
+            return $this;
         }
 
         //检查是否不允许的文件格式
         if (!$this->checkType()) {
             $this->stateInfo = $this->getStateInfo("ERROR_TYPE_NOT_ALLOWED");
-            return;
+            return $this;
         }
 
         //创建目录失败
         if (!file_exists($dirname) && !mkdir($dirname, 0644, true)) {
             $this->stateInfo = $this->getStateInfo("ERROR_CREATE_DIR");
-            return;
+            return $this;
         } else if (!is_writeable($dirname)) {
             $this->stateInfo = $this->getStateInfo("ERROR_DIR_NOT_WRITEABLE");
-            return;
+            return $this;
         }
 
 
