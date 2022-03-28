@@ -67,7 +67,7 @@ class IndexController extends Controller
         if (!empty($errorList)) {
             $ding = new DingTalkRobot();
             $ding->accessToken = Yii::$app->params['dingding_log_robot_token'];
-            $message = $envStr . ' 异常日志 :'."\n". implode("\n", $errorList)."\n";
+            $message = $envStr . ' 异常报告 :'."\n". implode("\n", $errorList)."\n";
             $isAtAll = false;
             //生产错误直接at所有人
             if (YII_ENV === 'prod') {
