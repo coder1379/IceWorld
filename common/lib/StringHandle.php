@@ -300,6 +300,8 @@ class StringHandle
         $browser = '';
         if (stripos($sys, "Chrome") > 0) {
             $browser = "Chrome浏览器";
+        } else if (stripos($sys, "MicroMessenger") > 0) {
+            $browser = "微信内嵌浏览器";
         } else if (stripos($sys, "WeChat") > 0) {
             $browser = "微信浏览器";
         }  else if (stripos($sys, "Safari") > 0) {
