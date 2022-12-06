@@ -984,7 +984,7 @@ class AccountLogic
     {
         $returnArr = null;
         if (!empty($visitorId)) {
-            $returnArr = Yii::$app->db->createCommand('select id,user_id,device_code,app_id,source_channel_id,type,system,model,device_desc,district,ip,add_time,convert_time from {{%device_visitor}} where id=:id', [':id' => $visitorId])->queryOne();
+            $returnArr = Yii::$app->db->createCommand('select id,user_id,device_code,app_id,source_channel_id,type,`system`,`model`,device_desc,district,ip,add_time,convert_time from {{%device_visitor}} where id=:id', [':id' => $visitorId])->queryOne();
         }
         return $returnArr;
     }
