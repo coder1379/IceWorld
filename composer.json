@@ -23,7 +23,7 @@
         "aliyuncs/oss-sdk-php":">=2.4.3",
         "yiisoft/yii2-redis": "^2.0",
         "guzzlehttp/guzzle": "^7.0",
-        "firebase/php-jwt": "^5.2",
+        "firebase/php-jwt": "^6.0",
         "yiisoft/yii2-debug": "~2.1.0"
     },
     "require-dev": {
