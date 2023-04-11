@@ -52,15 +52,33 @@ Nginx 配置中加入
 
 最外层加入
 ```nginx
-index index.php index.html index.htm;
+index index.php index.html index.htm; //下或者root下添加
 if (!-e $request_filename){
     rewrite ^/(.*) /index.php last;
 }
+
+或
+location / {
+        if (!-e $request_filename){
+                rewrite ^/(.*) /index.php last;
+        }
+   }
+
 ```
+
+服务器目录权限设置
+```
+cd /data/wwwroot/proeject_name/
+chown -R www:www .
+find . -type d -exec chmod 755 {} \;
+find . -type f -exec chmod 644 {} \;
+```
+
 
 数据库连接字符串顺序
 
 'dsn' => 'mysql:host=127.0.0.1;dbname=ice_world_db;port=3069',
+'charset' => 'utf8mb4',// 注意不要覆盖为utf8 要不容易出现特殊字符数据库不支持
 
 composer 生产性能优化：
 composer dumpautoload -o
