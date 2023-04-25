@@ -38,6 +38,7 @@ return [
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
+            //'class' => 'yii\redis\Cache', // redis缓存
         ],
     ],
 ];
