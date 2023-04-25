@@ -13,7 +13,7 @@ return [
             'class' => 'yii\redis\Connection',
             'hostname' => '127.0.0.1',
             'port' => 6379,
-            'password' => 'password',
+            'password' => 'password', // 注意，如果redis密码为空 则不能有password属性否则会爆权限验证错误
             'database' => 9,
             'retries' => 1,
         ],
