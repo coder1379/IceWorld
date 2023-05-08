@@ -34,7 +34,8 @@ class FileUploadHtml
         }*/
 
         if(empty($model->$attrName)!=true){
-            $oldValue = '<a class="clearuploadimg" onclick="reUpLoadImg(\''.$attrName.'\');" ></a><img style="max-width:'.$width.';max-height:'.$height.';" src="'.$model->$attrName.'" />';
+            //$oldValue = '<a class="clearuploadimg" onclick="reUpLoadImg(\''.$attrName.'\');" ></a><img style="max-width:'.$width.';max-height:'.$height.';" src="'.$model->$attrName.'" />'; // ####直接保存绝对路径时使用 屏蔽下面 注意要同事将下方的62行的short_url改为url
+            $oldValue = '<a class="clearuploadimg" onclick="reUpLoadImg(\''.$attrName.'\');" ></a><img style="max-width:'.$width.';max-height:'.$height.';" src="'.Yii::$app->params['local_static_link'].$model->$attrName.'" />';
             $value = $model->$attrName;
         }
 
@@ -58,7 +59,7 @@ class FileUploadHtml
                 var dataobj = eval('(' + data + ')');
                 if(dataobj.code==200){
                     $(\"#uploadimgpre_".$attrName."\").html('<a class=\"clearuploadimg\" onclick=\"reUpLoadImg(\'".$attrName."\');\" ></a><img style=\"max-width:{$width};max-height:{$height};\" src=\"'+dataobj.data.url+'\" />');
-                    $(\"#filename-".$attrName."\").val(dataobj.data.url);
+                    $(\"#filename-".$attrName."\").val(dataobj.data.short_url);
                 }else{
                     layer.msg(dataobj.msg,{icon:2,time:5000});
                 }

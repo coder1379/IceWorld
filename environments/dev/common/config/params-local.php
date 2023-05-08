@@ -1,6 +1,7 @@
 <?php
 return [
     'send_sms' =>false,//覆盖params里面的短信发送，测试地址短信不发送
+    'local_static_link' => 'http://localstatic.yii.com',//本地静态保存文件域名参数 **
     'oss' => [ //测试环境覆盖生产oss参数
         'accessKeyId' => '11111',
         'accessKeySecret' => '11111',
