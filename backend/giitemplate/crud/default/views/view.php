@@ -70,7 +70,7 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
             echo $hideStr."['attribute'=>'".$name."','value'=>@\$model->".$jsonV["name"]."->".$jsonV["showName"]."],\n";
                }else if($jsonV["type"]=="upload_image"){
                //echo $hideStr."['attribute' => '" . $name . "','label' => '".$comarr[0]."','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $name . ",['class'=>'backend-view-img']),\$model->" . $name . ",['target' => '_blank']),],\n";
-               echo $hideStr."['attribute' => '" . $name . "','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $name . ",['class'=>'backend-view-img']),\$model->" . $name . ",['target' => '_blank']),],\n";
+               echo $hideStr."['attribute' => '" . $name . "','format' => 'raw','value'  => Html::a(Html::img(Yii::\$app->params['local_static_link'].\$model->" . $name . ",['class'=>'backend-view-img']),Yii::\$app->params['local_static_link'].\$model->" . $name . ",['target' => '_blank']),],\n";
            }else if($jsonV["type"]=="more_text"){
                echo $hideStr."            '" . $name . "',\n";
            }else if($jsonV["type"]=="val"){
@@ -119,7 +119,7 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
                echo $hideStr."['attribute'=>'".$column->name."','value'=>@\$model->".$jsonV["name"]."->".$jsonV["showName"]."],\n";
                                                   }else if($jsonV["type"]=="upload_image"){
                //echo $hideStr."['attribute' => '" . $column->name . "','label' => '".$comarr[0]."','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $column->name . ",['class'=>'backend-view-img']),\$model->" . $column->name . ",['target' => '_blank']),],\n";
-               echo $hideStr."['attribute' => '" . $column->name . "','format' => 'raw','value'  => Html::a(Html::img(\$model->" . $column->name . ",['class'=>'backend-view-img']),\$model->" . $column->name . ",['target' => '_blank']),],\n";
+               echo $hideStr."['attribute' => '" . $column->name . "','format' => 'raw','value'  => Html::a(Html::img(Yii::\$app->params['local_static_link'].\$model->" . $column->name . ",['class'=>'backend-view-img']),Yii::\$app->params['local_static_link'].\$model->" . $column->name . ",['target' => '_blank']),],\n";
            }else if($jsonV["type"]=="more_text"){
                echo $hideStr."            '" . $column->name . ":ntext" . "',\n";
            }else if($jsonV["type"]=="val"){

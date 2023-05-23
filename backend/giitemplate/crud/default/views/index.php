@@ -119,7 +119,7 @@ if(empty($jsonV)!=true){
         echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>function(\$data){   return \$data->".$jsonV["name"]."->".$jsonV["showName"]."??'';},'attribute' => '".$name."'],\n";
     }else if($jsonV["type"]=="upload_image"){
         //echo $hideStr."['value'=>function(\$data){ return Html::a(Html::img(\$data->".$name.",['class' => 'backend-index-img']),\$data->".$name.",['target' => '_blank']);},'label'=>'".$commntstr."','format'=>'raw'],\n";
-        echo $hideStr."['value'=>function(\$data){ return Html::a(Html::img(\$data->".$name.",['class' => 'backend-index-img']),\$data->".$name.",['target' => '_blank']);},'attribute'=>'".$name."','format'=>'raw'],\n";
+        echo $hideStr."['value'=>function(\$data){ return Html::a(Html::img(Yii::\$app->params['local_static_link'].\$data->".$name.",['class' => 'backend-index-img']),Yii::\$app->params['local_static_link'].\$data->".$name.",['target' => '_blank']);},'attribute'=>'".$name."','format'=>'raw'],\n";
     }else if($jsonV["type"]=="more_text"){
         //echo $hideStr."['class'=>'yii\\grid\\DataColumn','value'=>'".$name."','label' => '".$commntstr."'],\n";
         echo $hideStr."['class'=>'yii\\grid\\DataColumn','attribute' => '".$name."'],\n";
